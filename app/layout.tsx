@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
+import { ClerkProvider, SignedIn, SignedOut, SignIn, SignInButton, UserButton } from "@clerk/nextjs";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -27,12 +27,31 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <SignedOut></SignedOut>
-          <SignedIn></SignedIn>
-          {children}
+        <body>
+          <SignedOut>
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="max-w-md w-full space-y-8">
+                <div className="text-center">
+                  <h2 className="mt-6 text-3xl font-bold text-gray-900">
+                    Welcome to CLI Compass
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Sign in to access your command line tools
+                  </p>
+                  <SignInButton />
+                </div>
+                <div className="mt-8">
+
+                  <SignIn />
+                </div>
+              </div>
+            </div>
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+
+            {children}
+          </SignedIn>
         </body>
       </html>
     </ClerkProvider>
