@@ -16,33 +16,44 @@ export default function AddCommand() {
   });
   const [selectedTag, setSelectedTag] = useState('');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const categories = ['System', 'Network', 'File Management', 'Process', 'Custom'];
   const availableTags = ['Linux', 'MacOS', 'Windows', 'Beginner', 'Advanced'];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    // Load existing commands
-    const existingCommands = localStorage.getItem('commands');
-    const commands: Command[] = existingCommands ? JSON.parse(existingCommands) : [];
+    try {
+      const response = await fetch('/api/commands', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          description: formData.description,
+          category: isCustomCategory ? formData.customCategory : formData.category,
+          tags: formData.tags,
+        }),
+      });
 
-    // Create new command
-    const newCommand: Command = {
-      id: Date.now().toString(), // Simple ID generation
-      ...formData,
-      category: isCustomCategory ? formData.customCategory : formData.category,
-      isFavorite: false,
-    };
-
-    // Add new command to list
-    commands.push(newCommand);
-
-    // Save back to localStorage
-    localStorage.setItem('commands', JSON.stringify(commands));
-
-    // Redirect to home page
-    router.push('/');
+      const data = await response.json();
+      
+      if (data.success) {
+        router.push('/');
+        router.refresh();
+      } else {
+        console.error('Failed to add command:', data.error);
+        alert('Failed to add command. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding command:', error);
+      alert('An error occurred while adding the command. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -205,9 +216,10 @@ export default function AddCommand() {
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              disabled={isSubmitting}
             >
-              Add Command
+              {isSubmitting ? 'Adding...' : 'Add Command'}
             </button>
           </div>
         </form>

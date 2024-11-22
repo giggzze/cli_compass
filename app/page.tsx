@@ -7,6 +7,7 @@ import CommandList from "./components/CommandList";
 import CommandSearch from "./components/CommandSearch";
 import { Command } from "./components/types";
 import Link from 'next/link';
+import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -113,12 +114,10 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         {/* Header with Search and Add Button */}
         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-          <div className="flex-1 ">
             <CommandSearch 
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />
-          </div>
           <Link
             href="/add"
             className="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
@@ -139,6 +138,8 @@ export default function Home() {
             </svg>
             Add Command
           </Link>
+
+            <UserButton />
         </div>
 
         <div className="grid md:grid-cols-[250px_1fr] gap-6">

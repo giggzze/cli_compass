@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS "tags" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_commands" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"user_id" uuid NOT NULL,
+	"user_id" text NOT NULL,
 	"command_id" integer NOT NULL,
 	"is_favorite" boolean DEFAULT false NOT NULL,
 	"notes" text,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "user_commands" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_profiles" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
 	"username" text NOT NULL,
 	"full_name" text,

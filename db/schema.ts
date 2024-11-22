@@ -34,7 +34,7 @@ export const commandTags = pgTable('command_tags', {
 }));
 
 export const userProfiles = pgTable('user_profiles', {
-  id: uuid('id').primaryKey().defaultRandom(),
+  id: text('id').primaryKey(),
   email: text('email').notNull().unique(),
   username: text('username').notNull().unique(),
   full_name: text('full_name'),
@@ -46,7 +46,7 @@ export const userProfiles = pgTable('user_profiles', {
 
 export const userCommands = pgTable('user_commands', {
   id: serial('id').primaryKey(), // Single primary key
-  user_id: uuid('user_id').references(() => userProfiles.id).notNull(),
+  user_id: text('user_id').references(() => userProfiles.id).notNull(),
   command_id: integer('command_id').references(() => commands.id).notNull(),
   is_favorite: boolean('is_favorite').default(false).notNull(),
   notes: text('notes'),
