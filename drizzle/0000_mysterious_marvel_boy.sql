@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "categories" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS "command_tags" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "commands" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"usage" text NOT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS "commands" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "tags" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS "tags" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_commands" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"user_id" text NOT NULL,
 	"command_id" text NOT NULL,
 	"is_favorite" boolean DEFAULT false NOT NULL,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS "user_commands" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_profiles" (
-	"id" text PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"email" text NOT NULL,
 	"username" text NOT NULL,
 	"full_name" text,

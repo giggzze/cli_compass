@@ -12,7 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const categories = pgTable("categories", {
-	id: text("id").primaryKey(),
+	id: text("id").primaryKey().default(sql`uuid_generate_v4()`),
 	name: text("name").notNull().unique(),
 	created_at: timestamp("created_at").defaultNow().notNull(),
 	updated_at: timestamp("updated_at").defaultNow().notNull(),
@@ -33,7 +33,7 @@ export const commands = pgTable("commands", {
 });
 
 export const tags = pgTable("tags", {
-	id: text("id").primaryKey(),
+	id: text("id").primaryKey().default(sql`uuid_generate_v4()`),
 	name: text("name").notNull().unique(),
 	created_at: timestamp("created_at").defaultNow().notNull(),
 	updated_at: timestamp("updated_at").defaultNow().notNull(),
@@ -57,7 +57,7 @@ export const commandTags = pgTable(
 );
 
 export const userProfiles = pgTable("user_profiles", {
-	id: text("id").primaryKey(),
+	id: text("id").primaryKey().default(sql`uuid_generate_v4()`),
 	email: text("email").notNull().unique(),
 	username: text("username").notNull().unique(),
 	full_name: text("full_name"),

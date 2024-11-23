@@ -1,7 +1,15 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { commands, categories, commandTags } from "@/db/schema";
+import { commands, categories } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
+import { Tag } from "@/app/components/types";
+
+interface CommandRequest {
+  name: string;
+  description: string;
+  category_id: string;
+  tags: Tag[];
+}
 
 export async function GET() {
 	try {
@@ -38,7 +46,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	try {
-		const { name, description, category_id, tags } = await request.json();
+		const { name, description, category_id }: CommandRequest = await request.json();
 
 		if (!name || !description || !category_id) {
 			return NextResponse.json(
@@ -70,14 +78,14 @@ export async function POST(request: Request) {
 		}).returning();
 
 		// Insert command tags
-		if (tags && tags.length > 0) {
-			const commandTags = tags.map(tagName => ({
-				command_id: newCommand[0].id,
-				tag_id: tagName.toLowerCase().replace(/\s+/g, '-'),
-			}));
+		// if (tags && tags.length > 0) {
+		// 	const tagValues = tags.map((tagName: Tag) => ({
+		// 		command_id: newCommand[0].id,
+		// 		tag_id: tagName.id.toLowerCase().replace(/\s+/g, '-'),
+		// 	}));
 
-			await db.insert(commandTags).values(commandTags);
-		}
+		// 	await db.insert(commandTags).values(tagValues);
+		// }
 
 		return NextResponse.json({
 			success: true,

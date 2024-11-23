@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "tsc": "npx tsc --noEmit"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.4.1",

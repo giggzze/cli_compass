@@ -14,7 +14,6 @@ export async function GET() {
         { status: 401 }
       );
     }
-    console.log("userId type: ", typeof userId);
 
     // const searchParams = request.nextUrl.searchParams;
     // const targetUserId = searchParams.get("userId") || userId;

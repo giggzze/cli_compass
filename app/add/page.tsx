@@ -14,6 +14,8 @@ export default function AddCommand() {
     tags: [] as string[],
   });
   const [selectedTag, setSelectedTag] = useState('');
+  const [isCustomTag, setIsCustomTag] = useState(false);
+  const [customTag, setCustomTag] = useState('');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
@@ -126,14 +128,46 @@ export default function AddCommand() {
     }));
   };
 
-  const handleTagAdd = () => {
-    if (selectedTag && !formData.tags.includes(selectedTag)) {
+  const handleTagAdd = async () => {
+    if (!selectedTag) return;
+
+    if (selectedTag === 'custom') {
+      if (!customTag.trim()) return;
+
+      try {
+        const response = await fetch('/api/tags', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: customTag.trim(),
+          }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          setFormData(prev => ({
+            ...prev,
+            tags: [...prev.tags, customTag.trim()],
+          }));
+          setAvailableTags(prev => [...prev, data.data]);
+          setCustomTag('');
+        } else {
+          console.error('Failed to create tag:', data.error);
+        }
+      } catch (error) {
+        console.error('Error creating tag:', error);
+      }
+    } else {
       setFormData(prev => ({
         ...prev,
-        tags: [...prev.tags, selectedTag]
+        tags: [...prev.tags, selectedTag],
       }));
-      setSelectedTag('');
     }
+
+    setSelectedTag('');
+    setIsCustomTag(false);
   };
 
   const handleTagRemove = (tagToRemove: string) => {
@@ -237,31 +271,48 @@ export default function AddCommand() {
             <div className="flex gap-2 mb-2">
               <select
                 value={selectedTag}
-                onChange={(e) => setSelectedTag(e.target.value)}
+                onChange={(e) => {
+                  setSelectedTag(e.target.value);
+                  setIsCustomTag(e.target.value === 'custom');
+                }}
                 className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a tag...</option>
                 {isLoadingTags ? (
                   <option>Loading...</option>
                 ) : (
-                  availableTags
-                    .filter(tag => !formData.tags.includes(tag.name))
-                    .map(tag => (
-                      <option key={tag.id} value={tag.name}>
-                        {tag.name}
-                      </option>
-                    ))
+                  <>
+                    {availableTags
+                      .filter(tag => !formData.tags.includes(tag.name))
+                      .map(tag => (
+                        <option key={tag.id} value={tag.name}>
+                          {tag.name}
+                        </option>
+                      ))}
+                    <option value="custom">Add new tag...</option>
+                  </>
                 )}
               </select>
               <button
                 type="button"
                 onClick={handleTagAdd}
-                disabled={!selectedTag}
+                disabled={!selectedTag || (isCustomTag && !customTag.trim())}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 Add
               </button>
             </div>
+            {isCustomTag && (
+              <div className="mt-2 mb-4">
+                <input
+                  type="text"
+                  value={customTag}
+                  onChange={(e) => setCustomTag(e.target.value)}
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter a new tag name..."
+                />
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               {formData.tags.map(tag => (
                 <span

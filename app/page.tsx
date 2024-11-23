@@ -14,83 +14,77 @@ export default function Home() {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Sample data - replace with your actual data
-  const allCategory = { id: 'all', name: 'all' };
-  const categories: Category[] = [
-    allCategory,
-    { id: 'system', name: 'System' },
-    { id: 'network', name: 'Network' },
-    { id: 'file', name: 'File Management' },
-    { id: 'process', name: 'Process' }
-  ];
+  const [categories, setCategories] = useState<Category[]>([
+    { id: 'all', name: 'all' }
+  ]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [commands, setCommands] = useState<Command[]>([]);
 
-  const tags: Tag[] = [
-    { id: '1', name: 'Linux' },
-    { id: '2', name: 'MacOS' },
-    { id: '3', name: 'Windows' },
-    { id: '4', name: 'Beginner' },
-    { id: '5', name: 'Advanced' }
-  ];
-
-  const [commands, setCommands] = useState<Command[]>(() => {
-    // Load commands from localStorage if available
-    if (typeof window !== 'undefined') {
-      const savedCommands = localStorage.getItem('commands');
-      if (savedCommands) {
-        return JSON.parse(savedCommands);
-      }
-    }
-    // Initial commands data
-    return [
-      {
-        id: '1',
-        name: 'ls',
-        description: 'List directory contents',
-        usage: 'ls [options] [path]',
-        category: { id: 'file', name: 'File Management' },
-        tags: [
-          { id: '1', name: 'Linux' },
-          { id: '2', name: 'MacOS' },
-          { id: '4', name: 'Beginner' }
-        ],
-        isFavorite: false,
-      },
-      {
-        id: '2',
-        name: 'ps',
-        description: 'Report a snapshot of current processes',
-        usage: 'ps [options]',
-        category: { id: 'process', name: 'Process' },
-        tags: [
-          { id: '1', name: 'Linux' },
-          { id: '2', name: 'MacOS' },
-          { id: '5', name: 'Advanced' }
-        ],
-        isFavorite: false,
-      },
-      {
-        id: '3',
-        name: 'ping',
-        description: 'Send ICMP ECHO_REQUEST to network hosts',
-        usage: 'ping [options] host',
-        category: { id: 'network', name: 'Network' },
-        tags: [
-          { id: '1', name: 'Linux' },
-          { id: '3', name: 'Windows' },
-          { id: '2', name: 'MacOS' },
-          { id: '4', name: 'Beginner' }
-        ],
-        isFavorite: false,
-      },
-    ];
-  });
-
-  // Save commands to localStorage whenever they change
+  // Fetch all necessary data when component mounts
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('commands', JSON.stringify(commands));
-    }
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        // Fetch categories
+        const categoriesResponse = await fetch('/api/categories');
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.success) {
+          setCategories([
+            { id: 'all', name: 'all' },
+            ...categoriesData.data.map((cat: Category) => ({
+              id: cat.id,
+              name: cat.name,
+            })),
+          ]);
+        }
+
+        // Fetch tags
+        const tagsResponse = await fetch('/api/tags');
+        const tagsData = await tagsResponse.json();
+        if (tagsData.success) {
+          setTags(tagsData.data);
+        }
+
+        // Fetch commands
+        const commandsResponse = await fetch('/api/commands');
+        const commandsData = await commandsResponse.json();
+        if (commandsData.success) {
+          // Load favorites from localStorage
+          const favoritesStr = localStorage.getItem('favoriteCommands');
+          const favorites = favoritesStr ? JSON.parse(favoritesStr) : [];
+
+          const formattedCommands = commandsData.data.map((cmd: Command) => ({
+            id: cmd.id,
+            name: cmd.name,
+            description: cmd.description,
+            usage: cmd.usage,
+            category: {
+              id: cmd.id,
+              name: cmd.category.name,
+            },
+            tags: cmd.tags || [],
+            isFavorite: favorites.includes(cmd.id),
+          }));
+          setCommands(formattedCommands);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Save favorites to localStorage whenever they change
+  useEffect(() => {
+    const favorites = commands
+      .filter(cmd => cmd.isFavorite)
+      .map(cmd => cmd.id);
+    localStorage.setItem('favoriteCommands', JSON.stringify(favorites));
   }, [commands]);
 
   const handleCategoryChange = (category: Category) => {
@@ -105,9 +99,13 @@ export default function Home() {
     );
   };
 
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query);
+  };
+
   const handleToggleFavorite = (commandId: string) => {
-    setCommands(prevCommands =>
-      prevCommands.map(command =>
+    setCommands(prev =>
+      prev.map(command =>
         command.id === commandId
           ? { ...command, isFavorite: !command.isFavorite }
           : command
@@ -117,116 +115,99 @@ export default function Home() {
 
   const filteredCommands = useMemo(() => {
     return commands.filter(command => {
-      // Favorites filter
+      // Filter by category
+      if (selectedCategory.id !== 'all' && command.category.id !== selectedCategory.id) {
+        return false;
+      }
+
+      // Filter by tags
+      if (selectedTags.length > 0) {
+        const commandTagIds = command.tags.map(tag => tag.id);
+        const selectedTagIds = selectedTags.map(tag => tag.id);
+        if (!selectedTagIds.every(tagId => commandTagIds.includes(tagId))) {
+          return false;
+        }
+      }
+
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        return (
+          command.name.toLowerCase().includes(query) ||
+          command.description.toLowerCase().includes(query) ||
+          command.usage.toLowerCase().includes(query)
+        );
+      }
+
+      // Filter by favorites
       if (showFavoritesOnly && !command.isFavorite) {
         return false;
       }
 
-      // Category filter
-      const categoryMatch = selectedCategory.id === allCategory.id || 
-        command.category.name === selectedCategory.name;
-
-      // Tags filter
-      const tagMatch = selectedTags.length === 0 ||
-        selectedTags.every(selectedTag => 
-          command.tags.some(tag => tag.id === selectedTag.id)
-        );
-
-      // Search query filter
-      const searchMatch = !searchQuery ||
-        command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        command.name.toLowerCase().includes(searchQuery.toLowerCase());
-
-      return categoryMatch && tagMatch && searchMatch;
+      return true;
     });
   }, [commands, selectedCategory, selectedTags, searchQuery, showFavoritesOnly]);
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header with Search and Add Button */}
-        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-          <div className="flex-1">
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
+          <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
+          <div className="flex items-center gap-4">
+            <Link
+              href="/add"
+              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+            >
+              Add Command
+            </Link>
+            <UserButton  />
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mb-6 grid gap-4 md:grid-cols-[1fr,auto] items-start">
+          <div className="space-y-4">
             <CommandSearch
               searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              onSearchChange={handleSearchChange}
             />
-          </div>
-          <Link
-            href="/add"
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-          >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+            <div className="flex flex-wrap gap-4">
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategoryChange}
               />
-            </svg>
-            Add Command
-          </Link>
-
-          <UserButton />
-        </div>
-
-        <div className="grid md:grid-cols-[250px_1fr] gap-6">
-          {/* Sidebar Filters */}
-          <div className="space-y-6 bg-white p-4 rounded-lg shadow">
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onCategoryChange={handleCategoryChange}
-            />
-            <TagsFilter
-              tags={tags}
-              selectedTags={selectedTags}
-              onTagToggle={handleTagToggle}
-            />
-            <div>
-              <h3 className="font-semibold mb-2">Favorites</h3>
-              <button
-                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
-                className={`w-full p-2 rounded-md border transition-colors ${
-                  showFavoritesOnly
-                    ? 'bg-yellow-100 border-yellow-400 text-yellow-700'
-                    : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <svg
-                    className={`w-5 h-5 ${showFavoritesOnly ? 'text-yellow-500' : 'text-gray-400'}`}
-                    viewBox="0 0 24 24"
-                    fill={showFavoritesOnly ? 'currentColor' : 'none'}
-                    stroke="currentColor"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
-                    />
-                  </svg>
-                  {showFavoritesOnly ? 'Show All' : 'Show Favorites'}
-                </div>
-              </button>
+              <TagsFilter
+                tags={tags}
+                selectedTags={selectedTags}
+                onTagToggle={handleTagToggle}
+              />
+              <label className="inline-flex items-center">
+                <input
+                  type="checkbox"
+                  className="form-checkbox h-5 w-5 text-blue-500"
+                  checked={showFavoritesOnly}
+                  onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+                />
+                <span className="ml-2">Show favorites only</span>
+              </label>
             </div>
           </div>
+        </div>
 
-          {/* Command List */}
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+            <p className="mt-2 text-gray-600">Loading commands...</p>
+          </div>
+        ) : (
           <CommandList
             commands={filteredCommands}
             onToggleFavorite={handleToggleFavorite}
           />
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   );
 }
