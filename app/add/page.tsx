@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -9,22 +9,82 @@ export default function AddCommand() {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    category: 'System',
+    category_id: '',
     customCategory: '',
     tags: [] as string[],
   });
   const [selectedTag, setSelectedTag] = useState('');
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [availableTags, setAvailableTags] = useState<Array<{ id: string; name: string }>>([]);
+  const [isLoadingTags, setIsLoadingTags] = useState(true);
 
-  const categories = ['System', 'Network', 'File Management', 'Process', 'Custom'];
-  const availableTags = ['Linux', 'MacOS', 'Windows', 'Beginner', 'Advanced'];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        const categoriesResponse = await fetch('/api/categories');
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.success) {
+          setCategories(categoriesData.data);
+          if (categoriesData.data.length > 0) {
+            setFormData(prev => ({ ...prev, category_id: categoriesData.data[0].id }));
+          }
+        }
+
+        // Fetch tags
+        const tagsResponse = await fetch('/api/tags');
+        const tagsData = await tagsResponse.json();
+        if (tagsData.success) {
+          setAvailableTags(tagsData.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoadingCategories(false);
+        setIsLoadingTags(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // If it's a custom category, create it first
+      let categoryId = formData.category_id;
+      if (isCustomCategory && formData.customCategory.trim()) {
+        const categoryResponse = await fetch('/api/categories', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.customCategory.trim(),
+          }),
+        });
+
+        if (!categoryResponse.ok) {
+          throw new Error('Failed to create category');
+        }
+
+        const categoryData = await categoryResponse.json();
+        if (categoryData.success) {
+          categoryId = categoryData.data.id;
+        } else {
+          throw new Error(categoryData.error || 'Failed to create category');
+        }
+      }
+
+      if (!categoryId && !isCustomCategory) {
+        throw new Error('Please select a category');
+      }
+
       const response = await fetch('/api/commands', {
         method: 'POST',
         headers: {
@@ -33,7 +93,7 @@ export default function AddCommand() {
         body: JSON.stringify({
           name: formData.name,
           description: formData.description,
-          category: isCustomCategory ? formData.customCategory : formData.category,
+          category_id: categoryId,
           tags: formData.tags,
         }),
       });
@@ -49,7 +109,7 @@ export default function AddCommand() {
       }
     } catch (error) {
       console.error('Error adding command:', error);
-      alert('An error occurred while adding the command. Please try again.');
+      alert('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,11 +117,12 @@ export default function AddCommand() {
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
-    setIsCustomCategory(value === 'Custom');
+    const isCustom = value === 'custom';
+    setIsCustomCategory(isCustom);
     setFormData(prev => ({
       ...prev,
-      category: value,
-      customCategory: value === 'Custom' ? prev.customCategory : ''
+      category_id: isCustom ? '' : value,
+      customCategory: isCustom ? prev.customCategory : ''
     }));
   };
 
@@ -134,15 +195,20 @@ export default function AddCommand() {
             </label>
             <select
               id="category"
-              value={formData.category}
+              value={formData.category_id}
               onChange={handleCategoryChange}
               className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
+              {isLoadingCategories ? (
+                <option>Loading...</option>
+              ) : (
+                categories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))
+              )}
+              <option value="custom" >Custom</option>
             </select>
             
             {isCustomCategory && (
@@ -175,13 +241,17 @@ export default function AddCommand() {
                 className="flex-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a tag...</option>
-                {availableTags
-                  .filter(tag => !formData.tags.includes(tag))
-                  .map(tag => (
-                    <option key={tag} value={tag}>
-                      {tag}
-                    </option>
-                  ))}
+                {isLoadingTags ? (
+                  <option>Loading...</option>
+                ) : (
+                  availableTags
+                    .filter(tag => !formData.tags.includes(tag.name))
+                    .map(tag => (
+                      <option key={tag.id} value={tag.name}>
+                        {tag.name}
+                      </option>
+                    ))
+                )}
               </select>
               <button
                 type="button"

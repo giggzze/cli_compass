@@ -8,16 +8,8 @@ import { eq } from "drizzle-orm";
 // export const middle = clerkMiddleware();
 
 export default clerkMiddleware(async (auth, req) => {
-	const { userId} =  await auth();
   
-	console.log("userId: ", userId)
 
-	// Check if user profile exists
-		const existingProfile = await db
-			.select()
-			
-
-			console.log("existingProfile: ", existingProfile)
 })
 
 
