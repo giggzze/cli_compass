@@ -16,7 +16,6 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Connection string will be like: postgres://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres
 const connectionString = process.env.DATABASE_URL;
-console.log("connection string: ", connectionString)
 
 if (!connectionString) {
   throw new Error('Missing DATABASE_URL');

@@ -1,7 +1,9 @@
+import { Category } from './types';
+
 interface CategoryFilterProps {
-  categories: string[];
-  selectedCategory: string;
-  onCategoryChange: (category: string) => void;
+  categories: Category[];
+  selectedCategory: Category;
+  onCategoryChange: (category: Category) => void;
 }
 
 export default function CategoryFilter({
@@ -13,13 +15,21 @@ export default function CategoryFilter({
     <div>
       <h3 className="font-semibold mb-2">Categories</h3>
       <select
-        value={selectedCategory}
-        onChange={(e) => onCategoryChange(e.target.value)}
+        value={selectedCategory.id}
+        onChange={(e) => {
+          const category = categories.find(c => c.id === e.target.value);
+          if (category) {
+            onCategoryChange(category);
+          }
+        }}
         className="w-full p-2 border rounded-md"
       >
         {categories.map((category) => (
-          <option key={category} value={category.toLowerCase()}>
-            {category}
+          <option 
+            key={category.id}
+            value={category.id}
+          >
+            {category.name === 'all' ? 'All Categories' : category.name}
           </option>
         ))}
       </select>

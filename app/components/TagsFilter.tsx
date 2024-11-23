@@ -2,11 +2,12 @@
 
 import { useState, useMemo } from 'react';
 import TagSearch from './TagSearch';
+import { Tag } from './types';
 
 interface TagsFilterProps {
-  tags: string[];
-  selectedTags: string[];
-  onTagToggle: (tag: string) => void;
+  tags: Tag[];
+  selectedTags: Tag[];
+  onTagToggle: (tag: Tag) => void;
 }
 
 export default function TagsFilter({
@@ -20,7 +21,7 @@ export default function TagsFilter({
     if (!searchQuery) return tags;
     const lowerQuery = searchQuery.toLowerCase();
     return tags.filter(tag => 
-      tag.toLowerCase().includes(lowerQuery)
+      tag.name.toLowerCase().includes(lowerQuery)
     );
   }, [tags, searchQuery]);
 
@@ -34,7 +35,7 @@ export default function TagsFilter({
       <div className="flex flex-wrap gap-2">
         {filteredTags.map((tag) => (
           <button
-            key={tag}
+            key={tag.id}
             onClick={() => onTagToggle(tag)}
             className={`px-3 py-1 rounded-full text-sm ${
               selectedTags.includes(tag)
@@ -42,7 +43,7 @@ export default function TagsFilter({
                 : 'bg-gray-100 text-gray-700'
             } hover:opacity-80 transition-opacity`}
           >
-            {tag}
+            {tag.name}
           </button>
         ))}
       </div>
