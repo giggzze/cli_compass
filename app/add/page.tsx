@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Command } from '../components/types';
 
 export default function AddCommand() {
   const router = useRouter();

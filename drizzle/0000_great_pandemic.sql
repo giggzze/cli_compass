@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS "categories" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -7,25 +7,25 @@ CREATE TABLE IF NOT EXISTS "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "command_tags" (
-	"command_id" integer NOT NULL,
-	"tag_id" integer NOT NULL,
+	"command_id" text NOT NULL,
+	"tag_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "command_tags_command_id_tag_id_pk" PRIMARY KEY("command_id","tag_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "commands" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
 	"usage" text NOT NULL,
-	"category_id" integer NOT NULL,
+	"category_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "tags" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS "tags" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_commands" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
-	"command_id" integer NOT NULL,
+	"command_id" text NOT NULL,
 	"is_favorite" boolean DEFAULT false NOT NULL,
 	"notes" text,
 	"last_used" timestamp DEFAULT now(),

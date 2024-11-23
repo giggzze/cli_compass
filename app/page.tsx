@@ -5,19 +5,33 @@ import CategoryFilter from "./components/CategoryFilter";
 import TagsFilter from "./components/TagsFilter";
 import CommandList from "./components/CommandList";
 import CommandSearch from "./components/CommandSearch";
-import { Command } from "./components/types";
+import { Category, Command, Tag } from "./components/types";
 import Link from 'next/link';
 import { UserButton } from "@clerk/nextjs";
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category>({ id: 'all', name: 'all' });
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
 
   // Sample data - replace with your actual data
-  const categories = ['All', 'System', 'Network', 'File Management', 'Process'];
-  const tags = ['Linux', 'MacOS', 'Windows', 'Beginner', 'Advanced'];
+  const allCategory = { id: 'all', name: 'all' };
+  const categories: Category[] = [
+    allCategory,
+    { id: 'system', name: 'System' },
+    { id: 'network', name: 'Network' },
+    { id: 'file', name: 'File Management' },
+    { id: 'process', name: 'Process' }
+  ];
+
+  const tags: Tag[] = [
+    { id: '1', name: 'Linux' },
+    { id: '2', name: 'MacOS' },
+    { id: '3', name: 'Windows' },
+    { id: '4', name: 'Beginner' },
+    { id: '5', name: 'Advanced' }
+  ];
 
   const [commands, setCommands] = useState<Command[]>(() => {
     // Load commands from localStorage if available
@@ -33,24 +47,40 @@ export default function Home() {
         id: '1',
         name: 'ls',
         description: 'List directory contents',
-        category: 'File Management',
-        tags: ['Linux', 'MacOS', 'Beginner'],
+        usage: 'ls [options] [path]',
+        category: { id: 'file', name: 'File Management' },
+        tags: [
+          { id: '1', name: 'Linux' },
+          { id: '2', name: 'MacOS' },
+          { id: '4', name: 'Beginner' }
+        ],
         isFavorite: false,
       },
       {
         id: '2',
         name: 'ps',
         description: 'Report a snapshot of current processes',
-        category: 'Process',
-        tags: ['Linux', 'MacOS', 'Advanced'],
+        usage: 'ps [options]',
+        category: { id: 'process', name: 'Process' },
+        tags: [
+          { id: '1', name: 'Linux' },
+          { id: '2', name: 'MacOS' },
+          { id: '5', name: 'Advanced' }
+        ],
         isFavorite: false,
       },
       {
         id: '3',
         name: 'ping',
         description: 'Send ICMP ECHO_REQUEST to network hosts',
-        category: 'Network',
-        tags: ['Linux', 'Windows', 'MacOS', 'Beginner'],
+        usage: 'ping [options] host',
+        category: { id: 'network', name: 'Network' },
+        tags: [
+          { id: '1', name: 'Linux' },
+          { id: '3', name: 'Windows' },
+          { id: '2', name: 'MacOS' },
+          { id: '4', name: 'Beginner' }
+        ],
         isFavorite: false,
       },
     ];
@@ -63,14 +93,14 @@ export default function Home() {
     }
   }, [commands]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategory(category.toLowerCase());
+  const handleCategoryChange = (category: Category) => {
+    setSelectedCategory(category);
   };
 
-  const handleTagToggle = (tag: string) => {
+  const handleTagToggle = (tag: Tag) => {
     setSelectedTags(prev =>
-      prev.includes(tag)
-        ? prev.filter(t => t !== tag)
+      prev.some(t => t.id === tag.id)
+        ? prev.filter(t => t.id !== tag.id)
         : [...prev, tag]
     );
   };
@@ -93,15 +123,17 @@ export default function Home() {
       }
 
       // Category filter
-      const categoryMatch = selectedCategory === 'all' || 
-        command.category.toLowerCase() === selectedCategory;
+      const categoryMatch = selectedCategory.id === allCategory.id || 
+        command.category.name === selectedCategory.name;
 
       // Tags filter
-      const tagMatch = selectedTags.length === 0 || 
-        selectedTags.some(tag => command.tags.includes(tag));
+      const tagMatch = selectedTags.length === 0 ||
+        selectedTags.every(selectedTag => 
+          command.tags.some(tag => tag.id === selectedTag.id)
+        );
 
       // Search query filter
-      const searchMatch = !searchQuery || 
+      const searchMatch = !searchQuery ||
         command.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
         command.name.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -114,10 +146,12 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         {/* Header with Search and Add Button */}
         <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-            <CommandSearch 
+          <div className="flex-1">
+            <CommandSearch
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
             />
+          </div>
           <Link
             href="/add"
             className="inline-flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
@@ -139,7 +173,7 @@ export default function Home() {
             Add Command
           </Link>
 
-            <UserButton />
+          <UserButton />
         </div>
 
         <div className="grid md:grid-cols-[250px_1fr] gap-6">
@@ -160,8 +194,8 @@ export default function Home() {
               <button
                 onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
                 className={`w-full p-2 rounded-md border transition-colors ${
-                  showFavoritesOnly 
-                    ? 'bg-yellow-100 border-yellow-400 text-yellow-700' 
+                  showFavoritesOnly
+                    ? 'bg-yellow-100 border-yellow-400 text-yellow-700'
                     : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -187,8 +221,8 @@ export default function Home() {
           </div>
 
           {/* Command List */}
-          <CommandList 
-            commands={filteredCommands} 
+          <CommandList
+            commands={filteredCommands}
             onToggleFavorite={handleToggleFavorite}
           />
         </div>
