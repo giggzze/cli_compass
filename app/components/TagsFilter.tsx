@@ -27,7 +27,7 @@ export default function TagsFilter({
 
   return (
     <div>
-      <h3 className="font-semibold mb-2">Tags</h3>
+      <h3 className="font-semibold mb-2 invisible">Tags</h3>
       <TagSearch 
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}

@@ -160,37 +160,36 @@ export default function Home() {
             >
               Add Command
             </Link>
-            <UserButton  />
+            <UserButton />
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 grid gap-4 md:grid-cols-[1fr,auto] items-start">
-          <div className="space-y-4">
-            <CommandSearch
-              searchQuery={searchQuery}
-              onSearchChange={handleSearchChange}
-            />
-            <div className="flex flex-wrap gap-4">
-              <CategoryFilter
-                categories={categories}
-                selectedCategory={selectedCategory}
-                onCategoryChange={handleCategoryChange}
-              />
+          <div>
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+              <div className="w-full sm:flex-1 justify-end items-end">
+                <h1 className="invisible">s</h1>
+                <CommandSearch
+                  searchQuery={searchQuery}
+                  onSearchChange={handleSearchChange}
+                />
+              </div>
               <TagsFilter
                 tags={tags}
                 selectedTags={selectedTags}
                 onTagToggle={handleTagToggle}
               />
-              <label className="inline-flex items-center">
+
+                <span className="ml-2">Favorites</span>
+              <label className="inline-flex items-center whitespace-nowrap">
                 <input
                   type="checkbox"
                   className="form-checkbox h-5 w-5 text-blue-500"
                   checked={showFavoritesOnly}
                   onChange={(e) => setShowFavoritesOnly(e.target.checked)}
                 />
-                <span className="ml-2">Show favorites only</span>
               </label>
             </div>
           </div>
