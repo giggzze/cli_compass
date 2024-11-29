@@ -1,24 +1,24 @@
 'use client';
 
 import { useState, useMemo, useEffect } from "react";
-import CategoryFilter from "./components/CategoryFilter";
 import TagsFilter from "./components/TagsFilter";
 import CommandList from "./components/CommandList";
 import CommandSearch from "./components/CommandSearch";
-import { Category, Command, Tag } from "./components/types";
+import { Command, Tag } from "./components/types";
 import Link from 'next/link';
 import { UserButton } from "@clerk/nextjs";
+import { toast } from "react-toastify";
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<Category>({ id: 'all', name: 'all' });
+  // const [selectedCategory, setSelectedCategory] = useState<Category>({ id: 'all', name: 'all' });
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 'all', name: 'all' }
-  ]);
+  // const [categories, setCategories] = useState<Category[]>([
+  //   { id: 'all', name: 'all' }
+  // ]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [commands, setCommands] = useState<Command[]>([]);
 
@@ -28,17 +28,17 @@ export default function Home() {
       setIsLoading(true);
       try {
         // Fetch categories
-        const categoriesResponse = await fetch('/api/categories');
-        const categoriesData = await categoriesResponse.json();
-        if (categoriesData.success) {
-          setCategories([
-            { id: 'all', name: 'all' },
-            ...categoriesData.data.map((cat: Category) => ({
-              id: cat.id,
-              name: cat.name,
-            })),
-          ]);
-        }
+        // const categoriesResponse = await fetch('/api/categories');
+        // const categoriesData = await categoriesResponse.json();
+        // if (categoriesData.success) {
+        //   // setCategories([
+        //   //   { id: 'all', name: 'all' },
+        //   //   ...categoriesData.data.map((cat: Category) => ({
+        //   //     id: cat.id,
+        //   //     name: cat.name,
+        //   //   })),
+        //   ]);
+        // }
 
         // Fetch tags
         const tagsResponse = await fetch('/api/tags');
@@ -51,21 +51,19 @@ export default function Home() {
         const commandsResponse = await fetch('/api/commands');
         const commandsData = await commandsResponse.json();
         if (commandsData.success) {
-          // Load favorites from localStorage
-          const favoritesStr = localStorage.getItem('favoriteCommands');
-          const favorites = favoritesStr ? JSON.parse(favoritesStr) : [];
-
           const formattedCommands = commandsData.data.map((cmd: Command) => ({
             id: cmd.id,
             name: cmd.name,
             description: cmd.description,
             usage: cmd.usage,
             category: {
-              id: cmd.id,
+              id: cmd.category.id,
               name: cmd.category.name,
             },
             tags: cmd.tags || [],
-            isFavorite: favorites.includes(cmd.id),
+            isFavorite: cmd.isFavorite ?? false,
+            notes: cmd.notes,
+            lastUsed: cmd.lastUsed,
           }));
           setCommands(formattedCommands);
         }
@@ -87,9 +85,9 @@ export default function Home() {
     localStorage.setItem('favoriteCommands', JSON.stringify(favorites));
   }, [commands]);
 
-  const handleCategoryChange = (category: Category) => {
-    setSelectedCategory(category);
-  };
+  // const handleCategoryChange = (category: Category) => {
+  //   setSelectedCategory(category);
+  // };
 
   const handleTagToggle = (tag: Tag) => {
     setSelectedTags(prev =>
@@ -103,22 +101,42 @@ export default function Home() {
     setSearchQuery(query);
   };
 
-  const handleToggleFavorite = (commandId: string) => {
-    setCommands(prev =>
-      prev.map(command =>
-        command.id === commandId
-          ? { ...command, isFavorite: !command.isFavorite }
-          : command
-      )
-    );
+  const handleToggleFavorite = async (commandId: string) => {
+    try {
+      const response = await fetch('/api/commands/user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          command_id: commandId,
+          is_favorite: !commands.find(cmd => cmd.id === commandId)?.isFavorite,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      setCommands(prev =>
+        prev.map(command =>
+          command.id === commandId
+            ? { ...command, isFavorite: !command.isFavorite }
+            : command
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorite status');
+    }
   };
 
   const filteredCommands = useMemo(() => {
     return commands.filter(command => {
       // Filter by category
-      if (selectedCategory.id !== 'all' && command.category.id !== selectedCategory.id) {
-        return false;
-      }
+      // if (selectedCategory.id !== 'all' && command.category.id !== selectedCategory.id) {
+      //   return false;
+      // }
 
       // Filter by tags
       if (selectedTags.length > 0) {
@@ -146,7 +164,7 @@ export default function Home() {
 
       return true;
     });
-  }, [commands, selectedCategory, selectedTags, searchQuery, showFavoritesOnly]);
+  }, [commands, selectedTags, searchQuery, showFavoritesOnly]);
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -77,6 +77,16 @@ export default function CommandList({ commands, onToggleFavorite }: CommandListP
               </div>
 
               <p className="text-gray-600 mt-1">{command.description}</p>
+              {command.notes && (
+                <p className="text-sm text-gray-500 mt-1 italic">
+                  Notes: {command.notes}
+                </p>
+              )}
+              {command.lastUsed && (
+                <p className="text-xs text-gray-400 mt-1">
+                  Last used: {new Date(command.lastUsed).toLocaleDateString()}
+                </p>
+              )}
               <div className="mt-3 flex flex-wrap gap-2">
                 <span className="px-2 py-1 bg-gray-100 rounded text-sm">
                   {command.category.name}

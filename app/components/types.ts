@@ -16,6 +16,30 @@ export interface Command {
 	category: Category;
 	tags: Tag[];
 	isFavorite: boolean;
-	createdAt?: Date;
-	updatedAt?: Date;
+	notes?: string;
+	lastUsed?: Date;
+	created_at?: Date;
+	updated_at?: Date;
+}
+
+export interface CommandListProps {
+	commands: Command[];
+	onToggleFavorite: (id: string) => void;
+}
+
+export interface CategoryFilterProps {
+	categories: Category[];
+	selectedCategory: Category;
+	onCategoryChange: (category: Category) => void;
+}
+
+export interface TagsFilterProps {
+	tags: Tag[];
+	selectedTags: Tag[];
+	onTagToggle: (tag: Tag) => void;
+}
+
+export interface CommandSearchProps {
+	searchQuery: string;
+	onSearchChange: (query: string) => void;
 }
