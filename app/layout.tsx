@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { ClerkProvider, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import "./globals.css";
+import { Inter } from 'next/font/google'
+import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from 'react-toastify';
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: "CLI Compass",
@@ -49,7 +54,7 @@ export default function RootLayout({
           <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
           <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
         </head>
-        <body>
+        <body className={inter.className}>
           <SignedOut>
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
               <div className="max-w-md w-full space-y-8">
@@ -72,6 +77,18 @@ export default function RootLayout({
             </div>
           </SignedOut>
           <SignedIn>{children}</SignedIn>
+          <ToastContainer 
+            position="bottom-right"
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
         </body>
       </html>
     </ClerkProvider>
