@@ -51,9 +51,26 @@ export async function GET() {
       )
       .orderBy(desc(commands.created_at));
 
+    // Format the response data to match the expected structure
+    const formattedCommands = allCommands.map(cmd => ({
+      id: cmd.id,
+      name: cmd.name,
+      description: cmd.description,
+      usage: cmd.usage,
+      category: {
+        id: cmd.category?.id || 'uncategorized',
+        name: cmd.category?.name || 'Uncategorized'
+      },
+      isFavorite: cmd.is_favorite || false,
+      notes: cmd.notes,
+      lastUsed: cmd.last_used,
+      created_at: cmd.created_at,
+      updated_at: cmd.updated_at
+    }));
+
     return NextResponse.json({
       success: true,
-      data: allCommands,
+      data: formattedCommands,
     });
   } catch (error) {
     console.error("Error fetching commands:", error);

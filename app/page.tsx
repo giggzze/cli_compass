@@ -1,25 +1,26 @@
 'use client';
 
 import { useState, useMemo, useEffect } from "react";
-import TagsFilter from "./components/TagsFilter";
+// import TagsFilter from "./components/TagsFilter";
 import CommandList from "./components/CommandList";
 import CommandSearch from "./components/CommandSearch";
-import { Command, Tag } from "./components/types";
+import { Category, Command } from "./components/types";
 import Link from 'next/link';
 import { UserButton } from "@clerk/nextjs";
 import { toast } from "react-toastify";
+import CategoryFilter from "./components/CategoryFilter";
 
 export default function Home() {
-  // const [selectedCategory, setSelectedCategory] = useState<Category>({ id: 'all', name: 'all' });
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<Category>({ id: 'all', name: 'all' });
+  // const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // const [categories, setCategories] = useState<Category[]>([
-  //   { id: 'all', name: 'all' }
-  // ]);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [categories, setCategories] = useState<Category[]>([
+    { id: 'all', name: 'all' }
+  ]);
+  // const [tags, setTags] = useState<Tag[]>([]);
   const [commands, setCommands] = useState<Command[]>([]);
 
   // Fetch all necessary data when component mounts
@@ -28,24 +29,24 @@ export default function Home() {
       setIsLoading(true);
       try {
         // Fetch categories
-        // const categoriesResponse = await fetch('/api/categories');
-        // const categoriesData = await categoriesResponse.json();
-        // if (categoriesData.success) {
-        //   // setCategories([
-        //   //   { id: 'all', name: 'all' },
-        //   //   ...categoriesData.data.map((cat: Category) => ({
-        //   //     id: cat.id,
-        //   //     name: cat.name,
-        //   //   })),
-        //   ]);
-        // }
+        const categoriesResponse = await fetch('/api/categories');
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.success) {
+          setCategories([
+            { id: 'all', name: 'all' },
+            ...categoriesData.data.map((cat: Category) => ({
+              id: cat.id,
+              name: cat.name,
+            })),
+          ]);
+        }
 
         // Fetch tags
-        const tagsResponse = await fetch('/api/tags');
-        const tagsData = await tagsResponse.json();
-        if (tagsData.success) {
-          setTags(tagsData.data);
-        }
+        // const tagsResponse = await fetch('/api/tags');
+        // const tagsData = await tagsResponse.json();
+        // if (tagsData.success) {
+        //   setTags(tagsData.data);
+        // }
 
         // Fetch commands
         const commandsResponse = await fetch('/api/commands');
@@ -85,17 +86,18 @@ export default function Home() {
     localStorage.setItem('favoriteCommands', JSON.stringify(favorites));
   }, [commands]);
 
-  // const handleCategoryChange = (category: Category) => {
-  //   setSelectedCategory(category);
-  // };
-
-  const handleTagToggle = (tag: Tag) => {
-    setSelectedTags(prev =>
-      prev.some(t => t.id === tag.id)
-        ? prev.filter(t => t.id !== tag.id)
-        : [...prev, tag]
-    );
+  const handleCategoryChange = (category: Category) => {
+    setSelectedCategory(category);
+    console.log('Selected category:', category);
   };
+
+  // const handleTagToggle = (tag: Tag) => {
+  //   setSelectedTags(prev =>
+  //     prev.some(t => t.id === tag.id)
+  //       ? prev.filter(t => t.id !== tag.id)
+  //       : [...prev, tag]
+  //   );
+  // };
 
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
@@ -134,18 +136,18 @@ export default function Home() {
   const filteredCommands = useMemo(() => {
     return commands.filter(command => {
       // Filter by category
-      // if (selectedCategory.id !== 'all' && command.category.id !== selectedCategory.id) {
-      //   return false;
-      // }
-
-      // Filter by tags
-      if (selectedTags.length > 0) {
-        const commandTagIds = command.tags.map(tag => tag.id);
-        const selectedTagIds = selectedTags.map(tag => tag.id);
-        if (!selectedTagIds.every(tagId => commandTagIds.includes(tagId))) {
-          return false;
-        }
+      if (selectedCategory.id !== 'all' && command.category.id !== selectedCategory.id) {
+        return false;
       }
+
+      // // Filter by tags
+      // if (selectedTags.length > 0) {
+      //   const commandTagIds = command.tags.map(tag => tag.id);
+      //   const selectedTagIds = selectedTags.map(tag => tag.id);
+      //   if (!selectedTagIds.every(tagId => commandTagIds.includes(tagId))) {
+      //     return false;
+      //   }
+      // }
 
       // Filter by search query
       if (searchQuery) {
@@ -164,7 +166,7 @@ export default function Home() {
 
       return true;
     });
-  }, [commands, selectedTags, searchQuery, showFavoritesOnly]);
+  }, [commands, searchQuery, showFavoritesOnly, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -184,30 +186,31 @@ export default function Home() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 grid gap-4 md:grid-cols-[1fr,auto] items-start">
-          <div>
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <div className="w-full sm:flex-1 justify-end items-end">
-                <h1 className="invisible">s</h1>
-                <CommandSearch
-                  searchQuery={searchQuery}
-                  onSearchChange={handleSearchChange}
-                />
-              </div>
-              <TagsFilter
+      <div className="mb-6 grid gap-4 md:grid-cols-[1fr,auto] items-start">
+          <div className="space-y-4">
+            <CommandSearch
+              searchQuery={searchQuery}
+              onSearchChange={handleSearchChange}
+            />
+            <div className="flex flex-wrap gap-4">
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onCategoryChange={handleCategoryChange}
+              />
+              {/* <TagsFilter
                 tags={tags}
                 selectedTags={selectedTags}
                 onTagToggle={handleTagToggle}
-              />
-
-                <span className="ml-2">Favorites</span>
-              <label className="inline-flex items-center whitespace-nowrap">
+              /> */}
+              <label className="inline-flex items-end">
                 <input
                   type="checkbox"
                   className="form-checkbox h-5 w-5 text-blue-500"
                   checked={showFavoritesOnly}
                   onChange={(e) => setShowFavoritesOnly(e.target.checked)}
                 />
+                <span className="ml-2">Show favorites only</span>
               </label>
             </div>
           </div>
