@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
 		return NextResponse.json({ profile: newProfile[0] });
 	} catch (error) {
-		// console.error("Error creating profile:", error);
+		console.error("Error creating profile:", error);
 		return NextResponse.json(
 			{ error: "Failed to create profile" },
 			{ status: 500 }
