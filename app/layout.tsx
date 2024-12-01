@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import "./globals.css";
-import { Inter } from 'next/font/google'
-import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer } from 'react-toastify';
+import { Inter } from "next/font/google";
+import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer } from "react-toastify";
 import Login from "./components/Login";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "CLI Compass",
@@ -40,22 +40,32 @@ export default function RootLayout({
           <link rel="manifest" href="/manifest.json" />
           <meta name="application-name" content="CLI Compass" />
           <meta name="apple-mobile-web-app-capable" content="yes" />
-          <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+          <meta
+            name="apple-mobile-web-app-status-bar-style"
+            content="default"
+          />
           <meta name="apple-mobile-web-app-title" content="CLI Compass" />
           <meta name="format-detection" content="telephone=no" />
           <meta name="mobile-web-app-capable" content="yes" />
           <meta name="theme-color" content="#000000" />
           <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-          <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
-          <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
+          <link
+            rel="apple-touch-icon"
+            sizes="192x192"
+            href="/icons/icon-192x192.png"
+          />
+          <link
+            rel="apple-touch-icon"
+            sizes="512x512"
+            href="/icons/icon-512x512.png"
+          />
         </head>
         <body className={inter.className}>
           <SignedOut>
             <Login />
-            
           </SignedOut>
           <SignedIn>{children}</SignedIn>
-          <ToastContainer 
+          {/* <ToastContainer
             position="bottom-right"
             autoClose={2000}
             hideProgressBar={false}
@@ -66,7 +76,7 @@ export default function RootLayout({
             draggable
             pauseOnHover
             theme="light"
-          />
+          /> */}
         </body>
       </html>
     </ClerkProvider>

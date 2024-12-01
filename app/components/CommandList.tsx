@@ -1,27 +1,30 @@
-import { Command } from './types';
-import { toast } from 'react-toastify';
+import { Command } from "./types";
+// import { toast } from "react-toastify";
 
 interface CommandListProps {
   commands: Command[];
   onToggleFavorite: (commandId: string) => void;
 }
 
-export default function CommandList({ commands, onToggleFavorite }: CommandListProps) {
+export default function CommandList({
+  commands,
+  onToggleFavorite,
+}: CommandListProps) {
   const copyToClipboard = (text: string, event: React.MouseEvent) => {
     // Don't copy if clicking on the favorite button
-    if ((event.target as HTMLElement).closest('.favorite-button')) {
+    if ((event.target as HTMLElement).closest(".favorite-button")) {
       return;
     }
     navigator.clipboard.writeText(text);
-    toast.success('Command copied to clipboard!', {
-      position: "bottom-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
+    // toast.success('Command copied to clipboard!', {
+    //   position: "bottom-right",
+    //   autoClose: 2000,
+    //   hideProgressBar: false,
+    //   closeOnClick: true,
+    //   pauseOnHover: true,
+    //   draggable: true,
+    //   progress: undefined,
+    // });
   };
 
   return (
@@ -43,12 +46,20 @@ export default function CommandList({ commands, onToggleFavorite }: CommandListP
                   {command.name}
                 </code>
                 <button
-                  onClick={() => onToggleFavorite(command.id ?? '')}
+                  onClick={() => onToggleFavorite(command.id ?? "")}
                   className="favorite-button absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
-                  aria-label={command.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                  aria-label={
+                    command.isFavorite
+                      ? "Remove from favorites"
+                      : "Add to favorites"
+                  }
                 >
                   <svg
-                    className={`w-6 h-6 ${command.isFavorite ? 'text-yellow-400 fill-current' : 'fill-none stroke-current'}`}
+                    className={`w-6 h-6 ${
+                      command.isFavorite
+                        ? "text-yellow-400 fill-current"
+                        : "fill-none stroke-current"
+                    }`}
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
