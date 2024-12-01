@@ -31,31 +31,13 @@ export default function Home() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch categories
-        const categoriesResponse = await fetch("/api/categories");
-        const categoriesData = await categoriesResponse.json();
-        if (categoriesData.success) {
-          setCategories([
-            { id: "all", name: "all" },
-            ...categoriesData.data.map((cat: Category) => ({
-              id: cat.id,
-              name: cat.name,
-            })),
-          ]);
-        }
-
-        // Fetch tags
-        // const tagsResponse = await fetch('/api/tags');
-        // const tagsData = await tagsResponse.json();
-        // if (tagsData.success) {
-        //   setTags(tagsData.data);
-        // }
-
-        // Fetch commands
+        // Fetch commands first
         const commandsResponse = await fetch("/api/commands");
         const commandsData = await commandsResponse.json();
+        let formattedCommands: Command[] = [];
+        
         if (commandsData.success) {
-          const formattedCommands = commandsData.data.map((cmd: Command) => ({
+          formattedCommands = commandsData.data.map((cmd: Command) => ({
             id: cmd.id,
             name: cmd.name,
             description: cmd.description,
@@ -70,6 +52,24 @@ export default function Home() {
             lastUsed: cmd.lastUsed,
           }));
           setCommands(formattedCommands);
+        }
+
+        // Fetch categories and filter based on commands
+        const categoriesResponse = await fetch("/api/categories");
+        const categoriesData = await categoriesResponse.json();
+        if (categoriesData.success) {
+          const usedCategoryIds = new Set(formattedCommands.map(cmd => cmd.category.id));
+          const filteredCategories = categoriesData.data.filter((cat: Category) => 
+            usedCategoryIds.has(cat.id)
+          );
+          
+          setCategories([
+            { id: "all", name: "all" },
+            ...filteredCategories.map((cat: Category) => ({
+              id: cat.id,
+              name: cat.name,
+            })),
+          ]);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
