@@ -42,7 +42,7 @@ export async function GET() {
       })
       .from(commands)
       .leftJoin(categories, eq(commands.category_id, categories.id))
-      .leftJoin(
+      .innerJoin(
         userCommands,
         and(
           eq(userCommands.command_id, commands.id),
