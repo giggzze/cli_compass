@@ -239,11 +239,6 @@ ALTER TABLE ONLY "public"."user_profiles"
 
 
 
-ALTER TABLE ONLY "public"."user_profiles"
-    ADD CONSTRAINT "user_profiles_username_unique" UNIQUE ("username");
-
-
-
 CREATE UNIQUE INDEX "user_command_unique" ON "public"."user_commands" USING "btree" ("user_id", "command_id");
 
 
@@ -285,21 +280,6 @@ GRANT USAGE ON SCHEMA "public" TO "postgres";
 GRANT USAGE ON SCHEMA "public" TO "anon";
 GRANT USAGE ON SCHEMA "public" TO "authenticated";
 GRANT USAGE ON SCHEMA "public" TO "service_role";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
