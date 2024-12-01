@@ -1,17 +1,11 @@
+-- Current sql file was generated after introspecting the database
+-- If you want to run this migration please uncomment this code before executing migrations
 CREATE TABLE IF NOT EXISTS "categories" (
 	"id" text PRIMARY KEY DEFAULT uuid_generate_v4() NOT NULL,
 	"name" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	CONSTRAINT "categories_name_unique" UNIQUE("name")
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "command_tags" (
-	"command_id" text NOT NULL,
-	"tag_id" text NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "command_tags_command_id_tag_id_pk" PRIMARY KEY("command_id","tag_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "commands" (
@@ -52,9 +46,34 @@ CREATE TABLE IF NOT EXISTS "user_profiles" (
 	"is_active" boolean DEFAULT true NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
-	CONSTRAINT "user_profiles_email_unique" UNIQUE("email"),
-	CONSTRAINT "user_profiles_username_unique" UNIQUE("username")
+	CONSTRAINT "user_profiles_email_unique" UNIQUE("email")
 );
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "command_tags" (
+	"command_id" text NOT NULL,
+	"tag_id" text NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "command_tags_command_id_tag_id_pk" PRIMARY KEY("command_id","tag_id")
+);
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "commands" ADD CONSTRAINT "commands_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "user_commands" ADD CONSTRAINT "user_commands_command_id_commands_id_fk" FOREIGN KEY ("command_id") REFERENCES "public"."commands"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "user_commands" ADD CONSTRAINT "user_commands_user_id_user_profiles_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user_profiles"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "command_tags" ADD CONSTRAINT "command_tags_command_id_commands_id_fk" FOREIGN KEY ("command_id") REFERENCES "public"."commands"("id") ON DELETE no action ON UPDATE no action;
@@ -68,22 +87,4 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "commands" ADD CONSTRAINT "commands_category_id_categories_id_fk" FOREIGN KEY ("category_id") REFERENCES "public"."categories"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "user_commands" ADD CONSTRAINT "user_commands_user_id_user_profiles_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user_profiles"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "user_commands" ADD CONSTRAINT "user_commands_command_id_commands_id_fk" FOREIGN KEY ("command_id") REFERENCES "public"."commands"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "user_command_unique" ON "user_commands" USING btree ("user_id","command_id");
+CREATE UNIQUE INDEX IF NOT EXISTS "user_command_unique" ON "user_commands" USING btree ("user_id" text_ops,"command_id" text_ops);

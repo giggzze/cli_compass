@@ -1,14 +1,14 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { createClient } from '@supabase/supabase-js';
-import postgres from 'postgres';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/postgres-js";
+import { createClient } from "@supabase/supabase-js";
+import postgres from "postgres";
+import * as schema from "./schema";
 
 // Make sure to create a .env.local file with these variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase credentials');
+  throw new Error("Missing Supabase credentials");
 }
 
 // Create a single supabase client for interacting with your database
@@ -18,7 +18,7 @@ export const supabase = createClient(supabaseUrl, supabaseKey);
 const connectionString = process.env.DATABASE_URL;
 
 if (!connectionString) {
-  throw new Error('Missing DATABASE_URL');
+  throw new Error("Missing DATABASE_URL");
 }
 
 // For migrations and queries
