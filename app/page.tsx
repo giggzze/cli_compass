@@ -88,7 +88,7 @@ export default function Home() {
 
   const handleCategoryChange = (category: Category) => {
     setSelectedCategory(category);
-    console.log('Selected category:', category);
+    // console.log('Selected category:', category);
   };
 
   // const handleTagToggle = (tag: Tag) => {

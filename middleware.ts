@@ -7,7 +7,7 @@ export default clerkMiddleware(async (auth, req) => {
 	const { userId } = await auth();
 	const path = req.nextUrl.pathname;
 
-	console.log("userId", userId);
+	// console.log("userId", userId);
 	// Skip middleware for public paths and API routes
 	if (
 		path.startsWith("/_next") ||
