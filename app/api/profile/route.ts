@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
       .insert(userProfiles)
       .values({
         id: userId,
-        is_active: true,
+        isActive: true,
       })
       .returning();
 

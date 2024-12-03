@@ -4,9 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 // import TagsFilter from "./components/TagsFilter";
 import CommandList from "./components/CommandList";
 import CommandSearch from "./components/CommandSearch";
-import { Category, Command } from "./components/types";
-import Link from "next/link";
-import { UserButton } from "@clerk/nextjs";
+import { Category, Command } from "@/lib/oldTyes";
 // import { toast } from "react-toastify";
 import CategoryFilter from "./components/CategoryFilter";
 
@@ -35,7 +33,7 @@ export default function Home() {
         const commandsResponse = await fetch("/api/commands");
         const commandsData = await commandsResponse.json();
         let formattedCommands: Command[] = [];
-        
+
         if (commandsData.success) {
           formattedCommands = commandsData.data.map((cmd: Command) => ({
             id: cmd.id,
@@ -58,11 +56,13 @@ export default function Home() {
         const categoriesResponse = await fetch("/api/categories");
         const categoriesData = await categoriesResponse.json();
         if (categoriesData.success) {
-          const usedCategoryIds = new Set(formattedCommands.map(cmd => cmd.category.id));
-          const filteredCategories = categoriesData.data.filter((cat: Category) => 
-            usedCategoryIds.has(cat.id)
+          const usedCategoryIds = new Set(
+            formattedCommands.map((cmd) => cmd.category.id)
           );
-          
+          const filteredCategories = categoriesData.data.filter(
+            (cat: Category) => usedCategoryIds.has(cat.id)
+          );
+
           setCategories([
             { id: "all", name: "all" },
             ...filteredCategories.map((cat: Category) => ({
@@ -177,21 +177,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/add"
-              className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
-            >
-              Add Command
-            </Link>
-            <UserButton />
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
         <div className="mb-6 grid gap-4 md:grid-cols-[1fr,auto] items-start">
           <div className="space-y-4">

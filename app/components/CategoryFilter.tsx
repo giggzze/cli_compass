@@ -1,4 +1,4 @@
-import { Category } from './types';
+import { Category } from "@/lib/oldTyes";
 
 interface CategoryFilterProps {
   categories: Category[];
@@ -17,7 +17,7 @@ export default function CategoryFilter({
       <select
         value={selectedCategory.id}
         onChange={(e) => {
-          const category = categories.find(c => c.id === e.target.value);
+          const category = categories.find((c) => c.id === e.target.value);
           if (category) {
             onCategoryChange(category);
           }
@@ -25,11 +25,8 @@ export default function CategoryFilter({
         className="w-full p-2 border rounded-md"
       >
         {categories.map((category) => (
-          <option 
-            key={category.id}
-            value={category.id}
-          >
-            {category.name === 'all' ? 'All Categories' : category.name}
+          <option key={category.id} value={category.id}>
+            {category.name === "all" ? "All Categories" : category.name}
           </option>
         ))}
       </select>

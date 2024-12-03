@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
 // import { ToastContainer } from "react-toastify";
 import Login from "./components/Login";
+import Navbar from "./components/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -64,7 +65,10 @@ export default function RootLayout({
           <SignedOut>
             <Login />
           </SignedOut>
-          <SignedIn>{children}</SignedIn>
+          <SignedIn>
+            <Navbar />
+            {children}
+          </SignedIn>
           {/* <ToastContainer
             position="bottom-right"
             autoClose={2000}
