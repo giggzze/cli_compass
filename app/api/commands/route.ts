@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { commands, categories, userCommands } from "@/db/schema";
 import { desc, eq, and } from "drizzle-orm";
-import { Tag } from "@/app/components/types";
 import { auth } from "@clerk/nextjs/server";
+import { Tag } from "@/lib/oldTyes";
 
 interface CommandRequest {
   name: string;
@@ -34,38 +34,38 @@ export async function GET() {
           id: categories.id,
           name: categories.name,
         },
-        created_at: commands.created_at,
-        updated_at: commands.updated_at,
-        is_favorite: userCommands.is_favorite,
+        created_at: commands.createdAt,
+        updated_at: commands.updatedAt,
+        is_favorite: userCommands.isFavorite,
         notes: userCommands.notes,
-        last_used: userCommands.last_used,
+        last_used: userCommands.lastUsed,
       })
       .from(commands)
-      .leftJoin(categories, eq(commands.category_id, categories.id))
+      .leftJoin(categories, eq(commands.categoryId, categories.id))
       .innerJoin(
         userCommands,
         and(
-          eq(userCommands.command_id, commands.id),
-          eq(userCommands.user_id, userId)
+          eq(userCommands.commandId, commands.id),
+          eq(userCommands.userId, userId)
         )
       )
-      .orderBy(desc(commands.created_at));
+      .orderBy(desc(commands.createdAt));
 
     // Format the response data to match the expected structure
-    const formattedCommands = allCommands.map(cmd => ({
+    const formattedCommands = allCommands.map((cmd) => ({
       id: cmd.id,
       name: cmd.name,
       description: cmd.description,
       usage: cmd.usage,
       category: {
-        id: cmd.category?.id || 'uncategorized',
-        name: cmd.category?.name || 'Uncategorized'
+        id: cmd.category?.id || "uncategorized",
+        name: cmd.category?.name || "Uncategorized",
       },
       isFavorite: cmd.is_favorite || false,
       notes: cmd.notes,
       lastUsed: cmd.last_used,
       created_at: cmd.created_at,
-      updated_at: cmd.updated_at
+      updated_at: cmd.updated_at,
     }));
 
     return NextResponse.json({
@@ -92,7 +92,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { name, description, category_id }: CommandRequest = await request.json();
+    const { name, description, category_id }: CommandRequest =
+      await request.json();
 
     if (!name || !description || !category_id) {
       return NextResponse.json(
@@ -116,18 +117,21 @@ export async function POST(request: Request) {
     }
 
     // Insert the command
-    const newCommand = await db.insert(commands).values({
-      name,
-      description,
-      category_id,
-      usage: description, // You might want to make this a separate field in the form
-    }).returning();
+    const newCommand = await db
+      .insert(commands)
+      .values({
+        name,
+        description,
+        categoryId: category_id,
+        usage: description, // You might want to make this a separate field in the form
+      })
+      .returning();
 
     // Create user-command association
     await db.insert(userCommands).values({
-      user_id: userId,
-      command_id: newCommand[0].id,
-      is_favorite: false,
+      userId: userId,
+      commandId: newCommand[0].id,
+      isFavorite: false,
     });
 
     return NextResponse.json({

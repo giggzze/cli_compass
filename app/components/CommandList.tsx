@@ -1,4 +1,4 @@
-import { Command } from "./types";
+import { Command } from "@/lib/oldTyes";
 // import { toast } from "react-toastify";
 
 interface CommandListProps {
