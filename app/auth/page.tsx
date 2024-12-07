@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
 import { SignIn } from "@clerk/nextjs";
+import { Button } from "../components/ui/button";
 
 export default function AuthPage() {
   return (
@@ -15,7 +16,9 @@ export default function AuthPage() {
           </p>
         </div>
         <div className="mt-8">
-          <SignIn />
+          <Button>
+            <SignIn />
+          </Button>
         </div>
       </div>
     </div>

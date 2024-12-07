@@ -4,22 +4,10 @@ import { ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { Textarea } from "@/app/components/ui/textarea";
 import { useRouter } from "next/navigation";
-
-interface ProcessStep {
-  id?: string;
-  title: string;
-  description: string;
-  code_block?: string;
-  order?: number;
-}
-
-interface Process {
-  id: string;
-  title: string;
-  steps: ProcessStep[];
-}
+import { ProcessStepForm } from "../../components/ProcessStepForm";
+import { EditableStepList } from "../../components/EditableStepList";
+import { Process, ProcessStep } from "../../components/types";
 
 export default function EditProcessPage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -135,86 +123,21 @@ export default function EditProcessPage({ params }: { params: { id: string } }) 
           />
         </div>
 
-        {steps.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Current Steps</h2>
-            {steps.map((step, index) => (
-              <div
-                key={index}
-                className="bg-gray-50 p-4 rounded-lg mb-4 relative"
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={() => removeStep(index)}
-                >
-                  Remove
-                </Button>
-                <h3 className="font-medium">{step.title}</h3>
-                <p className="text-gray-600 mt-1">{step.description}</p>
-                {step.code_block && (
-                  <pre className="bg-gray-100 p-2 rounded mt-2 text-sm">
-                    {step.code_block}
-                  </pre>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        <EditableStepList steps={steps} onRemove={removeStep} />
 
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <h2 className="text-xl font-semibold mb-4">Add Step</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">Step Title</label>
-              <Input
-                type="text"
-                value={currentStep.title}
-                onChange={(e) =>
-                  setCurrentStep({ ...currentStep, title: e.target.value })
-                }
-                placeholder="Enter step title"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Step Description
-              </label>
-              <Textarea
-                value={currentStep.description}
-                onChange={(e) =>
-                  setCurrentStep({ ...currentStep, description: e.target.value })
-                }
-                placeholder="Enter step description"
-                className="min-h-[100px]"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Code Block (Optional)
-              </label>
-              <Textarea
-                value={currentStep.code_block || ""}
-                onChange={(e) =>
-                  setCurrentStep({ ...currentStep, code_block: e.target.value })
-                }
-                placeholder="Enter code block"
-                className="font-mono text-sm"
-              />
-            </div>
-            <Button onClick={addStep}>Add Step</Button>
-          </div>
-        </div>
+        <ProcessStepForm
+          step={currentStep}
+          onChange={setCurrentStep}
+          onAdd={addStep}
+        />
 
-        <div className="flex justify-end">
-          <Button
-            onClick={updateProcess}
-            disabled={isSubmitting || !processTitle || steps.length === 0}
-          >
-            {isSubmitting ? "Updating..." : "Update Process"}
-          </Button>
-        </div>
+        <Button
+          onClick={updateProcess}
+          disabled={!processTitle || steps.length === 0 || isSubmitting}
+          className="w-full"
+        >
+          {isSubmitting ? "Updating..." : "Update Process"}
+        </Button>
       </div>
     </div>
   );

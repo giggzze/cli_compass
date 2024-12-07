@@ -4,14 +4,10 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { Textarea } from "@/app/components/ui/textarea";
 import { useRouter } from "next/navigation";
-
-interface ProcessStep {
-  title: string;
-  description: string;
-  code_block?: string;
-}
+import { ProcessStepForm } from "../components/ProcessStepForm";
+import { StepPreview } from "../components/StepPreview";
+import { ProcessStep } from "../components/types";
 
 export default function ProcessPage() {
   const router = useRouter();
@@ -26,7 +22,7 @@ export default function ProcessPage() {
 
   const addStep = () => {
     if (currentStep.title && currentStep.description) {
-      setSteps([...steps, currentStep]);
+      setSteps([...steps, { ...currentStep, order: steps.length + 1 }]);
       setCurrentStep({ title: "", description: "", code_block: "" });
     }
   };
@@ -90,77 +86,13 @@ export default function ProcessPage() {
           />
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-lg mb-6">
-          <h2 className="text-xl font-semibold mb-4">Add Step</h2>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Step Title
-              </label>
-              <Input
-                type="text"
-                value={currentStep.title}
-                onChange={(e) =>
-                  setCurrentStep({ ...currentStep, title: e.target.value })
-                }
-                placeholder="Enter step title"
-              />
-            </div>
+        <ProcessStepForm
+          step={currentStep}
+          onChange={setCurrentStep}
+          onAdd={addStep}
+        />
 
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Description
-              </label>
-              <Textarea
-                value={currentStep.description}
-                onChange={(e) =>
-                  setCurrentStep({
-                    ...currentStep,
-                    description: e.target.value,
-                  })
-                }
-                placeholder="Enter step description"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Code Block (Optional)
-              </label>
-              <Textarea
-                value={currentStep.code_block || ""}
-                onChange={(e) =>
-                  setCurrentStep({ ...currentStep, code_block: e.target.value })
-                }
-                placeholder="Enter code if applicable"
-                rows={5}
-                className="font-mono"
-              />
-            </div>
-
-            <Button onClick={addStep}>Add Step</Button>
-          </div>
-        </div>
-
-        {steps.length > 0 && (
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold mb-4">Steps</h2>
-            <div className="space-y-4">
-              {steps.map((step, index) => (
-                <div key={index} className="bg-white p-4 rounded-lg border">
-                  <h3 className="font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-gray-600">{step.description}</p>
-                  {step.code_block && (
-                    <pre className="mt-2 bg-gray-50 p-3 rounded font-mono text-sm">
-                      {step.code_block}
-                    </pre>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <StepPreview steps={steps} />
 
         <Button
           onClick={saveProcess}
