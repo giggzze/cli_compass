@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/app/components/ui/button";
+import { Edit, ChevronDown, ChevronUp, Copy, Check } from "lucide-react";
 
 interface ProcessStep {
   id: string;
@@ -94,18 +95,41 @@ export default function ProcessPage() {
           processes.map((process) => (
             <div
               key={process.id}
-              className="bg-white rounded-lg border p-4 cursor-pointer"
-              onClick={() =>
-                setExpandedProcessId(
-                  expandedProcessId === process.id ? null : process.id
-                )
-              }
+              className="bg-white rounded-lg border p-4"
             >
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">{process.title}</h2>
-                <span className="text-sm text-gray-500">
-                  {new Date(process.created_at).toLocaleDateString()}
-                </span>
+                <div 
+                  className="flex-1 cursor-pointer"
+                  onClick={() =>
+                    setExpandedProcessId(
+                      expandedProcessId === process.id ? null : process.id
+                    )
+                  }
+                >
+                  <h2 className="text-xl font-semibold">{process.title}</h2>
+                </div>
+                <div className="flex gap-2">
+                  <Link href={`/process/edit/${process.id}`}>
+                    <Button variant="outline" size="sm">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() =>
+                      setExpandedProcessId(
+                        expandedProcessId === process.id ? null : process.id
+                      )
+                    }
+                  >
+                    {expandedProcessId === process.id ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {expandedProcessId === process.id && process.steps.length > 0 && (
