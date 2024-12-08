@@ -62,6 +62,12 @@ export default function EditProcessPage({
     setSteps(steps.filter((_, i) => i !== index));
   };
 
+  const updateStep = (index: number, updatedStep: ProcessStep) => {
+    const newSteps = [...steps];
+    newSteps[index] = { ...updatedStep, order: index };
+    setSteps(newSteps);
+  };
+
   const updateProcess = async () => {
     if (!processTitle || steps.length === 0) return;
 
@@ -129,7 +135,11 @@ export default function EditProcessPage({
           />
         </div>
 
-        <EditableStepList steps={steps} onRemove={removeStep} />
+        <EditableStepList
+          steps={steps}
+          onRemove={removeStep}
+          onUpdate={updateStep}
+        />
 
         <ProcessStepForm
           step={currentStep}
