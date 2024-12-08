@@ -65,6 +65,7 @@ export default function ProcessPage() {
             <ProcessCard
               key={process.id}
               id={process.id}
+              createdAt={process.created_at}
               title={process.title}
               steps={process.steps}
               isExpanded={expandedProcessId === process.id}

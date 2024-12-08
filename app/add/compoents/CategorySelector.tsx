@@ -1,4 +1,4 @@
-import { Heading1, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Custom from "./Custom";
 
 interface Category {

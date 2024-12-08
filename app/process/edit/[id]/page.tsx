@@ -7,9 +7,13 @@ import { Input } from "@/app/components/ui/input";
 import { useRouter } from "next/navigation";
 import { ProcessStepForm } from "../../components/ProcessStepForm";
 import { EditableStepList } from "../../components/EditableStepList";
-import { Process, ProcessStep } from "../../components/types";
+import { ProcessStep } from "../../components/types";
 
-export default function EditProcessPage({ params }: { params: { id: string } }) {
+export default function EditProcessPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState("");
   const [steps, setSteps] = useState<ProcessStep[]>([]);
@@ -113,7 +117,9 @@ export default function EditProcessPage({ params }: { params: { id: string } }) 
         <h1 className="text-3xl font-bold mb-6">Edit Process</h1>
 
         <div className="mb-6">
-          <label className="block text-sm font-medium mb-2">Process Title</label>
+          <label className="block text-sm font-medium mb-2">
+            Process Title
+          </label>
           <Input
             type="text"
             value={processTitle}

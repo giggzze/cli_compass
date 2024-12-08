@@ -1,5 +1,5 @@
 import { Command } from "@/lib/oldTyes";
-// import { toast } from "react-toastify";
+import { useState } from "react";
 
 interface CommandListProps {
   commands: Command[];
@@ -10,21 +10,20 @@ export default function CommandList({
   commands,
   onToggleFavorite,
 }: CommandListProps) {
-  const copyToClipboard = (text: string, event: React.MouseEvent) => {
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  const copyToClipboard = async (text: string, event: React.MouseEvent) => {
     // Don't copy if clicking on the favorite button
     if ((event.target as HTMLElement).closest(".favorite-button")) {
       return;
     }
-    navigator.clipboard.writeText(text);
-    // toast.success('Command copied to clipboard!', {
-    //   position: "bottom-right",
-    //   autoClose: 2000,
-    //   hideProgressBar: false,
-    //   closeOnClick: true,
-    //   pauseOnHover: true,
-    //   draggable: true,
-    //   progress: undefined,
-    // });
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedCode(text);
+      setTimeout(() => setCopiedCode(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy code:", err);
+    }
   };
 
   return (
@@ -37,17 +36,38 @@ export default function CommandList({
         commands.map((command) => (
           <div
             key={command.id}
-            className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow relative cursor-pointer"
-            onClick={(e) => copyToClipboard(command.name, e)}
+            className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow relative"
           >
-            <div className="pr-10">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-medium text-gray-900">{command.description}</h3>
+                {command.notes && (
+                  <p className="text-sm text-gray-500 mt-2 italic">
+                    Notes: {command.notes}
+                  </p>
+                )}
+              </div>
+
               <div className="relative group">
-                <code className="block bg-gray-50 p-2 rounded mt-2 text-sm font-mono">
-                  {command.name}
-                </code>
+                <pre className="bg-gray-800 p-4 rounded-lg overflow-x-auto text-gray-100 text-sm">
+                  <code>{command.name}</code>
+                </pre>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(command.name, e);
+                  }}
+                  className={`absolute top-3 right-3 px-3 py-1.5 text-xs rounded transition-all duration-200 ${
+                    copiedCode === command.name
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-700 text-gray-300 opacity-0 group-hover:opacity-100 hover:bg-gray-600"
+                  }`}
+                >
+                  {copiedCode === command.name ? "Copied!" : "Copy"}
+                </button>
                 <button
                   onClick={() => onToggleFavorite(command.id ?? "")}
-                  className="favorite-button absolute right-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-yellow-400 transition-colors"
+                  className="favorite-button absolute right-20 top-3 text-gray-400 hover:text-yellow-400 transition-colors"
                   aria-label={
                     command.isFavorite
                       ? "Remove from favorites"
@@ -71,30 +91,10 @@ export default function CommandList({
                     />
                   </svg>
                 </button>
-                <svg
-                  className="w-5 h-5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-gray-600 transition-colors"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"
-                  />
-                </svg>
               </div>
 
-              <p className="text-gray-600 mt-1">{command.description}</p>
-              {command.notes && (
-                <p className="text-sm text-gray-500 mt-1 italic">
-                  Notes: {command.notes}
-                </p>
-              )}
               {command.lastUsed && (
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-400">
                   Last used: {new Date(command.lastUsed).toLocaleDateString()}
                 </p>
               )}

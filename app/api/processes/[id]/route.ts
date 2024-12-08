@@ -8,7 +8,7 @@ import { ProcessStep } from "@/lib/types";
 // GET /api/processes/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { userId } = await auth();
@@ -16,7 +16,7 @@ export async function GET(
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -37,7 +37,7 @@ export async function GET(
     if (process.length === 0) {
       return NextResponse.json(
         { success: false, error: "Process not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -49,7 +49,8 @@ export async function GET(
       updated_at: process[0].updated_at,
       steps: process
         .filter((p) => p.steps !== null)
-        .map((p) => p.steps)
+        .map((p) => p.steps!)
+        .filter((step): step is NonNullable<typeof step> => step !== null)
         .sort((a, b) => a.order - b.order),
     };
 
@@ -58,7 +59,7 @@ export async function GET(
     console.error("Error fetching process:", error);
     return NextResponse.json(
       { success: false, error: "Failed to fetch process" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -66,7 +67,7 @@ export async function GET(
 // PUT /api/processes/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const { userId } = await auth();
@@ -74,7 +75,7 @@ export async function PUT(
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -85,7 +86,7 @@ export async function PUT(
     if (!title || !steps || !Array.isArray(steps)) {
       return NextResponse.json(
         { success: false, error: "Invalid input" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -99,7 +100,7 @@ export async function PUT(
     if (existingProcess.length === 0) {
       return NextResponse.json(
         { success: false, error: "Process not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -107,7 +108,7 @@ export async function PUT(
     if (existingProcess[0].user_id !== userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -125,7 +126,7 @@ export async function PUT(
         .where(eq(processes.id, params.id));
 
       // Insert new steps
-      const newSteps = await tx
+      await tx
         .insert(processSteps)
         .values(
           steps.map((step: ProcessStep, index: number) => ({
@@ -134,7 +135,7 @@ export async function PUT(
             description: step.description,
             code_block: step.code_block || null,
             order: index,
-          }))
+          })),
         )
         .returning();
 
@@ -159,7 +160,8 @@ export async function PUT(
         updated_at: updatedProcess[0].updated_at,
         steps: updatedProcess
           .filter((p) => p.steps !== null)
-          .map((p) => p.steps)
+          .map((p) => p.steps!)
+          .filter((step): step is NonNullable<typeof step> => step !== null)
           .sort((a, b) => a.order - b.order),
       };
     });
@@ -169,7 +171,7 @@ export async function PUT(
     console.error("Error updating process:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update process" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
