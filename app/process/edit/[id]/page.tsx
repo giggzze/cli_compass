@@ -1,15 +1,19 @@
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { useRouter } from "next/navigation";
-import { ProcessStepForm } from "../components/ProcessStepForm";
-import { StepPreview } from "../components/StepPreview";
-import { ProcessStep } from "../components/types";
+import { ProcessStepForm } from "../../components/ProcessStepForm";
+import { EditableStepList } from "../../components/EditableStepList";
+import { ProcessStep } from "../../components/types";
 
-export default function ProcessPage() {
+export default function EditProcessPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState("");
   const [steps, setSteps] = useState<ProcessStep[]>([]);
@@ -19,21 +23,52 @@ export default function ProcessPage() {
     code_block: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProcess = async () => {
+      try {
+        const response = await fetch(`/api/processes/${params.id}`);
+        const data = await response.json();
+
+        if (data.success) {
+          setProcessTitle(data.data.title);
+          setSteps(data.data.steps);
+        } else {
+          console.error("Failed to fetch process:", data.error);
+          alert("Failed to fetch process. Please try again.");
+          router.push("/process");
+        }
+      } catch (error) {
+        console.error("Error fetching process:", error);
+        alert("An error occurred. Please try again.");
+        router.push("/process");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProcess();
+  }, [params.id, router]);
 
   const addStep = () => {
     if (currentStep.title && currentStep.description) {
-      setSteps([...steps, { ...currentStep, order: steps.length + 1 }]);
+      setSteps([...steps, { ...currentStep, order: steps.length }]);
       setCurrentStep({ title: "", description: "", code_block: "" });
     }
   };
 
-  const saveProcess = async () => {
+  const removeStep = (index: number) => {
+    setSteps(steps.filter((_, i) => i !== index));
+  };
+
+  const updateProcess = async () => {
     if (!processTitle || steps.length === 0) return;
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/processes", {
-        method: "POST",
+      const response = await fetch(`/api/processes/${params.id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -49,16 +84,24 @@ export default function ProcessPage() {
         router.push("/process");
         router.refresh();
       } else {
-        console.error("Failed to save process:", data.error);
-        alert("Failed to save process. Please try again.");
+        console.error("Failed to update process:", data.error);
+        alert("Failed to update process. Please try again.");
       }
     } catch (error) {
-      console.error("Error saving process:", error);
+      console.error("Error updating process:", error);
       alert("An error occurred. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-4 max-w-4xl">
+        <div className="text-center">Loading process...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-4xl">
@@ -71,7 +114,7 @@ export default function ProcessPage() {
         Back to Processes
       </Button>
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold mb-6">Create Process</h1>
+        <h1 className="text-3xl font-bold mb-6">Edit Process</h1>
 
         <div className="mb-6">
           <label className="block text-sm font-medium mb-2">
@@ -86,20 +129,20 @@ export default function ProcessPage() {
           />
         </div>
 
+        <EditableStepList steps={steps} onRemove={removeStep} />
+
         <ProcessStepForm
           step={currentStep}
           onChange={setCurrentStep}
           onAdd={addStep}
         />
 
-        <StepPreview steps={steps} />
-
         <Button
-          onClick={saveProcess}
+          onClick={updateProcess}
           disabled={!processTitle || steps.length === 0 || isSubmitting}
           className="w-full"
         >
-          {isSubmitting ? "Saving..." : "Save Process"}
+          {isSubmitting ? "Updating..." : "Update Process"}
         </Button>
       </div>
     </div>
