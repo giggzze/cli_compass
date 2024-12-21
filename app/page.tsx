@@ -1,17 +1,19 @@
 "use client";
 
-// app/page.tsx
-"use client";
-
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import Landing from "./components/Landing";
+import { useAuth } from "@clerk/nextjs";
 
 export default function Home() {
-	const router = useRouter();
+  const router = useRouter();
+  const { isSignedIn } = useAuth();
 
-	useEffect(() => {
-		router.push("/commands");
-	}, [router]);
+  useEffect(() => {
+    if (isSignedIn) {
+      router.push("/commands");
+    }
+  }, [router, isSignedIn]);
 
-	return null;
+  return <Landing />;
 }

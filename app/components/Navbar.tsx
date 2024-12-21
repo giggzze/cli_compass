@@ -17,10 +17,7 @@ function Navbar() {
           <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/about">
-            <Button variant="ghost">About</Button>
-          </Link>
-          {pathname === "/" && (
+          {pathname === "/commands" && (
             <Link href="/add">
               <Button>Add Command</Button>
             </Link>

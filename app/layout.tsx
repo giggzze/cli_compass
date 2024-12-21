@@ -3,9 +3,10 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
-// import { ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
+import Landing from "./components/Landing";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -67,13 +68,13 @@ export default function RootLayout({
         </head>
         <body className={inter.className}>
           <SignedOut>
-            <Login />
+            {/* <Login /> */} <Landing />
           </SignedOut>
           <SignedIn>
             <Navbar />
             {children}
           </SignedIn>
-          {/* <ToastContainer
+          <ToastContainer
             position="bottom-right"
             autoClose={2000}
             hideProgressBar={false}
@@ -84,7 +85,7 @@ export default function RootLayout({
             draggable
             pauseOnHover
             theme="light"
-          /> */}
+          />
         </body>
       </html>
     </ClerkProvider>

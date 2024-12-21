@@ -15,8 +15,10 @@ export default clerkMiddleware(async (auth, req) => {
   if (
     path.startsWith("/_next") ||
     path.startsWith("/api") ||
-    path === "/profile-setup"
+    path === "/profile-setup" ||
+    path === "/login"
   ) {
+    console.log("skipping middleware", path );
     return NextResponse.next();
   }
 
