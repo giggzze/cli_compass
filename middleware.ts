@@ -9,25 +9,36 @@ import { supabase } from "./db";
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const path = req.nextUrl.pathname;
+  console.log("path", path);
 
-  // console.log("userId", userId);
-  // Skip middleware for public paths and API routes
-  if (
-    path.startsWith("/_next") ||
-    path.startsWith("/api") ||
-    path === "/profile-setup" ||
-    path === "/login"
-  ) {
-    console.log("skipping middleware", path );
+  // Public paths that don't require authentication
+  const publicPaths = [
+    "/_next",
+    "/api",
+    "/",
+    "/commands",
+    "/login",
+    "/profile-setup"
+  ];
+
+  // Check if the current path is public
+  const isPublicPath = publicPaths.some(publicPath => 
+    path === publicPath || path.startsWith(publicPath + "/")
+  );
+
+  if (isPublicPath) {
+    console.log("skipping middleware - public path:", path);
     return NextResponse.next();
   }
 
+  // For all other paths, require authentication
   if (!userId) {
-    return NextResponse.next();
+    console.log("redirecting to login - private path:", path);
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   try {
-    //   // Check if user has a profile
+    // Check if user has a profile
     const { data: profile } = await supabase
       .from("user_profiles")
       .select()
@@ -35,7 +46,6 @@ export default clerkMiddleware(async (auth, req) => {
       .single();
     // If no profile and not already on profile setup page, redirect to profile setup
     if (!profile && path !== "/profile-setup") {
-      // return NextResponse.next();
       return NextResponse.redirect(new URL("/profile-setup", req.url));
     }
 

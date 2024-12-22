@@ -19,12 +19,6 @@ export const categories = pgTable(
 			.primaryKey()
 			.notNull(),
 		name: text().notNull(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
 	},
 	table => {
 		return {
@@ -47,8 +41,6 @@ export const commands = pgTable(
 		usage: text().notNull(),
 		categoryId: text("category_id").notNull(),
 		isPrivate: boolean("is_private").default(true).notNull(),
-		createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
-		updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
 	},
 	table => {
 		return {
@@ -69,12 +61,6 @@ export const tags = pgTable(
 			.primaryKey()
 			.notNull(),
 		name: text().notNull(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
 	},
 	table => {
 		return {
@@ -93,14 +79,7 @@ export const userCommands = pgTable(
 		userId: text("user_id").notNull(),
 		commandId: text("command_id").notNull(),
 		isFavorite: boolean("is_favorite").default(false).notNull(),
-		notes: text(),
 		lastUsed: timestamp("last_used", { mode: "string" }).defaultNow(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
 	},
 	table => {
 		return {
@@ -142,12 +121,6 @@ export const commandTags = pgTable(
 	{
 		commandId: text("command_id").notNull(),
 		tagId: text("tag_id").notNull(),
-		createdAt: timestamp("created_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
-		updatedAt: timestamp("updated_at", { mode: "string" })
-			.defaultNow()
-			.notNull(),
 	},
 	table => {
 		return {
@@ -177,8 +150,6 @@ export const processes = pgTable("processes", {
 	user_id: text("user_id")
 		.references(() => userProfiles.id)
 		.notNull(),
-	created_at: timestamp("created_at").defaultNow().notNull(),
-	updated_at: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const processSteps = pgTable("process_steps", {
@@ -192,6 +163,4 @@ export const processSteps = pgTable("process_steps", {
 	description: text("description").notNull(),
 	code_block: text("code_block"),
 	order: integer("order").notNull(),
-	created_at: timestamp("created_at").defaultNow().notNull(),
-	updated_at: timestamp("updated_at").defaultNow().notNull(),
 });

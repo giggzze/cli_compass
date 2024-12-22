@@ -19,7 +19,9 @@ export default function AddCommand() {
   });
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [categories, setCategories] = useState<
+    Array<{ id: string; name: string }>
+  >([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function AddCommand() {
         if (categoriesData.success) {
           setCategories(categoriesData.data);
           if (categoriesData.data.length > 0) {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               category_id: categoriesData.data[0].id,
             }));
@@ -52,7 +54,10 @@ export default function AddCommand() {
 
     try {
       let categoryId = formData.category_id;
-      if ((isCustomCategory || categories.length === 0) && formData.customCategory.trim()) {
+      if (
+        (isCustomCategory || categories.length === 0) &&
+        formData.customCategory.trim()
+      ) {
         const categoryResponse = await fetch("/api/categories", {
           method: "POST",
           headers: {
@@ -79,11 +84,14 @@ export default function AddCommand() {
         throw new Error("Please select a category");
       }
 
-      if (!categoryId && (!formData.customCategory || !formData.customCategory.trim())) {
+      if (
+        !categoryId &&
+        (!formData.customCategory || !formData.customCategory.trim())
+      ) {
         throw new Error("Please enter a category name");
       }
 
-      const response = await fetch("/api/commands", {
+      const response = await fetch("/api/commands/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -118,7 +126,7 @@ export default function AddCommand() {
     const value = e.target.value;
     const isCustom = value === "custom";
     setIsCustomCategory(isCustom);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       category_id: isCustom ? "" : value,
       customCategory: isCustom ? prev.customCategory : "",
@@ -127,12 +135,17 @@ export default function AddCommand() {
 
   return (
     <PageLayout title="Add New Command" backLink="/commands">
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-6 bg-white p-6 rounded-lg shadow"
+      >
         <FormInput
           id="name"
           label="Command Name"
           value={formData.name}
-          onChange={value => setFormData(prev => ({ ...prev, name: value }))}
+          onChange={(value) =>
+            setFormData((prev) => ({ ...prev, name: value }))
+          }
           placeholder="e.g., ls"
           required
         />
@@ -141,7 +154,9 @@ export default function AddCommand() {
           id="description"
           label="Description"
           value={formData.description}
-          onChange={value => setFormData(prev => ({ ...prev, description: value }))}
+          onChange={(value) =>
+            setFormData((prev) => ({ ...prev, description: value }))
+          }
           type="textarea"
           placeholder="Describe what the command does..."
           required
@@ -154,8 +169,8 @@ export default function AddCommand() {
           customCategory={formData.customCategory}
           isCustomCategory={isCustomCategory}
           onCategoryChange={handleCategoryChange}
-          onCustomCategoryChange={value =>
-            setFormData(prev => ({
+          onCustomCategoryChange={(value) =>
+            setFormData((prev) => ({
               ...prev,
               customCategory: value,
             }))
@@ -167,15 +182,17 @@ export default function AddCommand() {
             <input
               type="checkbox"
               checked={formData.is_private}
-              onChange={e =>
-                setFormData(prev => ({
+              onChange={(e) =>
+                setFormData((prev) => ({
                   ...prev,
                   is_private: e.target.checked,
                 }))
               }
               className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
-            <span className="text-sm text-gray-700">Make this command private</span>
+            <span className="text-sm text-gray-700">
+              Make this command private
+            </span>
           </label>
           <p className="mt-1 text-sm text-gray-500">
             Private commands are only visible to you

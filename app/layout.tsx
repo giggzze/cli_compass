@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Landing from "./components/Landing";
+import PublicNavbar from "./components/PublicNavbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -68,7 +69,8 @@ export default function RootLayout({
         </head>
         <body className={inter.className}>
           <SignedOut>
-            {/* <Login /> */} <Landing />
+            <PublicNavbar />
+            {children}
           </SignedOut>
           <SignedIn>
             <Navbar />

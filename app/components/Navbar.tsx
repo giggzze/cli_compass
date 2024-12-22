@@ -17,6 +17,9 @@ function Navbar() {
           <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
         </Link>
         <div className="flex items-center gap-4">
+          <Link href="/commands/public">
+            <Button variant="ghost">Public Commands</Button>
+          </Link>
           {pathname === "/commands" && (
             <Link href="/add">
               <Button>Add Command</Button>
@@ -31,7 +34,6 @@ function Navbar() {
               <Button>Processes</Button>
             </Link>
           )}
-
           <UserButton />
         </div>
       </div>
