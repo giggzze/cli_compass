@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { commands, categories, userCommands } from "@/db/schema";
-import { Command, CreateCommand, GetCommand } from "@/lib/types";
+import { Command, GetCommandDTO} from "@/lib/types";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -13,7 +13,7 @@ export class CommandService {
 	 * @returns {Promise<GetCommand[]>} A promise that resolves to an array of public commands.
 	 * @throws {Error} If there is an issue fetching the public commands from the database.
 	 */
-	static async getPublicCommands(): Promise<GetCommand[]> {
+	static async getPublicCommands(): Promise<GetCommandDTO[]> {
 		try {
 			const publicCommands = await db
 				.select({
@@ -46,7 +46,7 @@ export class CommandService {
 	 * @returns A promise that resolves to an array of `GetCommand` objects containing the user's commands.
 	 * @throws An error if the user commands could not be fetched.
 	 */
-	static async getUserCommands(userId: string): Promise<GetCommand[]> {
+	static async getUserCommands(userId: string): Promise<GetCommandDTO[]> {
 		try {
 			const userCommandsResult = await db
 				.select({

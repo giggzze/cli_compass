@@ -6,117 +6,97 @@ import PageLayout from "../../components/PageLayout";
 import FormInput from "../../components/FormInput";
 import CategorySelector from "../../components/CategorySelector";
 import { Button } from "../../components/ui/button";
+import { CategoryService } from "../../services/categoryService";
+import { CommandService } from "../../services/commandService";
+import { Category, CommandFormData, CreateCommandDTO } from "@/lib/types";
+import { toast } from "react-toastify";
+
+const initialFormData: CommandFormData = {
+  name: "",
+  description: "",
+  category_id: "",
+  customCategory: "",
+  tags: [],
+  is_private: true,
+};
 
 export default function AddCommand() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    category_id: "",
-    customCategory: "",
-    tags: [] as string[],
-    is_private: true,
-  });
+  const [formData, setFormData] = useState<CommandFormData>(initialFormData);
   const [isCustomCategory, setIsCustomCategory] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<
-    Array<{ id: string; name: string }>
-  >([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCategories = async () => {
       try {
-        const categoriesResponse = await fetch("/api/categories");
-        const categoriesData = await categoriesResponse.json();
-        if (categoriesData.success) {
-          setCategories(categoriesData.data);
-          if (categoriesData.data.length > 0) {
-            setFormData((prev) => ({
-              ...prev,
-              category_id: categoriesData.data[0].id,
-            }));
-          }
+        const categoriesData = await CategoryService.getAllCategories();
+        setCategories(categoriesData);
+        if (categoriesData.length > 0) {
+          setFormData(prev => ({
+            ...prev,
+            category_id: categoriesData[0].id,
+          }));
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
+        setError(null);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Failed to load categories";
+        setError(errorMessage);
+        toast.error(errorMessage);
       } finally {
         setIsLoadingCategories(false);
       }
     };
 
-    fetchData();
+    fetchCategories();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setIsSubmitting(true);
+    setError(null);
 
     try {
       let categoryId = formData.category_id;
-      if (
-        (isCustomCategory || categories.length === 0) &&
-        formData.customCategory.trim()
-      ) {
-        const categoryResponse = await fetch("/api/categories", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: formData.customCategory.trim(),
-          }),
-        });
 
-        if (!categoryResponse.ok) {
-          throw new Error("Failed to create category");
+      // Handle category creation if needed
+      if ((isCustomCategory || categories.length === 0) && formData.customCategory.trim()) {
+        const newCategory = await CategoryService.createCategory(formData.customCategory.trim());
+        categoryId = newCategory.id;
+      }
+
+      // Validate category
+      if (!categoryId) {
+        if (categories.length > 0 && !isCustomCategory) {
+          throw new Error("Please select a category");
         }
-
-        const categoryData = await categoryResponse.json();
-        if (categoryData.success) {
-          categoryId = categoryData.data.id;
-        } else {
-          throw new Error(categoryData.error || "Failed to create category");
+        if (!formData.customCategory?.trim()) {
+          throw new Error("Please enter a category name");
         }
       }
 
-      if (!categoryId && categories.length > 0 && !isCustomCategory) {
-        throw new Error("Please select a category");
-      }
+      // Create command
+      const commandData: CreateCommandDTO = {
+        name: formData.name,
+        description: formData.description,
+        categoryId: categoryId,
+        tags: formData.tags,
+        isPrivate: formData.is_private,
+      };
 
-      if (
-        !categoryId &&
-        (!formData.customCategory || !formData.customCategory.trim())
-      ) {
-        throw new Error("Please enter a category name");
-      }
-
-      const response = await fetch("/api/commands/user", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: formData.name,
-          description: formData.description,
-          category_id: categoryId,
-          tags: formData.tags,
-          is_private: formData.is_private,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
+      const success = await CommandService.createCommand(commandData, "user");
+      if (success) {
+        toast.success("Command created successfully!");
         router.push("/commands");
         router.refresh();
-      } else {
-        console.error("Failed to add command:", data.error);
-        alert("Failed to add command. Please try again.");
       }
-    } catch (error) {
-      console.error("Error adding command:", error);
-      alert("An error occurred. Please try again.");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "An error occurred";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -126,26 +106,31 @@ export default function AddCommand() {
     const value = e.target.value;
     const isCustom = value === "custom";
     setIsCustomCategory(isCustom);
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       category_id: isCustom ? "" : value,
       customCategory: isCustom ? prev.customCategory : "",
     }));
   };
 
+  if (error && !isLoadingCategories) {
+    return (
+      <PageLayout title="Error" backLink="/commands">
+        <div className="text-red-500 p-4 bg-red-50 rounded-lg">
+          {error}
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title="Add New Command" backLink="/commands">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-6 bg-white p-6 rounded-lg shadow"
-      >
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow">
         <FormInput
           id="name"
           label="Command Name"
           value={formData.name}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, name: value }))
-          }
+          onChange={(value) => setFormData(prev => ({ ...prev, name: value }))}
           placeholder="e.g., ls"
           required
         />
@@ -154,9 +139,7 @@ export default function AddCommand() {
           id="description"
           label="Description"
           value={formData.description}
-          onChange={(value) =>
-            setFormData((prev) => ({ ...prev, description: value }))
-          }
+          onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
           type="textarea"
           placeholder="Describe what the command does..."
           required
@@ -170,10 +153,7 @@ export default function AddCommand() {
           isCustomCategory={isCustomCategory}
           onCategoryChange={handleCategoryChange}
           onCustomCategoryChange={(value) =>
-            setFormData((prev) => ({
-              ...prev,
-              customCategory: value,
-            }))
+            setFormData(prev => ({ ...prev, customCategory: value }))
           }
         />
 
@@ -183,27 +163,24 @@ export default function AddCommand() {
               type="checkbox"
               checked={formData.is_private}
               onChange={(e) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  is_private: e.target.checked,
-                }))
+                setFormData(prev => ({ ...prev, is_private: e.target.checked }))
               }
               className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
             />
-            <span className="text-sm text-gray-700">
-              Make this command private
-            </span>
+            <span className="text-sm text-gray-700">Make this command private</span>
           </label>
           <p className="mt-1 text-sm text-gray-500">
             Private commands are only visible to you
           </p>
         </div>
 
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Adding..." : "Add Command"}
-          </Button>
-        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full"
+        >
+          {isSubmitting ? "Adding..." : "Add Command"}
+        </Button>
       </form>
     </PageLayout>
   );

@@ -4,8 +4,8 @@ import {
     tags,
     userCommands,
     commandTags,
-  processes,
-  processSteps,
+    processes,
+    processSteps,
 } from "@/db/schema";
 
 // types from the database
@@ -23,15 +23,47 @@ export type ProcessWithSteps = Process & {
 };
 
 // commands
-// DTO for creating a new command
-export type CreateCommand = Partial<Command>;
-
-// DTO for updating an existing command
-export type UpdateCommand = Partial<Command>;
-
-// DTO for command response
-export type GetCommand = Command & {
-  category: Category | null;
+export interface CreateCommandDTO {
+  name: string;
+  description: string;
+  usage?: string;
+  isPrivate: boolean;
+  categoryId: string;
+  tags?: string[];
 }
 
-// categories
+export interface UpdateCommandDTO {
+  name?: string;
+  description?: string;
+  usage?: string;
+  isPrivate?: boolean;
+  categoryId?: string;
+  tags?: string[];
+}
+
+export interface GetCommandDTO extends Command {
+  category: Category | null;
+  isFavorite?: boolean;
+  lastUsed?: string;
+}
+
+// forms
+export interface CommandFormData {
+  name: string;
+  description: string;
+  category_id: string;
+  customCategory: string;
+  tags: string[];
+  is_private: boolean;
+}
+
+export interface CategoryFormData {
+  name: string;
+}
+
+// API responses
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}

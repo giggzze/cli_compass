@@ -8,7 +8,49 @@ import { Button } from "./ui/button";
 
 function Navbar() {
   const pathname = usePathname();
-  const isProcessPage = pathname?.startsWith("/process");
+
+  const renderNavigationButton = () => {
+    switch (pathname) {
+      case "/commands/user":
+        return (
+          <>
+            <Link href="/add">
+              <Button>Add Command</Button>
+            </Link>
+            <Link href="/process">
+              <Button>Processes</Button>
+            </Link>
+          </>
+        );
+      case "/add":
+        return (
+          <Link href="/process">
+            <Button>Processes</Button>
+          </Link>
+        );
+      case "/process":
+        return (
+          <>
+            <Link href="/commands/user">
+              <Button>Commands</Button>
+            </Link>
+            <Link href="/process/add">
+              <Button>Create Process</Button>
+            </Link>
+          </>
+        );
+      case "/process/add":
+      case "/process/[id]":
+        return (
+          <Link href="/commands/user">
+            <Button>Commands</Button>
+          </Link>
+        );
+
+      default:
+        return <></>;
+    }
+  };
 
   return (
     <header className="bg-white shadow">
@@ -17,23 +59,7 @@ function Navbar() {
           <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
         </Link>
         <div className="flex items-center gap-4">
-          <Link href="/commands/public">
-            <Button variant="ghost">Public Commands</Button>
-          </Link>
-          {pathname === "/commands" && (
-            <Link href="/add">
-              <Button>Add Command</Button>
-            </Link>
-          )}
-          {isProcessPage ? (
-            <Link href="/process/add">
-              <Button>Create Process</Button>
-            </Link>
-          ) : (
-            <Link href="/process">
-              <Button>Processes</Button>
-            </Link>
-          )}
+          {renderNavigationButton()}
           <UserButton />
         </div>
       </div>

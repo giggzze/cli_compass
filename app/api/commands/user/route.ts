@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { userCommands } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
-import { CommandService } from "@/services/db";
+import { CommandService } from "@/app/services";
 
 export async function GET() {
 	try {
