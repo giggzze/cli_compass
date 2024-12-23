@@ -9,6 +9,7 @@ export interface Command {
   usage?: string;
   isPrivate: boolean;
   categoryId: string;
+  owner?: string;
 }
 
 export interface GetCommand extends Command {
