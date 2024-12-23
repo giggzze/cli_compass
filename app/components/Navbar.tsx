@@ -14,7 +14,7 @@ function Navbar() {
       case "/commands/user":
         return (
           <>
-            <Link href="/add">
+            <Link href="/commands/add">
               <Button>Add Command</Button>
             </Link>
             <Link href="/process">

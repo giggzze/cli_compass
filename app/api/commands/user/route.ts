@@ -51,8 +51,10 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	try {
+		// check the user is authenticated and get the user id
 		const { userId } = await auth();
 
+		// return if the user is not authenticated
 		if (!userId) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
@@ -60,7 +62,8 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const { command_id, is_favorite } = await request.json();
+		// get the form data from the request
+		const { name, description, category_id, is_private, command_id} = await request.json();
 
 		if (!command_id) {
 			return NextResponse.json(
