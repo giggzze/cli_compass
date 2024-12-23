@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
-import { userCommands } from "@/db/schema";
+import { categories, commands, userCommands } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { CommandService } from "@/app/services";
@@ -51,10 +51,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	try {
-		// check the user is authenticated and get the user id
 		const { userId } = await auth();
 
-		// return if the user is not authenticated
 		if (!userId) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
@@ -62,111 +60,58 @@ export async function POST(request: Request) {
 			);
 		}
 
-		// get the form data from the request
-		const { name, description, category_id, is_private, command_id} = await request.json();
+		const { name, description, category_id, is_private } =
+			await request.json();
 
-		if (!command_id) {
+		if (!name || !description || !category_id) {
 			return NextResponse.json(
-				{ success: false, error: "Command ID is required" },
+				{ success: false, error: "Missing required fields" },
 				{ status: 400 }
 			);
 		}
 
-		try {
-			// Check if user-command association exists
-			const existingAssociation = await CommandService.checkUserAssociation(userId, command_id);
+		// Check if the category exists
+		const existingCategory = await db
+			.select()
+			.from(categories)
+			.where(eq(categories.id, category_id))
+			.limit(1);
 
-			if (!existingAssociation) {
-				// Create new association
-				await CommandService.createUserAssociation(userId, command_id, is_favorite ?? false);
-			} else {
-				// Update existing association
-				await CommandService.updateUserAssociation(userId, command_id, is_favorite ?? false);
-			}
-
-			return NextResponse.json({
-				success: true,
-			});
-		} catch (error) {
-			console.error("Error updating user command:", error);
+		if (existingCategory.length === 0) {
 			return NextResponse.json(
-				{ success: false, error: "Failed to update user command" },
-				{ status: 500 }
+				{ success: false, error: "Invalid category_id" },
+				{ status: 400 }
 			);
 		}
+
+		// Insert the command
+		const newCommand = await db
+			.insert(commands)
+			.values({
+				name,
+				description,
+				categoryId: category_id,
+				usage: description, // You might want to make this a separate field in the form
+				isPrivate: is_private ?? true,
+			})
+			.returning();
+
+		// Create user-command association
+		await db.insert(userCommands).values({
+			userId: userId,
+			commandId: newCommand[0].id,
+			isFavorite: false,
+		});
+
+		return NextResponse.json({
+			success: true,
+			data: newCommand[0],
+		});
 	} catch (error) {
-		console.error("Error updating user command:", error);
+		console.error("Error creating command:", error);
 		return NextResponse.json(
-			{ success: false, error: "Failed to update user command" },
+			{ success: false, error: "Failed to create command" },
 			{ status: 500 }
 		);
 	}
 }
-
-// old code
-// export async function POST(request: Request) {
-// 	try {
-// 		const { userId } = await auth();
-
-// 		if (!userId) {
-// 			return NextResponse.json(
-// 				{ success: false, error: "Unauthorized" },
-// 				{ status: 401 }
-// 			);
-// 		}
-
-// 		const { name, description, category_id, is_private }: CommandRequest =
-// 			await request.json();
-
-// 		if (!name || !description || !category_id) {
-// 			return NextResponse.json(
-// 				{ success: false, error: "Missing required fields" },
-// 				{ status: 400 }
-// 			);
-// 		}
-
-// 		// Check if the category exists
-// 		const existingCategory = await db
-// 			.select()
-// 			.from(categories)
-// 			.where(eq(categories.id, category_id))
-// 			.limit(1);
-
-// 		if (existingCategory.length === 0) {
-// 			return NextResponse.json(
-// 				{ success: false, error: "Invalid category_id" },
-// 				{ status: 400 }
-// 			);
-// 		}
-
-// 		// Insert the command
-// 		const newCommand = await db
-// 			.insert(commands)
-// 			.values({
-// 				name,
-// 				description,
-// 				categoryId: category_id,
-// 				usage: description, // You might want to make this a separate field in the form
-// 				isPrivate: is_private ?? true,
-// 			})
-// 			.returning();
-
-// 		// Create user-command association
-// 		await db.insert(userCommands).values({
-// 			userId: userId,
-// 			commandId: newCommand[0].id,
-// 			isFavorite: false,
-// 		});
-
-// 		return NextResponse.json({
-// 			success: true,
-// 			data: newCommand[0],
-// 		});
-// 	} catch (error) {
-// 		console.error("Error creating command:", error);
-// 		return NextResponse.json(
-// 			{ success: false, error: "Failed to create command" },
-// 			{ status: 500 }
-// 		);
-// 	}
-// }
