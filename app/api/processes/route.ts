@@ -3,7 +3,7 @@ import { db } from "@/db";
 import { processes, processSteps } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
-import { ProcessStep, ProcessWithSteps } from "@/lib/types";
+import { ProcessStep, ProcessWithSteps } from "@/lib/db.types";
 
 export async function GET() {
   try {

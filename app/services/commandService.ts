@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { commands, categories, userCommands, userProfiles } from "@/db/schema";
-import { CreateCommandDTO, GetCommandDTO} from "@/lib/types";
+import { CreateCommandDTO, GetCommandDTO} from "@/lib/db.types";
 import { and, eq } from "drizzle-orm";
 
 export class CommandService {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Category, Command, GetCommandDTO } from "@/lib/types";
+import { Category, Command, GetCommandDTO } from "@/lib/db.types";
 import CommandSearch from "./CommandSearch";
 import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";

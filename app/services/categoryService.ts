@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { categories } from "@/db/schema";
-import { Category } from "@/lib/types";
+import { Category } from "@/lib/db.types";
 import { eq } from "drizzle-orm";
 
 export class CategoryService {

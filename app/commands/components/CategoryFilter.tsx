@@ -1,4 +1,4 @@
-import { Category } from "@/lib/types";
+import { Category } from "@/lib/db.types";
 
 interface CategoryFilterProps {
   categories: Category[];
