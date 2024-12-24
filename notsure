@@ -61,3 +61,35 @@ try {
 		{ status: 500 }
 	);
 }
+
+
+
+
+
+profile
+
+try {
+    const response = await fetch(
+      new URL("/api/profile", process.env.NEXT_PUBLIC_URL),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create profile");
+    }
+
+    const data = await response.json();
+    if (data.profile) {
+      redirect("/");
+    }
+  } catch (error) {
+    throw error;
+  }

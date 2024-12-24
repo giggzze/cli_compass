@@ -1,3 +1,7 @@
+import { supabase } from "@/supabase";
+import { userProfiles } from "@/db/schema";
+import { eq } from "drizzle-orm";
+
 export class UserService {
 	/**
 	 * Checks if the given user is the owner of the specified command.
@@ -8,5 +12,14 @@ export class UserService {
 	 */
 	static isOwner(userId: string, commandId: string) {
 		return userId === commandId;
+	}
+
+	static async userExists(userId: string) {
+		const { data } = await supabase
+			.from('user_profiles')
+			.select()
+			.eq('id', userId)
+			.single();
+		return data;
 	}
 }

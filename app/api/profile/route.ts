@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await request.json();
+    const { userId, username, userImageUrl } = await request.json();
 
     // Verify that the userId from the request matches the authenticated user
     if (!userId) {
@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
       .values({
         id: userId,
         isActive: true,
+        username,
+        avatarUrl: userImageUrl,
       })
       .returning();
 

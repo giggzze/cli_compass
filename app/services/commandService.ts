@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { commands, categories, userCommands } from "@/db/schema";
+import { commands, categories, userCommands, userProfiles } from "@/db/schema";
 import { Command, CreateCommandDTO, GetCommandDTO} from "@/lib/types";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
@@ -26,9 +26,16 @@ export class CommandService {
 						id: categories.id,
 						name: categories.name,
 					},
+					user: {
+						id: userProfiles.id,
+						username: userProfiles.username,
+						avatarUrl: userProfiles.avatarUrl,
+					},
 				})
 				.from(commands)
 				.leftJoin(categories, eq(commands.categoryId, categories.id))
+				.leftJoin(userCommands, eq(commands.id, userCommands.commandId))
+				.leftJoin(userProfiles, eq(userCommands.userId, userProfiles.id))
 				.where(eq(commands.isPrivate, false));
 
 			return publicCommands;
@@ -59,10 +66,16 @@ export class CommandService {
 						id: categories.id,
 						name: categories.name,
 					},
+					user: {
+						id: userProfiles.id,
+						username: userProfiles.username,
+						avatarUrl: userProfiles.avatarUrl,
+					},
 				})
-				.from(userCommands)
-				.innerJoin(commands, eq(userCommands.commandId, commands.id))
+				.from(commands)
 				.leftJoin(categories, eq(commands.categoryId, categories.id))
+				.leftJoin(userCommands, eq(commands.id, userCommands.commandId))
+				.leftJoin(userProfiles, eq(userCommands.userId, userProfiles.id))
 				.where(eq(userCommands.userId, userId));
 
 			return userCommandsResult;

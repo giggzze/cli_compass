@@ -39,8 +39,13 @@ export interface UpdateCommandDTO {
 
 export interface GetCommandDTO extends Command {
   category: Category | null;
-  isFavorite?: boolean;
+  isFavorite?: boolean | null;
   lastUsed?: string;
+  user?: {
+    id: string;
+    username: string | null;
+    avatarUrl: string | null;
+  } | null;
 }
 
 // forms

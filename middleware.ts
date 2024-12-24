@@ -1,69 +1,64 @@
-import {
-  clerkMiddleware,
-  createRouteMatcher,
-  getAuth,
-} from "@clerk/nextjs/server";
+import { authMiddleware } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
-import { supabase } from "./db";
-export default clerkMiddleware(async (auth, req) => {
-  
- // TODO: dont forget to remove this later
-  return NextResponse.next();
+import { UserService } from "./app/services/userService";
 
-  const { userId } = await auth();
-  const path = req.nextUrl.pathname;
-  console.log("path", path);
+export default authMiddleware({
+  publicRoutes: ["/", "/sign-in", "/sign-up"],
+  async afterAuth(auth, req, evt) {
+    const { userId } = auth;
+    const path = req.nextUrl.pathname;
+    console.log("path", path);
 
-  // Public paths that don't require authentication
-  const publicPaths = [
-    "/_next",
-    "/api",
-    "/",
-    "/commands",
-    "/login",
-    "/profile-setup"
-  ];
+    // Paths that require authentication
+    const privatePaths = [
+      "/commands/user",
+      "/settings",
+      "/profile",
+    ];
 
-  // Check if the current path is public
-  const isPublicPath = publicPaths.some(publicPath => 
-    path === publicPath || path.startsWith(publicPath + "/")
-  );
+    // Check if the current path is private
+    const isPrivatePath = privatePaths.some(privatePath => 
+      path === privatePath || path.startsWith(privatePath + "/")
+    );
 
-  if (isPublicPath) {
-    console.log("skipping middleware - public path:", path);
-    return NextResponse.next();
-  }
-
-  // For all other paths, require authentication
-  if (!userId) {
-    console.log("redirecting to login - private path:", path);
-    return NextResponse.redirect(new URL('/login', req.url));
-  }
-
-  try {
-    // Check if user has a profile
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select()
-      .eq("id", userId)
-      .single();
-    // If no profile and not already on profile setup page, redirect to profile setup
-    if (!profile && path !== "/profile-setup") {
-      return NextResponse.redirect(new URL("/profile-setup", req.url));
+    // If it's not a private path, allow access
+    if (!isPrivatePath) {
+      console.log("skipping middleware - public path:", path);
+      return NextResponse.next();
     }
 
-    return NextResponse.next();
-  } catch (error) {
-    console.error("Error in middleware:", error);
+    // For private paths, require authentication
+    if (!userId) {
+      console.log("redirecting to login - private path:", path);
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+
+    // Special handling for profile-setup path
+    if (path === "/profile-setup") {
+      const userExists = await UserService.userExists(userId);
+      if (userExists) {
+        // If user has a profile, redirect them away from profile setup
+        return NextResponse.redirect(new URL('/', req.url));
+      }
+      // If no profile, allow them to continue to profile setup
+      return NextResponse.next();
+    }
+
+    // For all private paths, check if user has a profile
+    const userExists = await UserService.userExists(userId);
+    if (!userExists) {
+      // If no profile, redirect to profile setup
+      return NextResponse.redirect(new URL('/profile-setup', req.url));
+    }
+
+    // Allow the request to proceed
     return NextResponse.next();
   }
 });
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/",
   ],
 };

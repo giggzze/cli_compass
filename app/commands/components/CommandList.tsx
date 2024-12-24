@@ -1,5 +1,6 @@
 import { Command } from "@/lib/types";
 import { useState } from "react";
+import Image from "next/image";
 
 interface CommandListProps {
   commands: Command[];
@@ -41,6 +42,20 @@ export default function CommandList({
             <div className="space-y-4">
               <div>
                 <div className="flex flex-wrap gap-2 mb-2">
+                  {command.user.id && (
+                    <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium flex items-center gap-1">
+                      {command.user.avatarUrl && (
+                        <Image
+                          src={command.user.avatarUrl}
+                          alt={`${command.user.username}'s avatar`}
+                          width={16}
+                          height={16}
+                          className="rounded-full"
+                        />
+                      )}
+                      Owner: {command.user.username}
+                    </span>
+                  )}
                   {command.isPrivate ? (
                     <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
                       Private
@@ -48,11 +63,6 @@ export default function CommandList({
                   ) : (
                     <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                       Public
-                    </span>
-                  )}
-                  {command.owner && (
-                    <span className="px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
-                      Owner: {command.owner}
                     </span>
                   )}
                 </div>
