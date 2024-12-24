@@ -1,4 +1,4 @@
-import { Category } from "@/lib/oldTyes";
+import { Category } from "@/lib/types";
 
 interface CategoryFilterProps {
   categories: Category[];

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { Category, Command } from "@/lib/types";
+import { Category, Command, GetCommandDTO } from "@/lib/types";
 import CommandSearch from "./CommandSearch";
 import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";
@@ -50,23 +50,22 @@ export default function CommandsPageContent({
 
         if (commandsData.success) {
           formattedCommands = commandsData.data
-            .filter((cmd: Command) => !cmd.isPrivate || userId)
-            .map((cmd: Command) => ({
+            .filter((cmd: GetCommandDTO) => !cmd.isPrivate || userId)
+            .map((cmd: GetCommandDTO) => ({
               id: cmd.id,
               description: cmd.description,
               code: cmd.code,
-              category: {
-                id: cmd.category.id,
-                name: cmd.category.name,
+              category: cmd.category || {
+                id: cmd.categoryId,
+                name: "Uncategorized",
               },
-              tags: cmd.tags || [],
               isFavorite: cmd.isFavorite ?? false,
               isPrivate: cmd.isPrivate,
-              userId: cmd.userId,
-              user: {
-                id: cmd.user.id,
-                username: cmd.user.username,
-                avatarUrl: cmd.user.avatarUrl,
+              userId: cmd.user?.id,
+              user: cmd.user || {
+                id: "",
+                username: null,
+                avatarUrl: null,
               },
             }));
           setCommands(formattedCommands);
@@ -77,7 +76,7 @@ export default function CommandsPageContent({
         const categoriesData = await categoriesResponse.json();
         if (categoriesData.success) {
           const usedCategoryIds = new Set(
-            formattedCommands.map((cmd) => cmd.category.id)
+            formattedCommands.map((cmd) => cmd.category?.id)
           );
           const filteredCategories = categoriesData.data.filter(
             (cat: Category) => usedCategoryIds.has(cat.id)
@@ -112,12 +111,32 @@ export default function CommandsPageContent({
     setSelectedCategory(category);
   };
 
-  const handleSearchChange = (query: string) => {
-    setSearchQuery(query);
-  };
+  // const handleSearchChange = (query: string) => {
+  //   setSearchQuery(query);
+  // };
 
   const handleFavoritesToggle = () => {
     setShowFavoritesOnly(!showFavoritesOnly);
+  };
+
+  const handleToggleFavorite = async (commandId: string) => {
+    if (!userId) return;
+
+    try {
+      const response = await fetch(`/api/commands/${commandId}/favorite`, {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        setCommands(
+          commands.map((cmd) =>
+            cmd.id === commandId ? { ...cmd, isFavorite: !cmd.isFavorite } : cmd
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
   };
 
   const filteredCommands = useMemo(() => {
@@ -125,7 +144,7 @@ export default function CommandsPageContent({
       // Filter by category
       if (
         selectedCategory.id !== "all" &&
-        cmd.category.id !== selectedCategory.id
+        cmd.category?.id !== selectedCategory.id
       ) {
         return false;
       }
@@ -136,7 +155,7 @@ export default function CommandsPageContent({
       }
 
       // Filter by user commands
-      if (showUserCommandsOnly && cmd.userId !== userId) {
+      if (showUserCommandsOnly && cmd.user?.id !== userId) {
         return false;
       }
 
@@ -144,9 +163,8 @@ export default function CommandsPageContent({
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
-          cmd.name.toLowerCase().includes(query) ||
-          cmd.description.toLowerCase().includes(query) ||
-          cmd.tags.some((tag) => tag.toLowerCase().includes(query))
+          cmd.code.toLowerCase().includes(query) ||
+          cmd.description.toLowerCase().includes(query)
         );
       }
 
@@ -161,10 +179,20 @@ export default function CommandsPageContent({
     userId,
   ]);
 
+  const transformedCommands = useMemo(() => {
+    return filteredCommands.map((cmd) => ({
+      ...cmd,
+      isFavorite: !!cmd.isFavorite,
+    }));
+  }, [filteredCommands]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8 space-y-6">
-        <CommandSearch value={searchQuery} onChange={setSearchQuery} />
+        <CommandSearch
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+        />
         {shouldFetchUserId && (
           <CommandFilters
             showFavorites={showFavoritesOnly}
@@ -179,11 +207,12 @@ export default function CommandsPageContent({
           onCategoryChange={handleCategoryChange}
         />
         <CommandList
-          commands={filteredCommands}
+          commands={transformedCommands}
           isLoading={isLoading}
           showFavoritesToggle={shouldFetchUserId}
           showFavoritesOnly={showFavoritesOnly}
           onFavoritesToggle={handleFavoritesToggle}
+          onToggleFavorite={handleToggleFavorite}
         />
       </div>
     </div>

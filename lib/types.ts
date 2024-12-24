@@ -20,7 +20,7 @@ export type ProcessStep = typeof processSteps.$inferSelect;
 // process
 export interface ProcessWithSteps extends Process {
   steps: ProcessStep[];
-};
+}
 
 // commands
 export interface CreateCommandDTO {
@@ -41,19 +41,29 @@ export interface GetCommandDTO extends Command {
   category: Category | null;
   isFavorite?: boolean | null;
   lastUsed?: string;
-  user?: {
+  user: {
     id: string;
-    username: string | null;
-    avatarUrl: string | null;
+    username: string;
+    avatarUrl: string;
+  } | null;
+}
+
+export interface GetCommandAndUserDTO extends Command {
+  isFavorite: boolean;
+  category: Category | null;
+  user: {
+    id: string;
+    username: string;
+    avatarUrl: string;
   } | null;
 }
 
 // forms
 export interface CommandFormData {
-  code : string;
-  category_id: string;
-  customCategory: string;
-  is_private: boolean;
+  code: string;
+  categoryId: string;
+  customCategory?: string;
+  isPrivate: boolean;
 }
 
 export interface CategoryFormData {

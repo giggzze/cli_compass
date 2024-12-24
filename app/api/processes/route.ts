@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { processes, processSteps } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { ProcessStep, ProcessWithSteps } from "@/lib/types";
 
@@ -21,14 +21,12 @@ export async function GET() {
       .select({
         id: processes.id,
         title: processes.title,
-        created_at: processes.created_at,
-        updated_at: processes.updated_at,
         steps: processSteps,
       })
       .from(processes)
-      .leftJoin(processSteps, eq(processes.id, processSteps.process_id))
-      .where(eq(processes.user_id, userId))
-      .orderBy(desc(processes.created_at));
+      .leftJoin(processSteps, eq(processes.id, processSteps.processId))
+      .where(eq(processes.userId, userId))
+      // .orderBy(desc(processes.created_at));
 
     // Group steps by process
     const formattedProcesses = allProcesses.reduce(
@@ -38,10 +36,8 @@ export async function GET() {
           acc.push({
             id: curr.id,
             title: curr.title,
-            created_at: curr.created_at,
-            updated_at: curr.updated_at,
             steps: curr.steps ? [curr.steps] : [],
-            user_id: "",
+            userId: "",
           });
         } else if (curr.steps) {
           existingProcess.steps.push(curr.steps);
@@ -89,15 +85,15 @@ export async function POST(request: Request) {
       .insert(processes)
       .values({
         title,
-        user_id: userId,
+        userId: userId,
       })
       .returning();
 
     // Create steps
     const stepsToInsert = steps.map((step: ProcessStep, index: number) => ({
-      process_id: newProcess.id,
+      processId: newProcess.id,
       title: step.title,
-      description: step.description,
+      stepExplanation: step.stepExplanation,
       code_block: step.code_block || null,
       order: index,
     }));

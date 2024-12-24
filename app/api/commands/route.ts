@@ -1,8 +1,4 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { commands, categories, userCommands } from "@/db/schema";
-import { desc, eq, and } from "drizzle-orm";
-import { auth } from "@clerk/nextjs/server";
 import { CommandService } from "@/app/services";
 
 export async function GET() {

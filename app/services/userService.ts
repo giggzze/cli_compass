@@ -1,6 +1,4 @@
 import { supabase } from "@/supabase";
-import { userProfiles } from "@/db/schema";
-import { eq } from "drizzle-orm";
 
 export class UserService {
 	/**

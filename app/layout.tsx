@@ -3,10 +3,8 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
-import Login from "./components/Login";
+// import { ToastContainer } from "react-toastify";
 import Navbar from "./components/Navbar";
-import Landing from "./components/Landing";
 import PublicNavbar from "./components/PublicNavbar";
 
 const inter = Inter({ subsets: ["latin"] });

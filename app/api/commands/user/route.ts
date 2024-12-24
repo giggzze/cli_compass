@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { categories, commands, userCommands } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { CategoryService, CommandService } from "@/app/services";
 

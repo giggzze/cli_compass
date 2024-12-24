@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import TagSearch from "./TagSearch";
-import { Tag } from "@/lib/oldTyes";
+import { Tag } from "@/lib/types";
 
 interface TagsFilterProps {
   tags: Tag[];

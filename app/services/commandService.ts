@@ -1,8 +1,7 @@
 import { db } from "@/db";
 import { commands, categories, userCommands, userProfiles } from "@/db/schema";
-import { Command, CreateCommandDTO, GetCommandDTO} from "@/lib/types";
+import { CreateCommandDTO, GetCommandDTO} from "@/lib/types";
 import { and, eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
 
 export class CommandService {
 	/**
@@ -163,7 +162,6 @@ export class CommandService {
 			.update(userCommands)
 			.set({
 				isFavorite: is_favorite,
-				lastUsed: new Date().toISOString(),
 			})
 			.where(
 				and(
@@ -190,7 +188,6 @@ export class CommandService {
 			userId,
 			commandId: command_id,
 			isFavorite: is_favorite,
-			lastUsed: new Date().toISOString(),
 		});
 	}
 

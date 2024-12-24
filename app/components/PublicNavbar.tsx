@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton, UserButton } from "@clerk/nextjs";
+import { SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -16,7 +16,7 @@ function PublicNavbar() {
           <h1 className="text-2xl font-bold text-gray-900">CLI Compass</h1>
         </Link>
         <div className="flex items-center gap-4">
-          {pathname !== '/' && (
+          {pathname !== "/" && (
             <>
               <Link href="/commands">
                 <Button variant="ghost">Commands</Button>
@@ -26,7 +26,7 @@ function PublicNavbar() {
               </Link>
             </>
           )}
-          {pathname === '/' && (
+          {pathname === "/" && (
             <SignInButton mode="modal">
               <Button variant="ghost">Sign In</Button>
             </SignInButton>

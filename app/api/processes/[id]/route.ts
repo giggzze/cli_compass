@@ -25,12 +25,10 @@ export async function GET(
       .select({
         id: processes.id,
         title: processes.title,
-        created_at: processes.created_at,
-        updated_at: processes.updated_at,
         steps: processSteps,
       })
       .from(processes)
-      .leftJoin(processSteps, eq(processes.id, processSteps.process_id))
+      .leftJoin(processSteps, eq(processes.id, processSteps.processId))
       .where(eq(processes.id, params.id))
       .orderBy(desc(processSteps.order));
 
@@ -45,8 +43,6 @@ export async function GET(
     const formattedProcess = {
       id: process[0].id,
       title: process[0].title,
-      created_at: process[0].created_at,
-      updated_at: process[0].updated_at,
       steps: process
         .filter((p) => p.steps !== null)
         .map((p) => p.steps!)
@@ -105,7 +101,7 @@ export async function PUT(
     }
 
     // Verify ownership
-    if (existingProcess[0].user_id !== userId) {
+    if (existingProcess[0].userId !== userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 401 },
@@ -117,12 +113,12 @@ export async function PUT(
       // Delete existing steps
       await tx
         .delete(processSteps)
-        .where(eq(processSteps.process_id, params.id));
+        .where(eq(processSteps.processId, params.id));
 
       // Update process title
       await tx
         .update(processes)
-        .set({ title, updated_at: new Date() })
+        .set({ title })
         .where(eq(processes.id, params.id));
 
       // Insert new steps
@@ -130,9 +126,9 @@ export async function PUT(
         .insert(processSteps)
         .values(
           steps.map((step: ProcessStep, index: number) => ({
-            process_id: params.id,
+            processId: params.id,
             title: step.title,
-            description: step.description,
+            stepExplanation: step.stepExplanation,
             code_block: step.code_block || null,
             order: index,
           })),
@@ -144,20 +140,16 @@ export async function PUT(
         .select({
           id: processes.id,
           title: processes.title,
-          created_at: processes.created_at,
-          updated_at: processes.updated_at,
           steps: processSteps,
         })
         .from(processes)
-        .leftJoin(processSteps, eq(processes.id, processSteps.process_id))
+        .leftJoin(processSteps, eq(processes.id, processSteps.processId))
         .where(eq(processes.id, params.id))
         .orderBy(desc(processSteps.order));
 
       return {
         id: updatedProcess[0].id,
         title: updatedProcess[0].title,
-        created_at: updatedProcess[0].created_at,
-        updated_at: updatedProcess[0].updated_at,
         steps: updatedProcess
           .filter((p) => p.steps !== null)
           .map((p) => p.steps!)
