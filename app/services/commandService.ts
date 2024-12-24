@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { commands, categories, userCommands } from "@/db/schema";
-import { Command, GetCommandDTO} from "@/lib/types";
+import { Command, CreateCommandDTO, GetCommandDTO} from "@/lib/types";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
@@ -18,9 +18,8 @@ export class CommandService {
 			const publicCommands = await db
 				.select({
 					id: commands.id,
-					name: commands.name,
 					description: commands.description,
-					usage: commands.usage,
+					code: commands.code,
 					isPrivate: commands.isPrivate,
 					categoryId: commands.categoryId,
 					category: {
@@ -51,13 +50,11 @@ export class CommandService {
 			const userCommandsResult = await db
 				.select({
 					id: commands.id,
-					name: commands.name,
 					description: commands.description,
-					usage: commands.usage,
+					code: commands.code,
 					isPrivate: commands.isPrivate,
 					categoryId: commands.categoryId,
 					isFavorite: userCommands.isFavorite,
-					lastUsed: userCommands.lastUsed,
 					category: {
 						id: categories.id,
 						name: categories.name,
@@ -84,7 +81,7 @@ export class CommandService {
 	 * @throws Will throw an error if the command creation fails.
 	 */
 	static async createCommand(
-		data: Command,
+		data: CreateCommandDTO,
 		userId: string
 	): Promise<boolean> {
 		try {
@@ -92,9 +89,8 @@ export class CommandService {
 			const newCommand = await db
 				.insert(commands)
 				.values({
-					name: data.name,
 					description: data.description,
-					usage: data.usage,
+					code: data.code,
 					isPrivate: data.isPrivate,
 					categoryId: data.categoryId,
 				})

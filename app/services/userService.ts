@@ -1,0 +1,12 @@
+export class UserService {
+	/**
+	 * Checks if the given user is the owner of the specified command.
+	 *
+	 * @param userId - The ID of the user.
+	 * @param commandId - The ID of the command.
+	 * @returns `true` if the user is the owner of the command, otherwise `false`.
+	 */
+	static isOwner(userId: string, commandId: string) {
+		return userId === commandId;
+	}
+}

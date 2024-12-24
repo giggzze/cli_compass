@@ -15,6 +15,13 @@
       "when": 1734298024507,
       "tag": "0001_nosy_lady_mastermind",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1734990862093,
+      "tag": "0002_nasty_zaladane",
+      "breakpoints": true
     }
   ]
 }

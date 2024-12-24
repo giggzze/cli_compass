@@ -36,9 +36,8 @@ export const commands = pgTable(
 			.default(sql`uuid_generate_v4()`)
 			.primaryKey()
 			.notNull(),
-		name: text().notNull(),
 		description: text().notNull(),
-		usage: text().notNull(),
+		code: text().notNull(),
 		categoryId: text("category_id").notNull(),
 		isPrivate: boolean("is_private").default(true).notNull(),
 	},
@@ -79,7 +78,6 @@ export const userCommands = pgTable(
 		userId: text("user_id").notNull(),
 		commandId: text("command_id").notNull(),
 		isFavorite: boolean("is_favorite").default(false).notNull(),
-		lastUsed: timestamp("last_used", { mode: "string" }).defaultNow(),
 	},
 	table => {
 		return {
@@ -108,12 +106,8 @@ export const userProfiles = pgTable("user_profiles", {
 		.primaryKey()
 		.notNull(),
 	isActive: boolean("is_active").default(true).notNull(),
-	createdAt: timestamp("created_at", { mode: "string" })
-		.defaultNow()
-		.notNull(),
-	updatedAt: timestamp("updated_at", { mode: "string" })
-		.defaultNow()
-		.notNull(),
+	username: text("username"),
+	avatarUrl: text("avatar_url"),
 });
 
 export const commandTags = pgTable(
@@ -147,7 +141,7 @@ export const processes = pgTable("processes", {
 		.primaryKey()
 		.default(sql`uuid_generate_v4()`),
 	title: text("title").notNull(),
-	user_id: text("user_id")
+	userId: text("user_id")
 		.references(() => userProfiles.id)
 		.notNull(),
 });
@@ -156,11 +150,11 @@ export const processSteps = pgTable("process_steps", {
 	id: text("id")
 		.primaryKey()
 		.default(sql`uuid_generate_v4()`),
-	process_id: text("process_id")
+	processId: text("process_id")
 		.references(() => processes.id)
 		.notNull(),
 	title: text("title").notNull(),
-	description: text("description").notNull(),
+	stepExplanation: text("description").notNull(),
 	code_block: text("code_block"),
 	order: integer("order").notNull(),
 });

@@ -5,8 +5,11 @@ import {
 } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { supabase } from "./db";
-
 export default clerkMiddleware(async (auth, req) => {
+  
+ // TODO: dont forget to remove this later
+  return NextResponse.next();
+
   const { userId } = await auth();
   const path = req.nextUrl.pathname;
   console.log("path", path);

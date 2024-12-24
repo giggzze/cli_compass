@@ -76,7 +76,7 @@ export default function RootLayout({
             <Navbar />
             {children}
           </SignedIn>
-          <ToastContainer
+          {/* <ToastContainer
             position="bottom-right"
             autoClose={2000}
             hideProgressBar={false}
@@ -87,7 +87,7 @@ export default function RootLayout({
             draggable
             pauseOnHover
             theme="light"
-          />
+          /> */}
         </body>
       </html>
     </ClerkProvider>

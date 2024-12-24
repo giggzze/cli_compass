@@ -18,27 +18,23 @@ export type Process = typeof processes.$inferSelect;
 export type ProcessStep = typeof processSteps.$inferSelect;
 
 // process
-export type ProcessWithSteps = Process & {
+export interface ProcessWithSteps extends Process {
   steps: ProcessStep[];
 };
 
 // commands
 export interface CreateCommandDTO {
-  name: string;
   description: string;
-  usage?: string;
+  code: string;
   isPrivate: boolean;
   categoryId: string;
-  tags?: string[];
 }
 
 export interface UpdateCommandDTO {
-  name?: string;
   description?: string;
-  usage?: string;
+  code?: string;
   isPrivate?: boolean;
   categoryId?: string;
-  tags?: string[];
 }
 
 export interface GetCommandDTO extends Command {
@@ -49,11 +45,9 @@ export interface GetCommandDTO extends Command {
 
 // forms
 export interface CommandFormData {
-  name: string;
-  description: string;
+  code : string;
   category_id: string;
   customCategory: string;
-  tags: string[];
   is_private: boolean;
 }
 

@@ -41,6 +41,23 @@ export class CategoryService {
 		}
 	}
 
+	static async categoryExists(id: string): Promise<boolean> {
+		try {
+			// Check if a category with the given name already exists in the database
+			const category = await db
+				.select()
+				.from(categories)
+				.where(eq(categories.id, id))
+				.limit(1);
+				
+				if (category.length === 0) return false;
+				return true;
+		} catch (error) {
+			console.error("Error in categoryExists:", error);
+			throw new Error("Failed to check category existence");
+		}
+	}
+
 	// static async updateCategory(id: string, name: string): Promise<Category> {
 	// 	try {
 	// 		const [updatedCategory] = await db
