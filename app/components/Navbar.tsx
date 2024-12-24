@@ -60,7 +60,7 @@ function Navbar() {
         </Link>
         <div className="flex items-center gap-4">
           {renderNavigationButton()}
-          <UserButton />
+          <UserButton afterSignOutUrl="/" />
         </div>
       </div>
     </header>

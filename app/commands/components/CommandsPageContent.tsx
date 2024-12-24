@@ -63,6 +63,11 @@ export default function CommandsPageContent({
               isFavorite: cmd.isFavorite ?? false,
               isPrivate: cmd.isPrivate,
               userId: cmd.userId,
+              user: {
+                id: cmd.user.id,
+                username: cmd.user.username,
+                avatarUrl: cmd.user.avatarUrl,
+              },
             }));
           setCommands(formattedCommands);
         }
