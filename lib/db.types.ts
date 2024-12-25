@@ -15,10 +15,7 @@ export type Profile = typeof profiles.$inferSelect;
 export type Process = typeof processes.$inferSelect;
 export type ProcessStep = typeof processSteps.$inferSelect;
 
-// interfaces for categories
-export interface CreateCategoryDto {
-	name: string;
-}
+
 
 // interfaces for commands
 export interface CreateCommandDTO {

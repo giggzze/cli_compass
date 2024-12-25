@@ -1,60 +1,82 @@
-import { db } from "@/db";
-import { categories } from "@/db/schema";
-import { Category } from "@/lib/db.types";
-import { eq } from "drizzle-orm";
+import {db} from "@/db";
+import {categories} from "@/db/schema";
+import {Category} from "@/lib/db.types";
+import {eq} from "drizzle-orm";
+import {CreateCategoryDto} from "@/lib/category.types";
+import {NotFoundError, ValidationError} from "./errorService";
 
 export class CategoryService {
 	static async getAllCategories(): Promise<Category[]> {
 		try {
-			// Select all categories from the database
-			const allCategories: Category[] = await db
-				.select({
-					id: categories.id,
-					name: categories.name,
-				})
+			return await db
+				.select()
 				.from(categories);
-
-			return allCategories;
 		} catch (error) {
+			if (error instanceof NotFoundError) {
+				throw error;
+			}
 			console.error("Error in getAllCategories:", error);
-			throw new Error("Failed to fetch categories");
+			throw new ValidationError("Failed to fetch categories");
 		}
 	}
 
-	static async createCategory(name: string): Promise<Category> {
+	static async createCategory(
+		newCategory: CreateCategoryDto
+	): Promise<Category> {
 		try {
-			// Insert a new category into the database
-			const [newCategory] = await db
+			if (!newCategory.name || newCategory.name.trim().length === 0) {
+				throw new ValidationError("Category name is required");
+			}
+
+			const existingCategory = await db
+				.select()
+				.from(categories)
+				.where(eq(categories.name, newCategory.name))
+				.limit(1);
+
+			if (existingCategory.length > 0) {
+				throw new ValidationError("Category with this name already exists");
+			}
+
+			const [createdCategory] = await db
 				.insert(categories)
 				.values({
-					name,
+					name: newCategory.name.trim(),
 				})
 				.returning();
 
 			return {
-				id: newCategory.id,
-				name: newCategory.name,
+				id: createdCategory.id,
+				name: createdCategory.name,
 			};
 		} catch (error) {
+			if (error instanceof ValidationError) {
+				throw error;
+			}
 			console.error("Error in createCategory:", error);
-			throw new Error("Failed to create category");
+			throw new ValidationError("Failed to create category");
 		}
 	}
 
 	static async categoryExists(id: string): Promise<boolean> {
 		try {
-			// Check if a category with the given name already exists in the database
+			if (!id) {
+				throw new ValidationError("Category ID is required");
+			}
+
 			const category = await db
 				.select()
 				.from(categories)
 				.where(eq(categories.id, id))
 				.limit(1);
-				
-				if (category.length === 0) return false;
-				return true;
+
+			return category.length > 0;
 		} catch (error) {
+			if (error instanceof ValidationError) {
+				throw error;
+			}
 			console.error("Error in categoryExists:", error);
-			throw new Error("Failed to check category existence");
+			throw new ValidationError("Failed to check category existence");
 		}
 	}
 
