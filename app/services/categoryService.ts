@@ -2,12 +2,13 @@ import {db} from "@/db";
 import {categories} from "@/db/schema";
 import {Category} from "@/lib/db.types";
 import {eq} from "drizzle-orm";
-import {CreateCategoryDto} from "@/lib/category.types";
+import {CategoryIdentifier, CreateCategoryDto} from "@/lib/category.types";
 import {NotFoundError, ValidationError} from "./errorService";
 
 export class CategoryService {
 	static async getAllCategories(): Promise<Category[]> {
 		try {
+			// retrieve and return all categories
 			return await db
 				.select()
 				.from(categories);
@@ -24,20 +25,18 @@ export class CategoryService {
 		newCategory: CreateCategoryDto
 	): Promise<Category> {
 		try {
+			// make sure name is not empty
 			if (!newCategory.name || newCategory.name.trim().length === 0) {
 				throw new ValidationError("Category name is required");
 			}
 
-			const existingCategory = await db
-				.select()
-				.from(categories)
-				.where(eq(categories.name, newCategory.name))
-				.limit(1);
-
-			if (existingCategory.length > 0) {
+			// check if category already exists
+			const exists = await CategoryService.categoryExists({ name: newCategory.name });
+			if (exists) {
 				throw new ValidationError("Category with this name already exists");
 			}
 
+			// create new category
 			const [createdCategory] = await db
 				.insert(categories)
 				.values({
@@ -58,18 +57,27 @@ export class CategoryService {
 		}
 	}
 
-	static async categoryExists(id: string): Promise<boolean> {
+	static async categoryExists(identifier: CategoryIdentifier): Promise<boolean> {
 		try {
-			if (!id) {
-				throw new ValidationError("Category ID is required");
+			// check what kind of identifier is provided
+			if (!identifier.id && !identifier.name) {
+				throw new ValidationError("Either category ID or name is required");
 			}
 
-			const category = await db
+			// get all categories
+			const query = db
 				.select()
 				.from(categories)
-				.where(eq(categories.id, id))
 				.limit(1);
 
+			// check if category exists depending on identifier
+			if (identifier.id) {
+				query.where(eq(categories.id, identifier.id));
+			} else if (identifier.name) {
+				query.where(eq(categories.name, identifier.name));
+			}
+
+			const category = await query;
 			return category.length > 0;
 		} catch (error) {
 			if (error instanceof ValidationError) {
@@ -80,33 +88,5 @@ export class CategoryService {
 		}
 	}
 
-	// static async updateCategory(id: string, name: string): Promise<Category> {
-	// 	try {
-	// 		const [updatedCategory] = await db
-	// 			.update(categories)
-	// 			.set({
-	// 				name,
-	// 				updatedAt: new Date().toISOString(),
-	// 			})
-	// 			.where(eq(categories.id, id))
-	// 			.returning();
-
-	// 		return {
-	// 			id: updatedCategory.id,
-	// 			name: updatedCategory.name,
-	// 		};
-	// 	} catch (error) {
-	// 		console.error("Error in updateCategory:", error);
-	// 		throw new Error("Failed to update category");
-	// 	}
-	// }
-
-	// static async deleteCategory(id: string): Promise<void> {
-	// 	try {
-	// 		await db.delete(categories).where(eq(categories.id, id));
-	// 	} catch (error) {
-	// 		console.error("Error in deleteCategory:", error);
-	// 		throw new Error("Failed to delete category");
-	// 	}
-	// }
+	
 }
