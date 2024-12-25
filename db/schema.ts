@@ -27,6 +27,7 @@ export const commands = pgTable("commands", {
 	code: text("code"),
 	categoryId: text("category_id"),
 	visibility: boolean("visibility").default(true),
+	createdAt: text("created_at").default(sql`now()`),
 });
 
 export const userCommands = pgTable("user_commands", {
@@ -54,6 +55,7 @@ export const processes = pgTable("processes", {
 		.default(sql`uuid_generate_v4()`),
 	title: text("title"),
 	userId: text("user_id"),
+	createdAt: text("created_at").default(sql`now()`),
 });
 
 export const processSteps = pgTable("process_steps", {
@@ -61,7 +63,6 @@ export const processSteps = pgTable("process_steps", {
 		.primaryKey()
 		.default(sql`uuid_generate_v4()`),
 	processId: text("process_id"),
-	title: text("title"),
 	stepExplanation: text("stepExplanation"),
 	code: text("code"),
 	order: integer("order"),

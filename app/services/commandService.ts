@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { commands, categories, userCommands, userProfiles } from "@/db/schema";
-import { CreateCommandDTO, GetCommandDTO} from "@/lib/db.types";
+import { categories, commands, profiles, userCommands } from "@/db/schema";
+import { CreateCommandDTO, GetCommandDTO } from "@/lib/command.types";
 import { and, eq } from "drizzle-orm";
 
 export class CommandService {
@@ -14,30 +14,30 @@ export class CommandService {
 	 */
 	static async getPublicCommands(): Promise<GetCommandDTO[]> {
 		try {
-			const publicCommands = await db
+			// Fetch public commands from the database
+			return await db
 				.select({
 					id: commands.id,
 					description: commands.description,
 					code: commands.code,
-					isPrivate: commands.isPrivate,
+					visibility: commands.visibility,
 					categoryId: commands.categoryId,
 					category: {
 						id: categories.id,
 						name: categories.name,
 					},
 					user: {
-						id: userProfiles.id,
-						username: userProfiles.username,
-						avatarUrl: userProfiles.avatarUrl,
+						id: profiles.id,
+						username: profiles.username,
+						avatarUrl: profiles.avatarUrl,
 					},
 				})
 				.from(commands)
 				.leftJoin(categories, eq(commands.categoryId, categories.id))
 				.leftJoin(userCommands, eq(commands.id, userCommands.commandId))
-				.leftJoin(userProfiles, eq(userCommands.userId, userProfiles.id))
-				.where(eq(commands.isPrivate, false));
+				.leftJoin(profiles, eq(userCommands.userId, profiles.id))
+				.where(eq(commands.visibility, true));
 
-			return publicCommands;
 		} catch (error) {
 			console.error("Error in getPublicCommands:", error);
 			throw new Error("Failed to fetch public commands");
@@ -53,31 +53,28 @@ export class CommandService {
 	 */
 	static async getUserCommands(userId: string): Promise<GetCommandDTO[]> {
 		try {
-			const userCommandsResult = await db
+			return await db
 				.select({
 					id: commands.id,
 					description: commands.description,
 					code: commands.code,
-					isPrivate: commands.isPrivate,
+					visibility: commands.visibility,
 					categoryId: commands.categoryId,
-					isFavorite: userCommands.isFavorite,
 					category: {
 						id: categories.id,
 						name: categories.name,
 					},
 					user: {
-						id: userProfiles.id,
-						username: userProfiles.username,
-						avatarUrl: userProfiles.avatarUrl,
+						id: profiles.id,
+						username: profiles.username,
+						avatarUrl: profiles.avatarUrl,
 					},
 				})
 				.from(commands)
 				.leftJoin(categories, eq(commands.categoryId, categories.id))
 				.leftJoin(userCommands, eq(commands.id, userCommands.commandId))
-				.leftJoin(userProfiles, eq(userCommands.userId, userProfiles.id))
+				.leftJoin(profiles, eq(userCommands.userId, profiles.id))
 				.where(eq(userCommands.userId, userId));
-
-			return userCommandsResult;
 		} catch (error) {
 			console.error("Error in getUserCommands:", error);
 			throw new Error("Failed to fetch user commands");
@@ -103,7 +100,7 @@ export class CommandService {
 				.values({
 					description: data.description,
 					code: data.code,
-					isPrivate: data.isPrivate,
+					visibility: data.visibility,
 					categoryId: data.categoryId,
 				})
 				.returning();

@@ -31,8 +31,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
 	try {
+		// Make sure the user is authenticated
 		const { userId } = await auth();
-
 		if (!userId) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
@@ -40,18 +40,20 @@ export async function POST(request: Request) {
 			);
 		}
 
-		const { name, description, category_id, is_private } =
+		// Parse the request body and check for required fields
+		const { code, description, categoryId, visibility} =
 			await request.json();
 
-		if (!name || !description || !category_id) {
+		if (!code || !description || !categoryId || !visibility) {
 			return NextResponse.json(
 				{ success: false, error: "Missing required fields" },
 				{ status: 400 }
 			);
 		}
 
+		// TODO: this should be here, if we are keeping it in this file then we should also get the name of the category so we can create it
 		// Check if the category exists
-		if (!CategoryService.categoryExists(category_id)) {
+		if (!CategoryService.categoryExists(categoryId)) {
 			return NextResponse.json(
 				{ success: false, error: "Invalid category_id" },
 				{ status: 400 }
@@ -62,9 +64,9 @@ export async function POST(request: Request) {
 		 await CommandService.createCommand(
 			{
 				description,
-				categoryId: category_id,
-				code : description, // You might want to make this a separate field in the form
-				isPrivate: is_private ?? true,
+				categoryId,
+				code, 
+				visibility: visibility ?? false,
 			},
 			userId
 		);

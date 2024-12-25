@@ -126,3 +126,24 @@ try {
 	// 		throw new Error("Failed to delete category");
 	// 	}
 	// }
+
+
+	//// removed from process service 
+	 // Group steps by process
+	 const formattedProcesses = allProcesses.reduce(
+        (acc: ProcessWithSteps[], curr) => {
+          const existingProcess = acc.find((p) => p.id === curr.id);
+          if (!existingProcess) {
+            acc.push({
+              id: curr.id,
+              title: curr.title,
+              steps: curr.steps ? [curr.steps] : [],
+              userId: "",
+            });
+          } else if (curr.steps) {
+            existingProcess.steps.push(curr.steps);
+          }
+          return acc;
+        },
+        []
+      );
