@@ -1,17 +1,15 @@
-import {db} from "@/db";
-import {categories} from "@/db/schema";
-import {Category} from "@/lib/db.types";
-import {eq} from "drizzle-orm";
-import {CategoryIdentifier, CreateCategoryDto} from "@/lib/category.types";
-import {NotFoundError, ValidationError} from "./errorService";
+import { db } from "@/db";
+import { categories } from "@/db/schema";
+import { Category } from "@/lib/db.types";
+import { eq } from "drizzle-orm";
+import { CategoryIdentifier, CreateCategoryDto } from "@/lib/category.types";
+import { NotFoundError, ValidationError } from "./errorService";
 
 export class CategoryService {
 	static async getAllCategories(): Promise<Category[]> {
 		try {
 			// retrieve and return all categories
-			return await db
-				.select()
-				.from(categories);
+			return await db.select().from(categories);
 		} catch (error) {
 			if (error instanceof NotFoundError) {
 				throw error;
@@ -21,26 +19,26 @@ export class CategoryService {
 		}
 	}
 
-	static async createCategory(
-		newCategory: CreateCategoryDto
-	): Promise<Category> {
+	static async createCategory(newCategory: string): Promise<Category> {
 		try {
 			// make sure name is not empty
-			if (!newCategory.name || newCategory.name.trim().length === 0) {
+			if (!newCategory) {
 				throw new ValidationError("Category name is required");
 			}
 
 			// check if category already exists
-			const exists = await CategoryService.categoryExists({ name: newCategory.name });
-			if (exists) {
-				throw new ValidationError("Category with this name already exists");
+			const exists = await CategoryService.categoryExists({
+				name: newCategory,
+			});
+			if (exists.exists) {
+				return exists.category![0];
 			}
 
 			// create new category
 			const [createdCategory] = await db
 				.insert(categories)
 				.values({
-					name: newCategory.name.trim(),
+					name: newCategory.trim(),
 				})
 				.returning();
 
@@ -57,18 +55,17 @@ export class CategoryService {
 		}
 	}
 
-	static async categoryExists(identifier: CategoryIdentifier): Promise<boolean> {
+	static async categoryExists(identifier: CategoryIdentifier) {
 		try {
 			// check what kind of identifier is provided
 			if (!identifier.id && !identifier.name) {
-				throw new ValidationError("Either category ID or name is required");
+				throw new ValidationError(
+					"Either category ID or name is required"
+				);
 			}
 
 			// get all categories
-			const query = db
-				.select()
-				.from(categories)
-				.limit(1);
+			const query = db.select().from(categories).limit(1);
 
 			// check if category exists depending on identifier
 			if (identifier.id) {
@@ -78,7 +75,11 @@ export class CategoryService {
 			}
 
 			const category = await query;
-			return category.length > 0;
+			if (category.length > 0)
+				return { exists: true, category: category };
+			return {
+				exists: false,
+			};
 		} catch (error) {
 			if (error instanceof ValidationError) {
 				throw error;
@@ -87,6 +88,4 @@ export class CategoryService {
 			throw new ValidationError("Failed to check category existence");
 		}
 	}
-
-	
 }

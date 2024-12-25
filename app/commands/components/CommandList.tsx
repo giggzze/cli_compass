@@ -1,6 +1,7 @@
 import { GetCommandAndUserDTO } from "@/lib/db.types";
 import { useState } from "react";
 import Image from "next/image";
+import Loading from "@/app/components/Loading";
 
 interface CommandListProps {
 	commands: GetCommandAndUserDTO[];
@@ -35,7 +36,9 @@ export default function CommandList({
 	return (
 		<div className='grid gap-4'>
 			{isLoading ? (
-				<div>Loading...</div>
+				<div className="flex justify-center items-center min-h-[200px]">
+					<Loading size="large" color="text-blue-600" />
+				</div>
 			) : (
 				<>
 					{commands.length === 0 ? (

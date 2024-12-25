@@ -1,4 +1,8 @@
+import { db } from "@/db";
+import { profiles } from "@/db/schema";
 import { supabase } from "@/supabase";
+import { profile } from "console";
+import { eq } from "drizzle-orm";
 
 export class UserService {
 	/**
@@ -14,10 +18,32 @@ export class UserService {
 
 	static async userExists(userId: string) {
 		const { data } = await supabase
-			.from('user_profiles')
+			.from("profiles")
 			.select()
-			.eq('id', userId)
+			.eq("id", userId)
 			.single();
-		return data;
+
+		if (data) return true;
+		return false;
+	}
+
+	static async createProfile(
+		userId: string,
+		username: string,
+		userImageUrl: string
+	) {
+		{
+			const newProfile = await db
+				.insert(profiles)
+				.values({
+					id: userId,
+					username,
+					avatarUrl: userImageUrl,
+				})
+				.returning();
+
+			if (newProfile) return true;
+			return false;
+		}
 	}
 }

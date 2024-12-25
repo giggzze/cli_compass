@@ -26,7 +26,7 @@ export const commands = pgTable("commands", {
 	description: text("description"),
 	code: text("code"),
 	categoryId: text("category_id"),
-	visibility: boolean("visibility").default(true),
+	isPrivate: boolean("is_private").default(true),
 	createdAt: text("created_at").default(sql`now()`),
 });
 

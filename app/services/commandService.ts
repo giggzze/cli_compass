@@ -15,13 +15,14 @@ export class CommandService {
 	static async getPublicCommands(): Promise<GetCommandDTO[]> {
 		try {
 			// Fetch public commands from the database
-			return await db
+			const rt = await db
 				.select({
 					id: commands.id,
 					description: commands.description,
 					code: commands.code,
-					visibility: commands.visibility,
+					isPrivate: commands.isPrivate,
 					categoryId: commands.categoryId,
+					createdAt: commands.createdAt,
 					category: {
 						id: categories.id,
 						name: categories.name,
@@ -36,8 +37,8 @@ export class CommandService {
 				.leftJoin(categories, eq(commands.categoryId, categories.id))
 				.leftJoin(userCommands, eq(commands.id, userCommands.commandId))
 				.leftJoin(profiles, eq(userCommands.userId, profiles.id))
-				.where(eq(commands.visibility, true));
-
+				.where(eq(commands.isPrivate, false));
+			return rt;
 		} catch (error) {
 			console.error("Error in getPublicCommands:", error);
 			throw new Error("Failed to fetch public commands");
@@ -58,8 +59,9 @@ export class CommandService {
 					id: commands.id,
 					description: commands.description,
 					code: commands.code,
-					visibility: commands.visibility,
+					isPrivate: commands.isPrivate,
 					categoryId: commands.categoryId,
+					createdAt: commands.createdAt,
 					category: {
 						id: categories.id,
 						name: categories.name,
@@ -100,8 +102,9 @@ export class CommandService {
 				.values({
 					description: data.description,
 					code: data.code,
-					visibility: data.visibility,
+					isPrivate: data.isPrivate,
 					categoryId: data.categoryId,
+					createdAt: new Date().toISOString(),
 				})
 				.returning();
 

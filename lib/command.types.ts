@@ -4,7 +4,7 @@ import { Category, Command } from "./db.types";
 export interface CreateCommandDTO {
 	description: string;
 	code: string;
-	visibility: boolean;
+	isPrivate: boolean;
 	categoryId: string;
 }
 

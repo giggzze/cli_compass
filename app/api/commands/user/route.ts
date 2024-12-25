@@ -41,32 +41,23 @@ export async function POST(request: Request) {
 		}
 
 		// Parse the request body and check for required fields
-		const { code, description, categoryId, visibility} =
+		const { code, description, categoryId, isPrivate } =
 			await request.json();
 
-		if (!code || !description || !categoryId || !visibility) {
+		if (!code || !description || !categoryId) {
 			return NextResponse.json(
 				{ success: false, error: "Missing required fields" },
 				{ status: 400 }
 			);
 		}
 
-		// TODO: this should be here, if we are keeping it in this file then we should also get the name of the category so we can create it
-		// Check if the category exists
-		if (!CategoryService.categoryExists(categoryId)) {
-			return NextResponse.json(
-				{ success: false, error: "Invalid category_id" },
-				{ status: 400 }
-			);
-		}
-
 		// Create the command in the database
-		 await CommandService.createCommand(
+		await CommandService.createCommand(
 			{
 				description,
 				categoryId,
-				code, 
-				visibility: visibility ?? false,
+				code,
+				isPrivate,
 			},
 			userId
 		);
