@@ -14,7 +14,7 @@ export default authMiddleware({
 			"/commands/user",
 			"/settings",
 			"/profile",
-			"/process",
+			"/process/user",
 		];
 
 		// Check if the current path is private
