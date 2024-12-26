@@ -56,6 +56,7 @@ export const processes = pgTable("processes", {
 	title: text("title"),
 	userId: text("user_id"),
 	createdAt: text("created_at").default(sql`now()`),
+	isPrivate: boolean("is_private").default(true),
 });
 
 export const processSteps = pgTable("process_steps", {

@@ -7,10 +7,10 @@ import { ProcessCard } from "./ProcessCard";
 import { Process } from "@/lib/db.types";
 
 interface ProcessPageContentProps {
-  processesEndpoint: string;
+  privacy: 'public' | 'private';
 }
 
-export default function ProcessPageContent({ processesEndpoint }: ProcessPageContentProps) {
+export default function ProcessPageContent({ privacy }: ProcessPageContentProps) {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedProcessId, setExpandedProcessId] = useState<string | null>(null);
@@ -26,7 +26,8 @@ export default function ProcessPageContent({ processesEndpoint }: ProcessPageCon
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
-        const response = await fetch(processesEndpoint);
+        const endpoint = privacy === 'private' ? '/api/processes/private' : '/api/processes';
+        const response = await fetch(endpoint);
         const data = await response.json();
 
         if (data.success) {
@@ -42,7 +43,7 @@ export default function ProcessPageContent({ processesEndpoint }: ProcessPageCon
     };
 
     fetchProcesses();
-  }, [processesEndpoint]);
+  }, [privacy]);
 
   if (isLoading) {
     return (

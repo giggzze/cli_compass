@@ -3,11 +3,11 @@
 import { LoginPrompt } from "../components/LoginPrompt";
 import ProcessPageContent from "./components/ProcessPageContent";
 
-export default function ProcessPage() {
+export default function PublicProcessPage() {
 	return (
 		<div>
 			<LoginPrompt type="process" />
-			<ProcessPageContent processesEndpoint='/api/processes' />
+			<ProcessPageContent privacy="public" />
 		</div>
 	);
 }
