@@ -1,5 +1,5 @@
 import { SignInButton } from "@clerk/nextjs";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 type LoginPromptType = "commands" | "process";
 

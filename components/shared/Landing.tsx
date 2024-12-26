@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 
 export default function Landing() {
   return (
@@ -39,7 +39,7 @@ export default function Landing() {
         <h2 className="text-2xl font-semibold">Ready to Get Started?</h2>
         <div className="space-x-4">
           <Button asChild>
-            <Link href="/commands">Browse Commands</Link>
+            <Link href="/public/command">Browse Commands</Link>
           </Button>
           <Button asChild>
             <Link href="/process">Browse Processes</Link>

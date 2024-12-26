@@ -1,10 +1,10 @@
-import { GetCommandAndUserDTO } from "@/lib/db.types";
 import { useState } from "react";
 import Image from "next/image";
-import Loading from "@/app/components/Loading";
+import Loading from "@/components/shared/Loading";
+import { GetCommandDTO } from "@/lib/command.types";
 
 interface CommandListProps {
-	commands: GetCommandAndUserDTO[];
+	commands: GetCommandDTO[];
 	isLoading: boolean;
 	showFavoritesToggle: boolean;
 	showFavoritesOnly: boolean;
@@ -57,17 +57,17 @@ export default function CommandList({
 												<span className='px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium flex items-center gap-1'>
 													{command.user
 														?.avatarUrl && (
-														<Image
-															src={
-																command.user
-																	?.avatarUrl
-															}
-															alt={`${command.user?.username}'s avatar`}
-															width={16}
-															height={16}
-															className='rounded-full'
-														/>
-													)}
+															<Image
+																src={
+																	command.user
+																		?.avatarUrl
+																}
+																alt={`${command.user?.username}'s avatar`}
+																width={16}
+																height={16}
+																className='rounded-full'
+															/>
+														)}
 													Owner:{" "}
 													{command.user?.username}
 												</span>
@@ -99,11 +99,10 @@ export default function CommandList({
 													e
 												);
 											}}
-											className={`absolute top-3 right-3 px-3 py-1.5 text-xs rounded transition-all duration-200 ${
-												copiedCode === command.code
+											className={`absolute top-3 right-3 px-3 py-1.5 text-xs rounded transition-all duration-200 ${copiedCode === command.code
 													? "bg-green-500 text-white"
 													: "bg-gray-700 text-gray-300 opacity-0 group-hover:opacity-100 hover:bg-gray-600"
-											}`}>
+												}`}>
 											{copiedCode === command.code
 												? "Copied!"
 												: "Copy"}
@@ -121,11 +120,10 @@ export default function CommandList({
 													: "Add to favorites"
 											}>
 											<svg
-												className={`w-6 h-6 ${
-													command.isFavorite
+												className={`w-6 h-6 ${command.isFavorite
 														? "text-yellow-400 fill-current"
 														: "fill-none stroke-current"
-												}`}
+													}`}
 												viewBox='0 0 24 24'
 												xmlns='http://www.w3.org/2000/svg'>
 												<path

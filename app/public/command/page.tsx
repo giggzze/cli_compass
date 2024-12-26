@@ -1,7 +1,8 @@
 "use client";
 
-import { LoginPrompt } from "../components/LoginPrompt";
-import CommandsPageContent from "./components/CommandsPageContent";
+import CommandsPageContent from "@/components/command/CommandsPageContent";
+import { LoginPrompt } from "@/components/shared/LoginPrompt";
+
 
 export default function PublicCommandsPage() {
   return (
