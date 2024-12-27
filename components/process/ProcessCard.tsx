@@ -75,7 +75,7 @@ export function ProcessCard({
 
           {/* Actions Section */}
           <div className="flex gap-2 shrink-0">
-            <Link href={`/process/edit/${id}`}>
+            <Link href={`/private/process/edit/${id}`}>
               <Button variant="outline" size="sm" className="h-8 px-2">
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Edit process</span>

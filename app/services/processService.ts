@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { processes, processSteps, profiles } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { IGetProcessWithStep, IProcess, IProcessStep } from "../models/Process";
 
 export class ProcessService {
@@ -63,6 +63,24 @@ export class ProcessService {
       .leftJoin(profiles, eq(processes.userId, profiles.id))
       .leftJoin(processSteps, eq(processes.id, processSteps.processId))
       .where(eq(processes.userId, userId))
+      .orderBy(desc(processes.createdAt));
+
+    return this.groupProcessSteps(allProcesses);
+  }
+
+  static async getPrivateProcessesForUpdate(userId: string, processId: string) {
+    const allProcesses = await db
+      .select({
+        id: processes.id,
+        title: processes.title,
+        userId: processes.userId,
+        isPrivate: processes.isPrivate,
+        createdAt: processes.createdAt,
+        steps: processSteps,
+      })
+      .from(processes)
+      .leftJoin(processSteps, eq(processes.id, processSteps.processId))
+      .where(and(eq(processes.id, processId), eq(processes.userId, userId)))
       .orderBy(desc(processes.createdAt));
 
     return this.groupProcessSteps(allProcesses);

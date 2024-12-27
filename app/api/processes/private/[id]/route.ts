@@ -1,69 +1,79 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { processes, processSteps } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
-import { ProcessStep } from "@/lib/db.types";
+import { withAuth } from "@/lib/middleware";
+import { ProcessService } from "@/app/services/processService";
 
 // GET /api/processes/[id]
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
-  try {
-    const { userId } = await auth();
+  return withAuth(async (userId) => {
+    try {
+      // Fetch process with steps
+      const process = await ProcessService.getPrivateProcessesForUpdate(
+        userId,
+        params.id
+      );
 
-    if (!userId) {
+      // const process = await db
+      //   .select({
+      //     id: processes.id,
+      //     title: processes.title,
+      //     isPrivate: processes.isPrivate,
+      //     createdAt: processes.createdAt,
+      //     steps: processSteps,
+      //     user: {
+      //       id: users.id,
+      //       username: users.username,
+      //       avatarUrl: users.avatarUrl,
+      //     },
+      //   })
+      //   .from(processes)
+      //   .leftJoin(processSteps, eq(processes.id, processSteps.processId))
+      //   .leftJoin(users, eq(processes.userId, users.id))
+      //   .where(and(eq(processes.id, params.id), eq(processes.userId, userId)))
+      //   .orderBy(desc(processSteps.order));
+
+      if (process.length === 0) {
+        return NextResponse.json(
+          { success: false, error: "Process not found" },
+          { status: 404 }
+        );
+      }
+
+      // Format the response
+      // const formattedProcess = {
+      //   id: process[0].id,
+      //   title: process[0].title,
+      //   isPrivate: process[0].isPrivate,
+      //   createdAt: process[0].createdAt,
+      //   user: process[0].user,
+      //   steps: process
+      //     .filter((p) => p.steps !== null)
+      //     .map((p) => p.steps!)
+      //     .filter((step): step is NonNullable<typeof step> => step !== null)
+      //     .sort((a, b) => a.order - b.order),
+      // };
+
+      return NextResponse.json({ success: true, data: process });
+    } catch (error) {
+      console.error("Error fetching process:", error);
       return NextResponse.json(
-        { success: false, error: "Unauthorized" },
-        { status: 401 },
+        { success: false, error: "Failed to fetch process" },
+        { status: 500 }
       );
     }
-
-    // Fetch process with steps
-    const process = await db
-      .select({
-        id: processes.id,
-        title: processes.title,
-        steps: processSteps,
-      })
-      .from(processes)
-      .leftJoin(processSteps, eq(processes.id, processSteps.processId))
-      .where(eq(processes.id, params.id))
-      .orderBy(desc(processSteps.order));
-
-    if (process.length === 0) {
-      return NextResponse.json(
-        { success: false, error: "Process not found" },
-        { status: 404 },
-      );
-    }
-
-    // Format the response
-    const formattedProcess = {
-      id: process[0].id,
-      title: process[0].title,
-      steps: process
-        .filter((p) => p.steps !== null)
-        .map((p) => p.steps!)
-        .filter((step): step is NonNullable<typeof step> => step !== null)
-        .sort((a, b) => a.order - b.order),
-    };
-
-    return NextResponse.json({ success: true, data: formattedProcess });
-  } catch (error) {
-    console.error("Error fetching process:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to fetch process" },
-      { status: 500 },
-    );
-  }
+  });
 }
 
 // PUT /api/processes/[id]
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const { userId } = await auth();
@@ -71,7 +81,7 @@ export async function PUT(
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -82,7 +92,7 @@ export async function PUT(
     if (!title || !steps || !Array.isArray(steps)) {
       return NextResponse.json(
         { success: false, error: "Invalid input" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -96,7 +106,7 @@ export async function PUT(
     if (existingProcess.length === 0) {
       return NextResponse.json(
         { success: false, error: "Process not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -104,7 +114,7 @@ export async function PUT(
     if (existingProcess[0].userId !== userId) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -131,7 +141,7 @@ export async function PUT(
             stepExplanation: step.stepExplanation,
             code_block: step.code_block || null,
             order: index,
-          })),
+          }))
         )
         .returning();
 
@@ -163,7 +173,7 @@ export async function PUT(
     console.error("Error updating process:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update process" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

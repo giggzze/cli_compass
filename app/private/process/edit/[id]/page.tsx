@@ -2,12 +2,12 @@
 
 import { ArrowLeft } from "lucide-react";
 import { useState, useEffect } from "react";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
 import { useRouter } from "next/navigation";
-import { ProcessStepForm } from "../../components/ProcessStepForm";
-import { EditableStepList } from "../../components/EditableStepList";
-import { ProcessStep } from "../../components/types";
+import { IProcessStep } from "@/app/models/Process";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EditableStepList } from "@/components/process/EditableStepList";
+import { ProcessStepForm } from "@/components/process/ProcessStepForm";
 
 export default function EditProcessPage({
   params,
@@ -16,8 +16,8 @@ export default function EditProcessPage({
 }) {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState("");
-  const [steps, setSteps] = useState<ProcessStep[]>([]);
-  const [currentStep, setCurrentStep] = useState<ProcessStep>({
+  const [steps, setSteps] = useState<IProcessStep[]>([]);
+  const [currentStep, setCurrentStep] = useState<IProcessStep>({
     title: "",
     description: "",
     code_block: "",
@@ -28,21 +28,23 @@ export default function EditProcessPage({
   useEffect(() => {
     const fetchProcess = async () => {
       try {
-        const response = await fetch(`/api/processes/${params.id}`);
+        const response = await fetch(`/api/processes/private/${params.id}`);
         const data = await response.json();
 
+        console.log(data);
+
         if (data.success) {
-          setProcessTitle(data.data.title);
-          setSteps(data.data.steps);
+          setProcessTitle(data.data[0].title);
+          setSteps(data.data[0].steps);
         } else {
           console.error("Failed to fetch process:", data.error);
           alert("Failed to fetch process. Please try again.");
-          router.push("/process");
+          router.push("/private/process");
         }
       } catch (error) {
         console.error("Error fetching process:", error);
         alert("An error occurred. Please try again.");
-        router.push("/process");
+        router.push("/private/process");
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +64,7 @@ export default function EditProcessPage({
     setSteps(steps.filter((_, i) => i !== index));
   };
 
-  const updateStep = (index: number, updatedStep: ProcessStep) => {
+  const updateStep = (index: number, updatedStep: IProcessStep) => {
     const newSteps = [...steps];
     newSteps[index] = { ...updatedStep, order: index };
     setSteps(newSteps);
@@ -114,7 +116,7 @@ export default function EditProcessPage({
       <Button
         variant="ghost"
         className="mb-4"
-        onClick={() => router.push("/process")}
+        onClick={() => router.push("/private/process")}
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
         Back to Processes

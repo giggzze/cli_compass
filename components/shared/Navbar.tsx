@@ -66,10 +66,10 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
     ),
     "/private/process": (
       <>
-        <Link href="/commands/user">
+        <Link href="/private/command">
           <Button>Commands</Button>
         </Link>
-        <Link href="/process/add">
+        <Link href="/private/process/add">
           <Button>Create Process</Button>
         </Link>
       </>
