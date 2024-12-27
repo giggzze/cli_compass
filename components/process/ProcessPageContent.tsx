@@ -7,17 +7,21 @@ import { ProcessCard } from "./ProcessCard";
 import { Process } from "@/lib/db.types";
 
 interface ProcessPageContentProps {
-  privacy: 'public' | 'private';
+  privacy: "public" | "private";
 }
 
-export default function ProcessPageContent({ privacy }: ProcessPageContentProps) {
+export default function ProcessPageContent({
+  privacy,
+}: ProcessPageContentProps) {
   const [processes, setProcesses] = useState<Process[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedProcessId, setExpandedProcessId] = useState<string | null>(null);
+  const [expandedProcessId, setExpandedProcessId] = useState<string | null>(
+    null
+  );
   const [currentSteps, setCurrentSteps] = useState<Record<string, number>>({});
 
   const handleStepClick = (processId: string, stepOrder: number) => {
-    setCurrentSteps(prev => ({
+    setCurrentSteps((prev) => ({
       ...prev,
       [processId]: stepOrder,
     }));
@@ -26,7 +30,8 @@ export default function ProcessPageContent({ privacy }: ProcessPageContentProps)
   useEffect(() => {
     const fetchProcesses = async () => {
       try {
-        const endpoint = privacy === 'private' ? '/api/processes/private' : '/api/processes';
+        const endpoint =
+          privacy === "private" ? "/api/processes/private" : "/api/processes";
         const response = await fetch(endpoint);
         const data = await response.json();
 
@@ -47,24 +52,24 @@ export default function ProcessPageContent({ privacy }: ProcessPageContentProps)
 
   if (isLoading) {
     return (
-      <div className='container mx-auto p-6'>
-        <div className='text-center'>Loading processes...</div>
+      <div className="container mx-auto p-6">
+        <div className="text-center">Loading processes...</div>
       </div>
     );
   }
 
   return (
-    <div className='container mx-auto p-6'>
-      <div className='space-y-4'>
+    <div className="container mx-auto p-6">
+      <div className="space-y-4">
         {processes.length === 0 ? (
-          <div className='text-center py-8'>
-            <p className='text-gray-600 mb-4'>No processes found</p>
-            <Link href='/process/add'>
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">No processes found</p>
+            <Link href="/process/add">
               <Button>Create Your First Process</Button>
             </Link>
           </div>
         ) : (
-          processes.map(process => (
+          processes.map((process) => (
             <ProcessCard
               key={process.id}
               id={process.id}
@@ -73,10 +78,8 @@ export default function ProcessPageContent({ privacy }: ProcessPageContentProps)
               steps={process.steps}
               isExpanded={expandedProcessId === process.id}
               currentStep={currentSteps[process.id]}
-              onToggleExpand={id =>
-                setExpandedProcessId(
-                  expandedProcessId === id ? null : id
-                )
+              onToggleExpand={(id) =>
+                setExpandedProcessId(expandedProcessId === id ? null : id)
               }
               onStepClick={handleStepClick}
             />
