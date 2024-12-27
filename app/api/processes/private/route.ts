@@ -31,7 +31,7 @@ export async function GET() {
 export async function POST(request: Request) {
   return withAuth(async (userId) => {
     try {
-      const { title, steps } = await request.json();
+      const { title, steps, isPrivate } = await request.json();
 
       if (!title || !steps || !Array.isArray(steps) || steps.length === 0) {
         return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       }
 
       // Create process
-      await ProcessService.createProcess(userId, title, steps);
+      await ProcessService.createProcess(userId, title, steps, isPrivate);
 
       return NextResponse.json({
         success: true,

@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ProcessStepForm } from "@/components/process/ProcessStepForm";
 import { StepPreview } from "@/components/process/StepPreview";
+import { PrivacyToggle } from "@/components/shared/PrivacyToggle";
 
 export default function ProcessPage() {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState("");
   const [steps, setSteps] = useState<ICreateProcessStep[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(true);
   const [currentStep, setCurrentStep] = useState<ICreateProcessStep>({
     code: "",
     stepExplanation: "",
@@ -41,6 +43,7 @@ export default function ProcessPage() {
         body: JSON.stringify({
           title: processTitle,
           steps: steps,
+          isPrivate,
         }),
       });
 
@@ -80,10 +83,9 @@ export default function ProcessPage() {
           </label>
           <Input
             type="text"
+            placeholder="Enter process title"
             value={processTitle}
             onChange={(e) => setProcessTitle(e.target.value)}
-            placeholder="Enter process title"
-            className="mb-4"
           />
         </div>
 
@@ -93,6 +95,7 @@ export default function ProcessPage() {
           onAdd={addStep}
         />
 
+        <PrivacyToggle isPrivate={isPrivate} onChange={setIsPrivate} />
         <StepPreview steps={steps} />
 
         <Button

@@ -72,6 +72,7 @@ export default function ProcessPageContent({
             <ProcessCard
               key={process.id}
               id={process.id}
+              isPrivate={process.isPrivate}
               user={process.user}
               createdAt={process.createdAt}
               title={process.title}

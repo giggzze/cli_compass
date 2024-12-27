@@ -71,13 +71,15 @@ export class ProcessService {
   static async createProcess(
     userId: string,
     title: string,
-    steps: IProcessStep[]
+    steps: IProcessStep[],
+    isPrivate = true
   ): Promise<void> {
     const [newProcess] = await db
       .insert(processes)
       .values({
         userId: userId,
         title: title,
+        isPrivate: isPrivate,
       })
       .returning();
 
