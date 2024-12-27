@@ -25,31 +25,36 @@ const PublicNavigation = ({ pathname }: { pathname: string }) => {
 
   return (
     <>
-      <Link href="/commands">
+      <Link href="/public/command">
         <Button>Commands</Button>
       </Link>
-      <Link href="/process">
+      <Link href="/public/process">
         <Button>Processes</Button>
       </Link>
     </>
   );
 };
 
-type ValidRoutes = "/commands/user" | "/commands/add" | "/process" | "/process/add" | "/process/[id]";
+type ValidRoutes =
+  | "/private/command"
+  | "/private/command/add"
+  | "/private/process"
+  | "/private/process/add"
+  | "/private/process/[id]";
 
 const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
   const navigationMap: Record<ValidRoutes, JSX.Element> = {
-    "/commands/user": (
+    "/private/command": (
       <>
-        <Link href="/commands/add">
+        <Link href="/private/command/add">
           <Button>Add Command</Button>
         </Link>
-        <Link href="/process">
+        <Link href="/private/process">
           <Button>Processes</Button>
         </Link>
       </>
     ),
-    "/commands/add": (
+    "/private/command/add": (
       <>
         <Link href="/commands/user">
           <Button>Commands</Button>
@@ -59,7 +64,7 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
         </Link>
       </>
     ),
-    "/process": (
+    "/private/process": (
       <>
         <Link href="/commands/user">
           <Button>Commands</Button>
@@ -69,7 +74,7 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
         </Link>
       </>
     ),
-    "/process/add": (
+    "/private/process/add": (
       <>
         <Link href="/commands/user">
           <Button>Commands</Button>
@@ -79,7 +84,7 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
         </Link>
       </>
     ),
-    "/process/[id]": (
+    "/private/process/[id]": (
       <>
         <Link href="/commands/user">
           <Button>Commands</Button>
@@ -91,15 +96,17 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
     ),
   };
 
-  return navigationMap[pathname as ValidRoutes] || (
-    <>
-      <Link href="/commands/user">
-        <Button>Commands</Button>
-      </Link>
-      <Link href="/process">
-        <Button>Processes</Button>
-      </Link>
-    </>
+  return (
+    navigationMap[pathname as ValidRoutes] || (
+      <>
+        <Link href="/public/commands">
+          <Button>Commands</Button>
+        </Link>
+        <Link href="/public/process">
+          <Button>Processes</Button>
+        </Link>
+      </>
+    )
   );
 };
 

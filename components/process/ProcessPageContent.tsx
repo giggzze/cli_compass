@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
 import { ProcessCard } from "./ProcessCard";
-import { Process } from "@/lib/db.types";
-
+import { IProcess } from "@/app/models/Process";
+import { Button } from "../ui/button";
 interface ProcessPageContentProps {
   privacy: "public" | "private";
 }
@@ -13,7 +12,7 @@ interface ProcessPageContentProps {
 export default function ProcessPageContent({
   privacy,
 }: ProcessPageContentProps) {
-  const [processes, setProcesses] = useState<Process[]>([]);
+  const [processes, setProcesses] = useState<IProcess[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedProcessId, setExpandedProcessId] = useState<string | null>(
     null

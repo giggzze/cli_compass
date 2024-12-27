@@ -1,6 +1,6 @@
 "use client";
 
-import CommandsPageContent from "../components/CommandsPageContent";
+import CommandsPageContent from "@/components/command/CommandsPageContent";
 
 export default function UserCommandsPage() {
   return (

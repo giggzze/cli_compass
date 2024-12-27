@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import Login from "../components/Login";
-import { UserService } from "../services/userService";
+import Login from "@/components/shared/Login";
+import { UserService } from "@/app/services/userService";
 import ProfileSetupForm from "./components/ProfileSetupForm";
 
 export default async function ProfileSetup() {

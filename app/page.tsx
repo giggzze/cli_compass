@@ -11,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.push("/commands/user");
+      router.push("/private/command");
     }
   }, [router, isSignedIn]);
 

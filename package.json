@@ -13,7 +13,8 @@
     "push": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "tsc": "npx tsc --noEmit",
-    "test": "npx playwright test --ui"
+    "test:ui": "npx playwright test --ui",
+    "test": "npx playwright test"
   },
   "dependencies": {
     "@clerk/nextjs": "^4.29.1",

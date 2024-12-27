@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/app/components/ui/button";
 import { Edit, ChevronDown, ChevronUp } from "lucide-react";
 import Link from "next/link";
-import { ProcessStep } from "./types";
 import { StepList } from "./StepList";
+import { IProcessStep } from "@/app/models/Process";
+import { Button } from "../ui/button";
 
 interface ProcessCardProps {
   id: string;
   title: string;
-  steps: ProcessStep[];
+  steps: IProcessStep[];
   isExpanded: boolean;
   currentStep: number | undefined;
   createdAt: string;
