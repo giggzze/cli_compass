@@ -2,37 +2,38 @@
 
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
 import { useRouter } from "next/navigation";
-import { ProcessStepForm } from "../components/ProcessStepForm";
-import { StepPreview } from "../components/StepPreview";
-import { ProcessStep } from "../components/types";
+import { ICreateProcessStep, IProcessStep } from "@/app/models/Process";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ProcessStepForm } from "@/components/process/ProcessStepForm";
+import { StepPreview } from "@/components/process/StepPreview";
 
 export default function ProcessPage() {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState("");
-  const [steps, setSteps] = useState<ProcessStep[]>([]);
-  const [currentStep, setCurrentStep] = useState<ProcessStep>({
-    title: "",
-    description: "",
-    code_block: "",
-  });
+  const [steps, setSteps] = useState<ICreateProcessStep[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState<ICreateProcessStep>({
+    code: "",
+    stepExplanation: "",
+  });
 
+  // add a new step to the process that is being created
   const addStep = () => {
-    if (currentStep.title && currentStep.description) {
+    if (currentStep.stepExplanation) {
       setSteps([...steps, { ...currentStep, order: steps.length + 1 }]);
-      setCurrentStep({ title: "", description: "", code_block: "" });
+      setCurrentStep({ stepExplanation: "", code: "" });
     }
   };
 
+  // save the process
   const saveProcess = async () => {
     if (!processTitle || steps.length === 0) return;
 
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/processes", {
+      const response = await fetch("/api/processes/private", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -46,7 +47,7 @@ export default function ProcessPage() {
       const data = await response.json();
 
       if (data.success) {
-        router.push("/process");
+        router.push("/private/process");
         router.refresh();
       } else {
         console.error("Failed to save process:", data.error);

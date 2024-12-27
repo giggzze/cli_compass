@@ -4,13 +4,15 @@ import { processes, processSteps } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { withAuth } from "@/lib/middleware";
 import { ProcessService } from "@/app/services/processService";
-import { Process } from "@/lib/db.types";
+import { IProcess } from "@/app/models/Process";
 
 export async function GET() {
   return withAuth(async (userId) => {
     try {
       // Fetch all processes with their steps
-      const processes: Process[] = await ProcessService.getProcesses(userId);
+      const processes: IProcess[] = await ProcessService.getPrivateProcesses(
+        userId
+      );
 
       return NextResponse.json({
         success: true,
@@ -39,7 +41,7 @@ export async function POST(request: Request) {
       }
 
       // Create process
-      await ProcessService.createProcess(title, userId, steps);
+      await ProcessService.createProcess(userId, title, steps);
 
       return NextResponse.json({
         success: true,

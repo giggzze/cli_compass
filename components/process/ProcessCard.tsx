@@ -5,6 +5,8 @@ import Link from "next/link";
 import { StepList } from "./StepList";
 import { IProcessStep } from "@/app/models/Process";
 import { Button } from "../ui/button";
+import { UserBadge } from "../shared/UserBadge";
+import { PrivacyBadge } from "../shared/PrivacyBadge";
 
 interface ProcessCardProps {
   id: string;
@@ -13,6 +15,12 @@ interface ProcessCardProps {
   isExpanded: boolean;
   currentStep: number | undefined;
   createdAt: string;
+  isPrivate: boolean;
+  user?: {
+    id: string;
+    username: string;
+    avatarUrl?: string;
+  } | null;
   onToggleExpand: (id: string) => void;
   onStepClick: (processId: string, stepOrder: number) => void;
 }
@@ -24,6 +32,8 @@ export function ProcessCard({
   isExpanded,
   currentStep,
   createdAt,
+  isPrivate,
+  user,
   onToggleExpand,
   onStepClick,
 }: ProcessCardProps) {
@@ -34,6 +44,15 @@ export function ProcessCard({
           className="flex-1 cursor-pointer"
           onClick={() => onToggleExpand(id)}
         >
+          <div className="flex flex-wrap gap-2 mb-1">
+            {user?.id && (
+              <UserBadge
+                avatarUrl={user.avatarUrl}
+                username={user.username}
+              />
+            )}
+            <PrivacyBadge isPrivate={isPrivate} />
+          </div>
           <span className="text-sm text-gray-500">
             {new Date(createdAt).toLocaleDateString()}
           </span>

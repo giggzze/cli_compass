@@ -1,17 +1,58 @@
 import { db } from "@/db";
 import { processes, processSteps, profiles } from "@/db/schema";
-import { ProcessStep } from "@/lib/db.types";
 import { desc, eq } from "drizzle-orm";
+import { IGetProcessWithStep, IProcess, IProcessStep } from "../models/Process";
 
 export class ProcessService {
-  static async getProcesses(userId: string) {
-    return await db
+  private static groupProcessSteps(allProcesses: any[]): IGetProcessWithStep[] {
+    return allProcesses.reduce((acc: IGetProcessWithStep[], curr) => {
+      const existingProcess = acc.find((p) => p.id === curr.id);
+      if (!existingProcess) {
+        acc.push({
+          id: curr.id,
+          userId: curr.userId,
+          title: curr.title,
+          isPrivate: curr.isPrivate,
+          createdAt: curr.createdAt,
+          steps: curr.steps ? [curr.steps] : [],
+          user: curr.user,
+        });
+      } else if (curr.steps) {
+        existingProcess.steps.push(curr.steps);
+      }
+      return acc;
+    }, []);
+  }
+
+  static async getPublicProcesses(): Promise<IGetProcessWithStep[]> {
+    const allProcesses = await db
       .select({
         id: processes.id,
         title: processes.title,
         userId: processes.userId,
-        steps: processSteps,
+        isPrivate: processes.isPrivate,
         createdAt: processes.createdAt,
+        steps: processSteps,
+        user: profiles,
+      })
+      .from(processes)
+      .leftJoin(profiles, eq(processes.userId, profiles.id))
+      .leftJoin(processSteps, eq(processes.id, processSteps.processId))
+      .where(eq(processes.isPrivate, false))
+      .orderBy(desc(processes.createdAt));
+
+    return this.groupProcessSteps(allProcesses);
+  }
+
+  static async getPrivateProcesses(userId: string) {
+    const allProcesses = await db
+      .select({
+        id: processes.id,
+        title: processes.title,
+        userId: processes.userId,
+        isPrivate: processes.isPrivate,
+        createdAt: processes.createdAt,
+        steps: processSteps,
         user: {
           id: profiles.id,
           username: profiles.username,
@@ -23,12 +64,14 @@ export class ProcessService {
       .leftJoin(processSteps, eq(processes.id, processSteps.processId))
       .where(eq(processes.userId, userId))
       .orderBy(desc(processes.createdAt));
+
+    return this.groupProcessSteps(allProcesses);
   }
 
   static async createProcess(
     userId: string,
     title: string,
-    steps: ProcessStep[]
+    steps: IProcessStep[]
   ): Promise<void> {
     const [newProcess] = await db
       .insert(processes)
@@ -38,7 +81,7 @@ export class ProcessService {
       })
       .returning();
 
-    const stepsToInsert = steps.map((step: ProcessStep, index: number) => ({
+    const stepsToInsert = steps.map((step: IProcessStep, index: number) => ({
       processId: newProcess.id,
       stepExplanation: step.stepExplanation,
       code: step.code || null,

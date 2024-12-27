@@ -63,7 +63,7 @@ export default function ProcessPageContent({
         {processes.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">No processes found</p>
-            <Link href="/process/add">
+            <Link href="/private/process/add">
               <Button>Create Your First Process</Button>
             </Link>
           </div>
@@ -72,6 +72,7 @@ export default function ProcessPageContent({
             <ProcessCard
               key={process.id}
               id={process.id}
+              user={process.user}
               createdAt={process.createdAt}
               title={process.title}
               steps={process.steps}
