@@ -3,7 +3,6 @@
 import CommandsPageContent from "@/components/command/CommandsPageContent";
 import { LoginPrompt } from "@/components/shared/LoginPrompt";
 
-
 export default function PublicCommandsPage() {
   return (
     <div>
