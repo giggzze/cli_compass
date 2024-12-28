@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { CategoryService, CommandService } from "@/app/services";
+import { CommandService } from "@/app/services";
 
 export async function GET() {
 	try {

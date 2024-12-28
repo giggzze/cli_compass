@@ -7,7 +7,6 @@ export default authMiddleware({
   async afterAuth(auth, req, evt) {
     const { userId } = auth;
     const path = req.nextUrl.pathname;
-    console.log("path", path);
 
     // Paths that require authentication
     const privatePaths = [
@@ -27,13 +26,13 @@ export default authMiddleware({
 
     // If it's not a private path, allow access
     if (!isPrivatePath) {
-      console.log("skipping middleware - public path:", path);
+      // console.log("skipping middleware - public path:", path);
       return NextResponse.next();
     }
 
     // For private paths, require authentication
     if (!userId) {
-      console.log("redirecting to login - private path:", path);
+      // console.log("redirecting to login - private path:", path);
       return NextResponse.redirect(new URL("/public/login", req.url));
     }
 
@@ -61,10 +60,5 @@ export default authMiddleware({
 });
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes
-    "/(api|trpc)(.*)",
-  ],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };

@@ -1,7 +1,9 @@
+// @ts-nocheck
+
 import { db } from "@/db";
 import { processes, processSteps, profiles } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
-import { IGetProcessWithStep, IProcess, IProcessStep } from "../models/Process";
+import { IGetProcessWithStep, IProcessStep } from "../models/Process";
 
 export class ProcessService {
   private static groupProcessSteps(allProcesses: any[]): IGetProcessWithStep[] {

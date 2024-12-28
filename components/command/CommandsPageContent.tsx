@@ -6,7 +6,7 @@ import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";
 import CommandList from "./CommandList";
 import { ICategory } from "@/app/models/Category";
-import { ICommand, IGetCommand } from "@/app/models/Command";
+import { IGetCommand } from "@/app/models/Command";
 
 interface CommandsPageContentProps {
   commandsEndpoint: string;

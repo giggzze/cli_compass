@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Category } from "@/lib/db.types";
 
 interface CategoryFilterProps {

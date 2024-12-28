@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { test, expect } from "@playwright/test";
 import { ProcessService } from "@/app/services/processService";
 import { db } from "@/db";

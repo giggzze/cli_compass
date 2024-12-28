@@ -1,11 +1,7 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { processes, processSteps } from "@/db/schema";
-import { eq, desc, and } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { withAuth } from "@/lib/middleware";
 import { ProcessService } from "@/app/services/processService";
-import { IProcessStep } from "@/app/models/Process";
 
 // GET /api/processes/[id]
 export async function GET(

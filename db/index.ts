@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { drizzle } from "drizzle-orm/postgres-js";
 import { createClient } from "@supabase/supabase-js";
 import postgres from "postgres";

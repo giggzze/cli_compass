@@ -1,12 +1,11 @@
 import { useState } from "react";
-import Image from "next/image";
 import Loading from "@/components/shared/Loading";
-import { GetCommandDTO } from "@/lib/command.types";
 import { UserBadge } from "@/components/shared/UserBadge";
 import { PrivacyBadge } from "@/components/shared/PrivacyBadge";
+import { IGetCommand } from "@/app/models";
 
 interface CommandListProps {
-  commands: GetCommandDTO[];
+  commands: IGetCommand[];
   isLoading: boolean;
   showFavoritesToggle: boolean;
   showFavoritesOnly: boolean;
@@ -76,7 +75,7 @@ export default function CommandList({
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        copyToClipboard(command.code, e);
+                        copyToClipboard(command.code ?? "", e);
                       }}
                       className={`absolute top-3 right-3 px-3 py-1.5 text-xs rounded transition-all duration-200 ${
                         copiedCode === command.code

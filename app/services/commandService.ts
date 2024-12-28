@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { categories, commands, profiles, userCommands } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { ICreateCommand, IGetCommand } from "@/app/models";
 
 export class CommandService {
@@ -30,7 +30,8 @@ export class CommandService {
         .leftJoin(categories, eq(commands.categoryId, categories.id))
         .leftJoin(userCommands, eq(commands.id, userCommands.commandId))
         .leftJoin(profiles, eq(userCommands.userId, profiles.id))
-        .where(eq(commands.isPrivate, false));
+        .where(eq(commands.isPrivate, false))
+        .orderBy(desc(commands.createdAt));
     } catch (error) {
       console.error("Error in getPublicCommands:", error);
       throw new Error("Failed to fetch public commands");
@@ -69,7 +70,8 @@ export class CommandService {
         .leftJoin(categories, eq(commands.categoryId, categories.id))
         .leftJoin(userCommands, eq(commands.id, userCommands.commandId))
         .leftJoin(profiles, eq(userCommands.userId, profiles.id))
-        .where(eq(userCommands.userId, userId));
+        .where(eq(userCommands.userId, userId))
+        .orderBy(desc(commands.createdAt));
     } catch (error) {
       console.error("Error in getUserCommands:", error);
       throw new Error("Failed to fetch user commands");
@@ -221,7 +223,7 @@ export class CommandService {
         .limit(1);
 
       if (!result || result.length === 0) {
-        throw new Error('Command not found');
+        throw new Error("Command not found");
       }
 
       return result[0] as IGetCommand;

@@ -1,7 +1,5 @@
 "use client";
 
-import { IProcessStep } from "@/app/models/Process";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { IProcessStepFormProps } from "@/app/models/Process";

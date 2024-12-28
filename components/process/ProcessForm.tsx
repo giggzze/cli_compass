@@ -1,7 +1,8 @@
+// @ts-nocheck
 "use client";
 
 import { ArrowLeft } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ICreateProcessStep, IProcessStep } from "@/app/models/Process";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
 interface PrivacyBadgeProps {
-  isPrivate: boolean;
+  isPrivate: boolean | null;
 }
 
 export function PrivacyBadge({ isPrivate }: PrivacyBadgeProps) {

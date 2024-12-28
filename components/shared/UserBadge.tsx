@@ -3,14 +3,9 @@ import Image from "next/image";
 interface UserBadgeProps {
   avatarUrl?: string | null;
   username?: string | null;
-  label?: string;
 }
 
-export function UserBadge({
-  avatarUrl,
-  username,
-  label = "Owner",
-}: UserBadgeProps) {
+export function UserBadge({ avatarUrl, username }: UserBadgeProps) {
   if (!username) return null;
 
   return (
