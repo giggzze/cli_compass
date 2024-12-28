@@ -1,12 +1,12 @@
+import { IApiResponse } from "@/app/models/ApiResponse";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { ApiResponse } from "./db.types";
 
 export async function withAuth<T>(
-  handler: (userId: string) => Promise<NextResponse<ApiResponse<T>>>
-): Promise<NextResponse<ApiResponse<T>>> {
+  handler: (userId: string) => Promise<NextResponse<IApiResponse<T>>>
+): Promise<NextResponse<IApiResponse<T>>> {
   try {
-    const { userId } = await auth();
+    const { userId } = auth();
 
     if (!userId) {
       return NextResponse.json(

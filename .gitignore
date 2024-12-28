@@ -42,3 +42,8 @@ public/workbox-00a24876.js
 public/sw.js
 package-lock.json
 package-lock.json
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

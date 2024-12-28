@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import Landing from "./components/Landing";
 import { useAuth } from "@clerk/nextjs";
+import Landing from "../components/shared/Landing";
 
 export default function Home() {
   const router = useRouter();
@@ -11,7 +11,7 @@ export default function Home() {
 
   useEffect(() => {
     if (isSignedIn) {
-      router.push("/commands/user");
+      router.push("/private/command");
     }
   }, [router, isSignedIn]);
 

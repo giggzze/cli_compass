@@ -1,11 +1,7 @@
 import {
 	pgTable,
-	unique,
 	text,
-	foreignKey,
-	uniqueIndex,
 	boolean,
-	primaryKey,
 	integer,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
