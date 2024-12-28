@@ -11,11 +11,12 @@ export default authMiddleware({
 
     // Paths that require authentication
     const privatePaths = [
-      "/private/:path*",
-      "/commands/user",
-      "/settings",
-      "/profile",
-      "/process/user",
+      "/private/command",
+      "/private/command/add",
+      "/private/process",
+      "/private/process/add",
+      "/private/process/[id]",
+      "private/profile-setup",
     ];
 
     // Check if the current path is private
@@ -33,7 +34,7 @@ export default authMiddleware({
     // For private paths, require authentication
     if (!userId) {
       console.log("redirecting to login - private path:", path);
-      return NextResponse.redirect(new URL("/login", req.url));
+      return NextResponse.redirect(new URL("/public/login", req.url));
     }
 
     // Special handling for profile-setup path

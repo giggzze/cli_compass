@@ -42,7 +42,7 @@ export default function Landing() {
             <Link href="/public/command">Browse Commands</Link>
           </Button>
           <Button asChild>
-            <Link href="/process">Browse Processes</Link>
+            <Link href="/public/process">Browse Processes</Link>
           </Button>
         </div>
       </div>

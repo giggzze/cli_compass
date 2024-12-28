@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import Login from "../components/Login";
 import { auth } from "@clerk/nextjs/server";
+import Login from "@/components/shared/Login";
 
 export default async function LoginPage() {
   const { userId } = await auth();

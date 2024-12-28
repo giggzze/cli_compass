@@ -17,7 +17,7 @@ const Logo = () => (
 const PublicNavigation = ({ pathname }: { pathname: string }) => {
   if (pathname === "/") {
     return (
-      <SignInButton mode="modal">
+      <SignInButton mode="modal" afterSignInUrl="/private/command">
         <Button>Sign In</Button>
       </SignInButton>
     );
@@ -56,10 +56,10 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
     ),
     "/private/command/add": (
       <>
-        <Link href="/commands/user">
+        <Link href="/private/command">
           <Button>Commands</Button>
         </Link>
-        <Link href="/process">
+        <Link href="/private/process">
           <Button>Processes</Button>
         </Link>
       </>
@@ -76,20 +76,20 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
     ),
     "/private/process/add": (
       <>
-        <Link href="/commands/user">
+        <Link href="/private/command">
           <Button>Commands</Button>
         </Link>
-        <Link href="/process">
+        <Link href="/private/process">
           <Button>Processes</Button>
         </Link>
       </>
     ),
     "/private/process/[id]": (
       <>
-        <Link href="/commands/user">
+        <Link href="/private/command">
           <Button>Commands</Button>
         </Link>
-        <Link href="/process">
+        <Link href="/private/process">
           <Button>Processes</Button>
         </Link>
       </>
@@ -99,10 +99,10 @@ const AuthenticatedNavigation = ({ pathname }: { pathname: string }) => {
   return (
     navigationMap[pathname as ValidRoutes] || (
       <>
-        <Link href="/public/commands">
+        <Link href="/private/command">
           <Button>Commands</Button>
         </Link>
-        <Link href="/public/process">
+        <Link href="/private/process">
           <Button>Processes</Button>
         </Link>
       </>

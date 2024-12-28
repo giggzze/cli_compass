@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { ProcessCard } from "./ProcessCard";
 import { IProcess } from "@/app/models/Process";
 import { Button } from "../ui/button";
+import ProcessSearch from "./ProcessSearch";
+
 interface ProcessPageContentProps {
   privacy: "public" | "private";
 }
@@ -14,10 +16,9 @@ export default function ProcessPageContent({
 }: ProcessPageContentProps) {
   const [processes, setProcesses] = useState<IProcess[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [expandedProcessId, setExpandedProcessId] = useState<string | null>(
-    null
-  );
+  const [expandedProcessId, setExpandedProcessId] = useState<string | null>(null);
   const [currentSteps, setCurrentSteps] = useState<Record<string, number>>({});
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const handleStepClick = (processId: string, stepOrder: number) => {
     setCurrentSteps((prev) => ({
@@ -49,6 +50,22 @@ export default function ProcessPageContent({
     fetchProcesses();
   }, [privacy]);
 
+  const filteredProcesses = useMemo(() => {
+    if (!searchQuery) return processes;
+
+    return processes.filter((process) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        process.title.toLowerCase().includes(query) ||
+        process.steps.some(
+          (step) =>
+            step.stepExplanation.toLowerCase().includes(query) ||
+            (step.code && step.code.toLowerCase().includes(query))
+        )
+      );
+    });
+  }, [processes, searchQuery]);
+
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
@@ -59,16 +76,26 @@ export default function ProcessPageContent({
 
   return (
     <div className="container mx-auto p-6">
+      <ProcessSearch 
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
       <div className="space-y-4">
-        {processes.length === 0 ? (
+        {filteredProcesses.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">No processes found</p>
-            <Link href="/private/process/add">
-              <Button>Create Your First Process</Button>
-            </Link>
+            {searchQuery ? (
+              <p className="text-gray-600">No processes found matching your search</p>
+            ) : (
+              <>
+                <p className="text-gray-600 mb-4">No processes found</p>
+                <Link href="/private/process/add">
+                  <Button>Create Your First Process</Button>
+                </Link>
+              </>
+            )}
           </div>
         ) : (
-          processes.map((process) => (
+          filteredProcesses.map((process) => (
             <ProcessCard
               key={process.id}
               id={process.id}

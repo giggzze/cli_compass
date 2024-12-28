@@ -39,7 +39,7 @@ export default function ProfileSetupForm({ userId }: ProfileSetupFormProps) {
         throw new Error(data.error || "Failed to create profile");
       }
 
-      router.push("/");
+      router.replace("/private/command");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {

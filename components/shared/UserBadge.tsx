@@ -6,7 +6,11 @@ interface UserBadgeProps {
   label?: string;
 }
 
-export function UserBadge({ avatarUrl, username, label = "Owner" }: UserBadgeProps) {
+export function UserBadge({
+  avatarUrl,
+  username,
+  label = "Owner",
+}: UserBadgeProps) {
   if (!username) return null;
 
   return (
@@ -20,7 +24,7 @@ export function UserBadge({ avatarUrl, username, label = "Owner" }: UserBadgePro
           className="rounded-full"
         />
       )}
-      {label}: {username}
+      {username}
     </span>
   );
 }

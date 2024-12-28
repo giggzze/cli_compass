@@ -26,7 +26,7 @@ export default function CommandFilters({
         />
         <Label htmlFor="favorites">Show Favorites Only</Label>
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center space-x-2 hidden">
         <Switch
           id="user-commands"
           checked={showUserCommands}
