@@ -5,8 +5,8 @@ import CommandSearch from "./CommandSearch";
 import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";
 import CommandList from "./CommandList";
-import { Category, Command } from "@/lib/db.types";
-import { GetCommandDTO } from "@/lib/command.types";
+import { ICategory } from "@/app/models/Category";
+import { ICommand, IGetCommand } from "@/app/models/Command";
 
 interface CommandsPageContentProps {
   commandsEndpoint: string;
@@ -17,7 +17,7 @@ export default function CommandsPageContent({
   commandsEndpoint,
   shouldFetchUserId = false,
 }: CommandsPageContentProps) {
-  const [selectedCategory, setSelectedCategory] = useState<Category>({
+  const [selectedCategory, setSelectedCategory] = useState<ICategory>({
     id: "all",
     name: "all",
   });
@@ -25,10 +25,10 @@ export default function CommandsPageContent({
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showUserCommandsOnly, setShowUserCommandsOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([
+  const [categories, setCategories] = useState<ICategory[]>([
     { id: "all", name: "all" },
   ]);
-  const [commands, setCommands] = useState<Command[]>([]);
+  const [commands, setCommands] = useState<IGetCommand[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -47,51 +47,28 @@ export default function CommandsPageContent({
         // Fetch commands
         const commandsResponse = await fetch(commandsEndpoint);
         const commandsData = await commandsResponse.json();
-        let formattedCommands: Command[] = [];
 
         if (commandsData.success) {
-          formattedCommands = commandsData.data
-            .filter((cmd: GetCommandDTO) => !cmd.isPrivate || userId)
-            .map((cmd: GetCommandDTO) => ({
-              id: cmd.id,
-              description: cmd.description,
-              code: cmd.code,
-              category: cmd.category || {
-                id: cmd.categoryId,
-                name: "Uncategorized",
-              },
-              isFavorite: cmd.isFavorite ?? false,
-              isPrivate: cmd.isPrivate,
-              userId: cmd.user?.id,
-              user: cmd.user || {
-                id: "",
-                username: null,
-                avatarUrl: null,
-              },
-            }));
-          setCommands(formattedCommands);
+          setCommands(commandsData.data);
         }
 
-        // Fetch categories and filter based on commands
-        const categoriesResponse = await fetch("/api/categories");
-        const categoriesData = await categoriesResponse.json();
-        if (categoriesData.success) {
-          const usedCategoryIds = new Set(
-            formattedCommands.map((cmd) => cmd.categoryId)
-          );
-          const filteredCategories = categoriesData.data.filter(
-            (cat: Category) => usedCategoryIds.has(cat.id)
-          );
+        // ensure we only have unique categories
+        const usedCategoryIds: ICategory[] = Array.from(
+          new Set(
+            commandsData.data
+              .filter((cmd: IGetCommand) => cmd.category !== null)
+              .map((cmd: IGetCommand) => cmd.category!.id)
+          )
+        )
+          .map(
+            (categoryId) =>
+              commandsData.data.find(
+                (cmd: IGetCommand) => cmd.category?.id === categoryId
+              )?.category!
+          )
+          .filter((category): category is ICategory => category !== undefined);
 
-          setCategories([
-            { id: "all", name: "all" },
-            ...filteredCategories.map((cat: Category) => ({
-              id: cat.id,
-              name: cat.name,
-            })),
-          ]);
-          console.log("categories: ", categories);
-        }
+        setCategories([{ id: "all", name: "all" }, ...usedCategoryIds]);
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -109,7 +86,7 @@ export default function CommandsPageContent({
     localStorage.setItem("favoriteCommands", JSON.stringify(favorites));
   }, [commands]);
 
-  const handleCategoryChange = (category: Category) => {
+  const handleCategoryChange = (category: ICategory) => {
     setSelectedCategory(category);
   };
 
@@ -165,8 +142,8 @@ export default function CommandsPageContent({
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         return (
-          cmd.code.toLowerCase().includes(query) ||
-          cmd.description.toLowerCase().includes(query)
+          cmd.code!.toLowerCase().includes(query) ||
+          cmd.description!.toLowerCase().includes(query)
         );
       }
 

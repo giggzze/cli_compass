@@ -1,8 +1,5 @@
 import { CommandService } from "@/app/services";
-import { db } from "@/db";
-import { userCommands } from "@/db/schema";
 import { auth } from "@clerk/nextjs";
-import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 export async function POST(
@@ -10,10 +7,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } = await auth();
-
-    console.log("params.id", params.id);
-    console.log("params.id", params);
+    const { userId } =  auth();
 
     if (!userId) {
       return NextResponse.json(
@@ -22,16 +16,14 @@ export async function POST(
       );
     }
 
-    const commandId = params.id;
-
-    if (!commandId) {
+    if (!params.id) {
       return NextResponse.json(
         { success: false, error: "Command ID is required" },
         { status: 400 }
       );
     }
 
-    await CommandService.updateFavorite(userId, commandId);
+    await CommandService.updateFavorite(userId, params.id);
 
     return NextResponse.json({
       success: true,

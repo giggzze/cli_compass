@@ -3,7 +3,7 @@ import { ClerkProvider, SignedIn, SignedOut } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import "react-toastify/dist/ReactToastify.css";
-import Navbar from "@/components/shared/Navbar";
+import Navbar from "../components/shared/Navbar";
 // import { ToastContainer } from "react-toastify";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -66,7 +66,7 @@ export default function RootLayout({
         </head>
         <body className={inter.className}>
           <SignedOut>
-            <Navbar/>
+            <Navbar />
             {children}
           </SignedOut>
           <SignedIn>

@@ -1,12 +1,11 @@
 import { db } from "@/db";
 import { categories } from "@/db/schema";
-import { Category } from "@/lib/db.types";
 import { eq } from "drizzle-orm";
-import { CategoryIdentifier, CreateCategoryDto } from "@/lib/category.types";
 import { NotFoundError, ValidationError } from "./errorService";
+import {ICategory, ICategoryIdentifier} from "@/app/models";
 
 export class CategoryService {
-	static async getAllCategories(): Promise<Category[]> {
+	static async getAllCategories(): Promise<ICategory[]> {
 		try {
 			// retrieve and return all categories
 			return await db.select().from(categories);
@@ -19,15 +18,13 @@ export class CategoryService {
 		}
 	}
 
-	static async createCategory(newCategory: string): Promise<Category> {
+	static async createCategory(newCategory: string): Promise<ICategory> {
 		try {
 			// make sure name is not empty
-			if (!newCategory) {
-				throw new ValidationError("Category name is required");
-			}
+			if (!newCategory) throw new ValidationError("Category name is required");
 
 			// check if category already exists
-			const exists = await CategoryService.categoryExists({
+			const exists = await this.categoryExists({
 				name: newCategory,
 			});
 			if (exists.exists) {
@@ -42,10 +39,7 @@ export class CategoryService {
 				})
 				.returning();
 
-			return {
-				id: createdCategory.id,
-				name: createdCategory.name,
-			};
+			return createdCategory
 		} catch (error) {
 			if (error instanceof ValidationError) {
 				throw error;
@@ -55,7 +49,7 @@ export class CategoryService {
 		}
 	}
 
-	static async categoryExists(identifier: CategoryIdentifier) {
+	static async categoryExists(identifier: ICategoryIdentifier) {
 		try {
 			// check what kind of identifier is provided
 			if (!identifier.id && !identifier.name) {

@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { categories, commands, profiles, userCommands } from "@/db/schema";
-import { CreateCommandDTO, GetCommandDTO } from "@/lib/command.types";
 import { and, eq } from "drizzle-orm";
+import { ICreateCommand, IGetCommand } from "@/app/models";
 
 export class CommandService {
   /**
@@ -9,13 +9,13 @@ export class CommandService {
    *
    * This method fetches commands that are not marked as private, along with their associated categories.
    *
-   * @returns {Promise<GetCommand[]>} A promise that resolves to an array of public commands.
+   * @returns {Promise<IGetCommand[]>} A promise that resolves to an array of public commands.
    * @throws {Error} If there is an issue fetching the public commands from the database.
    */
-  static async getPublicCommands(): Promise<GetCommandDTO[]> {
+  static async getPublicCommands(): Promise<IGetCommand[]> {
     try {
       // Fetch public commands from the database
-      const rt = await db
+      return await db
         .select({
           id: commands.id,
           description: commands.description,
@@ -23,22 +23,14 @@ export class CommandService {
           isPrivate: commands.isPrivate,
           categoryId: commands.categoryId,
           createdAt: commands.createdAt,
-          category: {
-            id: categories.id,
-            name: categories.name,
-          },
-          user: {
-            id: profiles.id,
-            username: profiles.username,
-            avatarUrl: profiles.avatarUrl,
-          },
+          category: categories,
+          user: profiles,
         })
         .from(commands)
         .leftJoin(categories, eq(commands.categoryId, categories.id))
         .leftJoin(userCommands, eq(commands.id, userCommands.commandId))
         .leftJoin(profiles, eq(userCommands.userId, profiles.id))
         .where(eq(commands.isPrivate, false));
-      return rt;
     } catch (error) {
       console.error("Error in getPublicCommands:", error);
       throw new Error("Failed to fetch public commands");
@@ -52,7 +44,7 @@ export class CommandService {
    * @returns A promise that resolves to an array of `GetCommand` objects containing the user's commands.
    * @throws An error if the user commands could not be fetched.
    */
-  static async getUserCommands(userId: string): Promise<GetCommandDTO[]> {
+  static async getUserCommands(userId: string): Promise<IGetCommand[]> {
     try {
       return await db
         .select({
@@ -93,7 +85,7 @@ export class CommandService {
    * @throws Will throw an error if the command creation fails.
    */
   static async createCommand(
-    data: CreateCommandDTO,
+    data: ICreateCommand,
     userId: string
   ): Promise<boolean> {
     try {
@@ -195,9 +187,9 @@ export class CommandService {
   static async getUserCommand(
     userId: string,
     commandId: string
-  ): Promise<GetCommandDTO[]> {
+  ): Promise<IGetCommand> {
     try {
-      return await db
+      const result = await db
         .select({
           id: commands.id,
           description: commands.description,
@@ -227,6 +219,12 @@ export class CommandService {
           )
         )
         .limit(1);
+
+      if (!result || result.length === 0) {
+        throw new Error('Command not found');
+      }
+
+      return result[0] as IGetCommand;
     } catch (error) {
       console.error("Error in getUserCommands:", error);
       throw new Error("Failed to fetch user commands");
@@ -246,7 +244,7 @@ export class CommandService {
     await db
       .update(userCommands)
       .set({
-        isFavorite: !command[0].isFavorite,
+        isFavorite: !command.isFavorite,
       })
       .where(
         and(

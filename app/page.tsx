@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
-import Landing from "@/components/shared/Landing";
+import Landing from "../components/shared/Landing";
 
 export default function Home() {
   const router = useRouter();

@@ -5,9 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/models/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/categories/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/categories/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/commands/user/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/commands/user/[id]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Command.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Command.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/categoryService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/db.types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/db.types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/shared/Landing.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/shared/Landing.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/ui/button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,10 +28,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2qhVqAlBjU4K88Zlq66Oxvnxe3P" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -30,15 +41,15 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "pubic-process-and-commands",
+    "git-widget-placeholder": "rewrite",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "/home/jimmy/.nvm/versions/node/v20.18.1/bin/node",
+    "nodejs_interpreter_path": "node",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "settings.nodejs",
-    "ts.external.directory.path": "/home/jimmy/Documents/cli_compass/node_modules/typescript/lib",
+    "ts.external.directory.path": "/Users/giggzze/Documents/GitHub/cli_compass/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -58,6 +69,7 @@
       <option name="presentableId" value="Default" />
       <updated>1735114983759</updated>
       <workItem from="1735114986446" duration="1430000" />
+      <workItem from="1735399795385" duration="2323000" />
     </task>
     <servers />
   </component>

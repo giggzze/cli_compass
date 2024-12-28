@@ -1,5 +1,6 @@
 import { commands, userCommands } from "@/db/schema";
 import { ICategory } from "./Category";
+import {IProfile} from "@/app/models/Profile";
 
 
 export type ICommand = typeof commands.$inferSelect;
@@ -23,11 +24,7 @@ export interface IUpdateCommand {
 export interface IGetCommand extends ICommand {
 	category: ICategory | null;
 	isFavorite?: boolean | null;
-	user: {
-		id: string;
-		username: string | null;
-		avatarUrl: string | null;
-	} | null;
+	user: IProfile | null;
 }
 
 // interfaces for forms
