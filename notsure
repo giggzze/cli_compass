@@ -1,0 +1,149 @@
+try {
+	// check the user is authenticated and get the user id
+	const { userId } = await auth();
+
+	// return if the user is not authenticated
+	if (!userId) {
+		return NextResponse.json(
+			{ success: false, error: "Unauthorized" },
+			{ status: 401 }
+		);
+	}
+
+	// get the form data from the request
+	const { name, description, category_id, is_private, command_id } =
+		await request.json();
+
+	if (!command_id) {
+		return NextResponse.json(
+			{ success: false, error: "Command ID is required" },
+			{ status: 400 }
+		);
+	}
+
+	try {
+		// Check if user-command association exists
+		const existingAssociation = await CommandService.checkUserAssociation(
+			userId,
+			command_id
+		);
+
+		if (!existingAssociation) {
+			// Create new association
+			await CommandService.createUserAssociation(
+				userId,
+				command_id,
+				is_favorite ?? false
+			);
+		} else {
+			// Update existing association
+			await CommandService.updateUserAssociation(
+				userId,
+				command_id,
+				is_favorite ?? false
+			);
+		}
+
+		return NextResponse.json({
+			success: true,
+		});
+	} catch (error) {
+		console.error("Error updating user command:", error);
+		return NextResponse.json(
+			{ success: false, error: "Failed to update user command" },
+			{ status: 500 }
+		);
+	}
+} catch (error) {
+	console.error("Error updating user command:", error);
+	return NextResponse.json(
+		{ success: false, error: "Failed to update user command" },
+		{ status: 500 }
+	);
+}
+
+
+
+
+
+profile
+
+try {
+    const response = await fetch(
+      new URL("/api/profile", process.env.NEXT_PUBLIC_URL),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
+        cache: "no-store",
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create profile");
+    }
+
+    const data = await response.json();
+    if (data.profile) {
+      redirect("/");
+    }
+  } catch (error) {
+    throw error;
+  }
+
+
+
+  ////// removed from category service
+  // static async updateCategory(id: string, name: string): Promise<Category> {
+	// 	try {
+	// 		const [updatedCategory] = await db
+	// 			.update(categories)
+	// 			.set({
+	// 				name,
+	// 				updatedAt: new Date().toISOString(),
+	// 			})
+	// 			.where(eq(categories.id, id))
+	// 			.returning();
+
+	// 		return {
+	// 			id: updatedCategory.id,
+	// 			name: updatedCategory.name,
+	// 		};
+	// 	} catch (error) {
+	// 		console.error("Error in updateCategory:", error);
+	// 		throw new Error("Failed to update category");
+	// 	}
+	// }
+
+	// static async deleteCategory(id: string): Promise<void> {
+	// 	try {
+	// 		await db.delete(categories).where(eq(categories.id, id));
+	// 	} catch (error) {
+	// 		console.error("Error in deleteCategory:", error);
+	// 		throw new Error("Failed to delete category");
+	// 	}
+	// }
+
+
+	//// removed from process service 
+	 // Group steps by process
+	 const formattedProcesses = allProcesses.reduce(
+        (acc: ProcessWithSteps[], curr) => {
+          const existingProcess = acc.find((p) => p.id === curr.id);
+          if (!existingProcess) {
+            acc.push({
+              id: curr.id,
+              title: curr.title,
+              steps: curr.steps ? [curr.steps] : [],
+              userId: "",
+            });
+          } else if (curr.steps) {
+            existingProcess.steps.push(curr.steps);
+          }
+          return acc;
+        },
+        []
+      );
