@@ -49,23 +49,25 @@ test.describe("ProcessService", () => {
 
   test.afterAll(async () => {
     // Cleanup test data
-    await db.delete(processSteps).where(eq(processSteps.processId, testProcessId));
+    await db
+      .delete(processSteps)
+      .where(eq(processSteps.processId, testProcessId));
     await db.delete(processes).where(eq(processes.id, testProcessId));
     await db.delete(profiles).where(eq(profiles.id, testUserId));
   });
 
   test("getProcesses should return user's processes with steps", async () => {
-    const processes = await ProcessService.getProcesses(testUserId);
-    
+    const processes = await ProcessService.getPrivateProcesses(testUserId);
+
     expect(processes).toBeDefined();
     expect(processes.length).toBeGreaterThan(0);
-    
-    const testProcess = processes.find(p => p.id === testProcessId);
+
+    const testProcess = processes.find((p) => p.id === testProcessId);
     expect(testProcess).toBeDefined();
     expect(testProcess?.title).toBe("Test Process");
     expect(testProcess?.userId).toBe(testUserId);
     expect(testProcess?.steps).toHaveLength(2);
-    
+
     // Verify steps are in correct order
     const steps = testProcess?.steps || [];
     expect(steps[0].stepExplanation).toBe("Test Step 1");
@@ -87,7 +89,12 @@ test.describe("ProcessService", () => {
       },
     ];
 
-    await ProcessService.createProcess(testUserId, newProcessTitle, newSteps);
+    await ProcessService.createProcess(
+      testUserId,
+      newProcessTitle,
+      newSteps,
+      true
+    );
 
     // Verify process was created
     const createdProcess = await db
@@ -114,7 +121,9 @@ test.describe("ProcessService", () => {
     expect(createdSteps[1].order).toBe(1);
 
     // Cleanup the created test process
-    await db.delete(processSteps).where(eq(processSteps.processId, createdProcess[0].id));
+    await db
+      .delete(processSteps)
+      .where(eq(processSteps.processId, createdProcess[0].id));
     await db.delete(processes).where(eq(processes.id, createdProcess[0].id));
   });
 });

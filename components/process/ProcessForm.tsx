@@ -12,7 +12,7 @@ import { EditableStepList } from "@/components/process/EditableStepList";
 import { PrivacyToggle } from "@/components/shared/PrivacyToggle";
 
 interface ProcessFormProps {
-  mode: 'add' | 'edit';
+  mode: "add" | "edit";
   processId?: string;
   initialData?: {
     title: string;
@@ -22,7 +22,12 @@ interface ProcessFormProps {
   backUrl: string;
 }
 
-export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFormProps) {
+export function ProcessForm({
+  mode,
+  processId,
+  initialData,
+  backUrl,
+}: ProcessFormProps) {
   const router = useRouter();
   const [processTitle, setProcessTitle] = useState(initialData?.title || "");
   const [steps, setSteps] = useState<IProcessStep[]>(initialData?.steps || []);
@@ -55,12 +60,13 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
 
     setIsSubmitting(true);
     try {
-      const url = mode === 'add' 
-        ? "/api/processes/private"
-        : `/api/processes/${processId}`;
-      
-      const method = mode === 'add' ? 'POST' : 'PUT';
-      
+      const url =
+        mode === "add"
+          ? "/api/processes/private"
+          : `/api/processes/private/${processId}`;
+
+      const method = mode === "add" ? "POST" : "PUT";
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -69,7 +75,7 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
         body: JSON.stringify({
           title: processTitle,
           steps: steps,
-          ...(mode === 'add' && { isPrivate }),
+          ...(mode === "add" && { isPrivate }),
         }),
       });
 
@@ -102,7 +108,7 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
       </Button>
       <div className="space-y-4">
         <h1 className="text-3xl font-bold mb-6">
-          {mode === 'add' ? 'Create' : 'Edit'} Process
+          {mode === "add" ? "Create" : "Edit"} Process
         </h1>
 
         <div className="mb-6">
@@ -117,7 +123,7 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
           />
         </div>
 
-        {mode === 'edit' && (
+        {mode === "edit" && (
           <EditableStepList
             steps={steps}
             onRemove={removeStep}
@@ -131,7 +137,7 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
           onAdd={addStep}
         />
 
-        {mode === 'add' && (
+        {mode === "add" && (
           <>
             <PrivacyToggle isPrivate={isPrivate} onChange={setIsPrivate} />
             <StepPreview steps={steps} />
@@ -143,7 +149,9 @@ export function ProcessForm({ mode, processId, initialData, backUrl }: ProcessFo
           disabled={!processTitle || steps.length === 0 || isSubmitting}
           className="w-full"
         >
-          {isSubmitting ? `${mode === 'add' ? 'Saving' : 'Updating'}...` : `${mode === 'add' ? 'Save' : 'Update'} Process`}
+          {isSubmitting
+            ? `${mode === "add" ? "Saving" : "Updating"}...`
+            : `${mode === "add" ? "Save" : "Update"} Process`}
         </Button>
       </div>
     </div>

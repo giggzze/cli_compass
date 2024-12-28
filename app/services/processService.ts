@@ -110,6 +110,59 @@ export class ProcessService {
 
     await db.insert(processSteps).values(stepsToInsert);
   }
+
+  /**
+   * Checks if a user is associated with a specific command.
+   *
+   * @param userId - The ID of the user to check.
+   * @param command_id - The ID of the command to check.
+   * @returns A promise that resolves to `true` if the user is associated with the command, otherwise `false`.
+   */
+  static async checkUserAssociation(userId: string, processId: string) {
+    const existingAssociation = await db
+      .select()
+      .from(processes)
+      .where(and(eq(processes.id, processId), eq(processes.userId, userId)))
+      .limit(1);
+
+    if (existingAssociation.length === 0) return false;
+    return true;
+  }
+
+  static async updateProcess(
+    userId: string,
+    processId: string,
+    title: string,
+    steps: IProcessStep[]
+  ) {
+    // Verify ownership
+    if (!this.checkUserAssociation(userId, processId)) return false;
+
+    // Update process and steps in a transaction
+    const updatedProcess = await db.transaction(async (tx) => {
+      //TODO:: this should be a check only adding new steps
+      // Delete existing steps
+      await tx
+        .delete(processSteps)
+        .where(eq(processSteps.processId, processId));
+
+      // Update process title
+      await tx
+        .update(processes)
+        .set({ title })
+        .where(eq(processes.id, processId));
+
+      // Insert new steps
+      await tx.insert(processSteps).values(
+        steps.map((step: IProcessStep, index: number) => ({
+          processId: processId,
+          stepExplanation: step.stepExplanation,
+          code: step.code || null,
+          order: index,
+        }))
+      );
+    });
+  }
 }
 
 // await db
