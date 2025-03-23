@@ -14,6 +14,7 @@ export interface ICreateProcessStep {
 	processId?: string | null;
 	stepExplanation: string | null;
 	code: string | null;
+	image?: string | null;
 	order?: number | null;
 }
 

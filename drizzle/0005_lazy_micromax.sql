@@ -1,1 +1,0 @@
-ALTER TABLE "commands" RENAME COLUMN "visibility" TO "is_private";

@@ -1,1 +1,0 @@
-ALTER TABLE "processes" ADD COLUMN "is_private" boolean DEFAULT true;
