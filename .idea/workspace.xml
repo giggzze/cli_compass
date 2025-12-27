@@ -5,23 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/api/commands/user/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/commands/user/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/processes/private/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/processes/private/[id]/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/processes/private/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/processes/private/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/processes/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/processes/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/profile/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/profile/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/models/Process.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Process.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/private/command/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/private/command/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/processService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/processService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/userService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/userService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/command/CommandList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/process/ProcessForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/process/ProcessForm.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/process/ProcessStepForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/process/ProcessStepForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/shared/PrivacyBadge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/shared/PrivacyBadge.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/shared/UserBadge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/shared/UserBadge.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/next.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.mjs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0000_condemned_karen_page.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0001_nosy_lady_mastermind.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0002_nasty_zaladane.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0003_woozy_norman_osborn.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0004_rapid_proudstar.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0005_lazy_micromax.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/0006_whole_liz_osborn.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0001_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0002_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0003_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0004_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0005_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/0006_snapshot.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241201174052_remote_schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241201174647_remote_schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241203141336_remote_schema.sql" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,7 +48,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "rewrite",
+    "git-widget-placeholder": "18-add-images-to-processes",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -73,6 +77,7 @@
       <updated>1735114983759</updated>
       <workItem from="1735114986446" duration="1430000" />
       <workItem from="1735399795385" duration="3102000" />
+      <workItem from="1739629422010" duration="45000" />
     </task>
     <servers />
   </component>
