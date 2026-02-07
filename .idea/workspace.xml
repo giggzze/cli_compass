@@ -5,27 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/models/Process.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/Process.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/process/ProcessStepForm.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/process/ProcessStepForm.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0000_condemned_karen_page.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0001_nosy_lady_mastermind.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0002_nasty_zaladane.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0003_woozy_norman_osborn.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0004_rapid_proudstar.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0005_lazy_micromax.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/0006_whole_liz_osborn.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0000_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0001_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0002_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0003_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0004_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0005_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/0006_snapshot.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241201174052_remote_schema.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241201174647_remote_schema.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/supabase/migrations/20241203141336_remote_schema.sql" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/export/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/export/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/import/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/import/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Category.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Command.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Process.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/Profile.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,6 +23,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -47,8 +39,11 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "18-add-images-to-processes",
+    "js.debugger.nextJs.config.created.client": "true",
+    "js.debugger.nextJs.config.created.server": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -60,10 +55,25 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
+      <method v="2" />
+    </configuration>
+    <configuration name="Next.js: server-side" type="js.build_tools.npm">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.222" />
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.26830.93" />
       </set>
     </attachedChunks>
   </component>
@@ -78,6 +88,7 @@
       <workItem from="1735114986446" duration="1430000" />
       <workItem from="1735399795385" duration="3102000" />
       <workItem from="1739629422010" duration="45000" />
+      <workItem from="1770502591166" duration="1069000" />
     </task>
     <servers />
   </component>

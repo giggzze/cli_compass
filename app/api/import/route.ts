@@ -103,6 +103,7 @@ export async function POST(request: Request) {
                 description: cmd.description,
                 code: cmd.code,
                 isPrivate: cmd.isPrivate ?? true,
+                userId,
                 // Note: categoryId would need to be resolved from categoryName
               })
               .returning();

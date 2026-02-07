@@ -4,14 +4,15 @@ import { CommandService } from "@/app/services/commandService";
 import { ProcessService } from "@/app/services/processService";
 import { TagService } from "@/app/services/tagService";
 import { CollectionService } from "@/app/services/collectionService";
+import {Command, Process, Tag, Collection} from "@/types/STT";
 
 interface ExportData {
   version: string;
   exportedAt: string;
-  commands: any[];
-  processes: any[];
-  tags: any[];
-  collections: any[];
+  commands: Command[];
+  processes: Process[];
+  tags: Tag[];
+  collections: Collection[];
 }
 
 // GET /api/export - Export all user data

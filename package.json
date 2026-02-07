@@ -15,7 +15,7 @@
     "tsc": "npx tsc --noEmit",
     "test:ui": "npx playwright test --ui",
     "test": "npx playwright test",
-    "gen": "supabase gen types typescript --local > src/types/supabase.ts"
+    "gen": "supabase gen types typescript --local > types/supabase.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "~4.29.1",

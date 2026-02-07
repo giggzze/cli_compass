@@ -1,337 +1,316 @@
-import { db } from "@/db";
-import { categories, commands, profiles, userCommands } from "@/db/schema";
-import { and, desc, eq } from "drizzle-orm";
-import { ICreateCommand, IGetCommand } from "@/app/models";
+import { supabase } from "@/supabase";
+import type {
+  GetCommand,
+  CreateCommandPayload,
+  CommandInsert,
+  UserCommandInsert,
+} from "@/types/STT";
+
+function mapRowToGetCommand(row: {
+  id: string;
+  description: string;
+  code: string;
+  is_private: boolean;
+  category_id: string;
+  doc_url: string | null;
+  language: string | null;
+  created_at: string;
+  user_id: string | null;
+  categories?: { id: string; name: string } | null;
+  profiles?: { id: string; username: string | null; avatar_url: string | null } | null;
+  is_favorite?: boolean;
+}): GetCommand {
+  return {
+    id: row.id,
+    description: row.description,
+    code: row.code,
+    isPrivate: row.is_private,
+    categoryId: row.category_id,
+    docUrl: row.doc_url,
+    language: row.language,
+    createdAt: row.created_at,
+    userId: row.user_id,
+    category: row.categories
+      ? { id: row.categories.id, name: row.categories.name }
+      : null,
+    user: row.profiles
+      ? {
+          id: row.profiles.id,
+          username: row.profiles.username,
+          avatar_url: row.profiles.avatar_url,
+        }
+      : null,
+    isFavorite: row.is_favorite ?? undefined,
+  };
+}
 
 export class CommandService {
   /**
    * Retrieves a list of public commands from the database.
-   *
-   * This method fetches commands that are not marked as private, along with their associated categories.
-   *
-   * @returns {Promise<IGetCommand[]>} A promise that resolves to an array of public commands.
-   * @throws {Error} If there is an issue fetching the public commands from the database.
    */
-  static async getPublicCommands(): Promise<IGetCommand[]> {
-    try {
-      // Fetch public commands from the database
-      return await db
-        .select({
-          id: commands.id,
-          description: commands.description,
-          code: commands.code,
-          isPrivate: commands.isPrivate,
-          categoryId: commands.categoryId,
-          docUrl: commands.docUrl,
-          language: commands.language,
-          createdAt: commands.createdAt,
-          category: categories,
-          user: profiles,
-        })
-        .from(commands)
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .leftJoin(userCommands, eq(commands.id, userCommands.commandId))
-        .leftJoin(profiles, eq(userCommands.userId, profiles.id))
-        .where(eq(commands.isPrivate, false))
-        .orderBy(desc(commands.createdAt));
-    } catch (error) {
+  static async getPublicCommands(): Promise<GetCommand[]> {
+    const { data, error } = await supabase
+      .from("commands")
+      .select("id, description, code, is_private, category_id, doc_url, language, created_at, user_id, categories(id, name)")
+      .eq("is_private", false)
+      .order("created_at", { ascending: false });
+
+    if (error) {
       console.error("Error in getPublicCommands:", error);
       throw new Error("Failed to fetch public commands");
     }
+
+    return (data ?? []).map((row) => {
+      const r = row as Record<string, unknown>;
+      const cat = r.categories;
+      const categories =
+        cat == null
+          ? null
+          : Array.isArray(cat)
+            ? (cat[0] as { id: string; name: string }) ?? null
+            : (cat as { id: string; name: string });
+      return mapRowToGetCommand({
+        ...row,
+        categories,
+        profiles: null,
+      } as Parameters<typeof mapRowToGetCommand>[0]);
+    });
   }
 
   /**
    * Retrieves a list of commands associated with a specific user.
-   *
-   * @param userId - The unique identifier of the user.
-   * @returns A promise that resolves to an array of `GetCommand` objects containing the user's commands.
-   * @throws An error if the user commands could not be fetched.
    */
-  static async getUserCommands(userId: string): Promise<IGetCommand[]> {
-    try {
-      return await db
-        .select({
-          id: commands.id,
-          description: commands.description,
-          code: commands.code,
-          isPrivate: commands.isPrivate,
-          categoryId: commands.categoryId,
-          docUrl: commands.docUrl,
-          language: commands.language,
-          isFavorite: userCommands.isFavorite,
-          createdAt: commands.createdAt,
-          category: {
-            id: categories.id,
-            name: categories.name,
-          },
-          user: {
-            id: profiles.id,
-            username: profiles.username,
-            avatarUrl: profiles.avatarUrl,
-          },
-        })
-        .from(commands)
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .leftJoin(userCommands, eq(commands.id, userCommands.commandId))
-        .leftJoin(profiles, eq(userCommands.userId, profiles.id))
-        .where(eq(userCommands.userId, userId))
-        .orderBy(desc(commands.createdAt));
-    } catch (error) {
+  static async getUserCommands(userId: string): Promise<GetCommand[]> {
+    const { data, error } = await supabase
+      .from("user_commands")
+      .select(
+        "is_favorite, commands(id, description, code, is_private, category_id, doc_url, language, created_at, user_id, categories(id, name)), profiles(id, username, avatar_url)"
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
       console.error("Error in getUserCommands:", error);
       throw new Error("Failed to fetch user commands");
     }
+
+    return (data ?? []).map((row) => {
+      const r = row as unknown as {
+        commands: Record<string, unknown> | Record<string, unknown>[] | null;
+        profiles: Record<string, unknown> | Record<string, unknown>[] | null;
+        is_favorite: boolean;
+      };
+      const cmd = Array.isArray(r.commands) ? r.commands[0] : r.commands;
+      const prof = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
+      if (!cmd) return null;
+      const cat = cmd.categories;
+      const categories =
+        cat == null
+          ? null
+          : Array.isArray(cat)
+            ? (cat[0] as { id: string; name: string }) ?? null
+            : (cat as { id: string; name: string });
+      return mapRowToGetCommand({
+        id: cmd.id as string,
+        description: cmd.description as string,
+        code: cmd.code as string,
+        is_private: cmd.is_private as boolean,
+        category_id: cmd.category_id as string,
+        doc_url: (cmd.doc_url as string | null) ?? null,
+        language: (cmd.language as string | null) ?? null,
+        created_at: cmd.created_at as string,
+        user_id: (cmd.user_id as string | null) ?? null,
+        categories,
+        profiles: prof
+          ? {
+              id: prof.id as string,
+              username: prof.username as string | null,
+              avatar_url: prof.avatar_url as string | null,
+            }
+          : null,
+        is_favorite: r.is_favorite,
+      });
+    }).filter(Boolean) as GetCommand[];
   }
 
   /**
    * Creates a new command and associates it with a user.
-   *
-   * @param data - The command data to be inserted into the database.
-   * @param userId - The ID of the user creating the command.
-   * @returns A promise that resolves to a boolean indicating whether the command was successfully created.
-   * @throws Will throw an error if the command creation fails.
    */
   static async createCommand(
-    data: ICreateCommand,
+    data: CreateCommandPayload,
     userId: string
   ): Promise<boolean> {
-    try {
-      // Insert the new command into the database
-      const newCommand = await db
-        .insert(commands)
-        .values({
-          description: data.description,
-          code: data.code,
-          isPrivate: data.isPrivate,
-          categoryId: data.categoryId,
-          createdAt: new Date().toISOString(),
-        })
-        .returning();
+    const insert: CommandInsert = {
+      description: data.description,
+      code: data.code,
+      is_private: data.isPrivate,
+      category_id: data.categoryId,
+      user_id: userId,
+    };
 
-      // Insert the user command association into the database
-      await db.insert(userCommands).values({
-        userId,
-        commandId: newCommand[0].id,
-        isFavorite: false,
-      });
+    const { data: newCommand, error: cmdError } = await supabase
+      .from("commands")
+      .insert(insert)
+      .select("id")
+      .single();
 
-      return true;
-    } catch (error) {
-      console.error("Error in createCommand:", error);
+    if (cmdError || !newCommand) {
+      console.error("Error in createCommand:", cmdError);
       throw new Error("Failed to create command");
     }
-  }
 
-  /**
-   * Checks if a user is associated with a specific command.
-   *
-   * @param userId - The ID of the user to check.
-   * @param command_id - The ID of the command to check.
-   * @returns A promise that resolves to `true` if the user is associated with the command, otherwise `false`.
-   */
-  static async checkUserAssociation(userId: string, command_id: string) {
-    const existingAssociation = await db
-      .select()
-      .from(userCommands)
-      .where(
-        and(
-          eq(userCommands.userId, userId),
-          eq(userCommands.commandId, command_id)
-        )
-      )
-      .limit(1);
+    const ucInsert: UserCommandInsert = {
+      user_id: userId,
+      command_id: newCommand.id,
+      is_favorite: false,
+    };
 
-    if (existingAssociation.length === 0) return false;
+    const { error: ucError } = await supabase.from("user_commands").insert(ucInsert);
+
+    if (ucError) {
+      console.error("Error in createCommand (user_commands):", ucError);
+      throw new Error("Failed to create command");
+    }
+
     return true;
   }
 
   /**
-   * Updates the association of a user with a command in the database.
-   *
-   * @param userId - The ID of the user.
-   * @param command_id - The ID of the command.
-   * @param is_favorite - A boolean indicating whether the command is marked as favorite by the user.
-   * @returns A promise that resolves when the update operation is complete.
+   * Checks if a user is associated with a specific command.
+   */
+  static async checkUserAssociation(
+    userId: string,
+    command_id: string
+  ): Promise<boolean> {
+    const { data, error } = await supabase
+      .from("user_commands")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("command_id", command_id)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) return false;
+    return data != null;
+  }
+
+  /**
+   * Updates the association of a user with a command (e.g. is_favorite).
    */
   static async updateUserAssociation(
     userId: string,
     command_id: string,
     is_favorite: boolean
-  ) {
-    await db
-      .update(userCommands)
-      .set({
-        isFavorite: is_favorite,
-      })
-      .where(
-        and(
-          eq(userCommands.userId, userId),
-          eq(userCommands.commandId, command_id)
-        )
-      );
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("user_commands")
+      .update({ is_favorite })
+      .eq("user_id", userId)
+      .eq("command_id", command_id);
+
+    if (error) {
+      console.error("Error in updateUserAssociation:", error);
+      throw new Error("Failed to update association");
+    }
   }
 
   /**
    * Creates a new association between a user and a command.
-   *
-   * @param userId - The ID of the user.
-   * @param command_id - The ID of the command.
-   * @param is_favorite - Whether the command should be marked as favorite.
-   * @returns A promise that resolves when the association is created.
    */
   static async createUserAssociation(
     userId: string,
     command_id: string,
     is_favorite: boolean
-  ) {
-    await db.insert(userCommands).values({
-      userId,
-      commandId: command_id,
-      isFavorite: is_favorite,
+  ): Promise<void> {
+    const { error } = await supabase.from("user_commands").insert({
+      user_id: userId,
+      command_id,
+      is_favorite,
     });
-  }
 
-  static async getUserCommand(
-    userId: string,
-    commandId: string
-  ): Promise<IGetCommand> {
-    try {
-      const result = await db
-        .select({
-          id: commands.id,
-          description: commands.description,
-          code: commands.code,
-          isPrivate: commands.isPrivate,
-          categoryId: commands.categoryId,
-          docUrl: commands.docUrl,
-          language: commands.language,
-          createdAt: commands.createdAt,
-          isFavorite: userCommands.isFavorite,
-          category: {
-            id: categories.id,
-            name: categories.name,
-          },
-          user: {
-            id: profiles.id,
-            username: profiles.username,
-            avatarUrl: profiles.avatarUrl,
-          },
-        })
-        .from(userCommands)
-        .leftJoin(commands, eq(userCommands.commandId, commands.id))
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .leftJoin(profiles, eq(userCommands.userId, profiles.id))
-        .where(
-          and(
-            eq(userCommands.commandId, commandId),
-            eq(userCommands.userId, userId)
-          )
-        )
-        .limit(1);
-
-      if (!result || result.length === 0) {
-        throw new Error("Command not found");
-      }
-
-      return result[0] as IGetCommand;
-    } catch (error) {
-      console.error("Error in getUserCommands:", error);
-      throw new Error("Failed to fetch user commands");
+    if (error) {
+      console.error("Error in createUserAssociation:", error);
+      throw new Error("Failed to create association");
     }
   }
 
-  static async updateFavorite(userId: string, commandId: string) {
-    const existingAssociation = await this.checkUserAssociation(
-      userId,
-      commandId
-    );
+  /**
+   * Gets a single command for a user (by user_commands link).
+   */
+  static async getUserCommand(
+    userId: string,
+    commandId: string
+  ): Promise<GetCommand> {
+    const { data, error } = await supabase
+      .from("user_commands")
+      .select(
+        "is_favorite, commands(id, description, code, is_private, category_id, doc_url, language, created_at, user_id, categories(id, name)), profiles(id, username, avatar_url)"
+      )
+      .eq("user_id", userId)
+      .eq("command_id", commandId)
+      .limit(1)
+      .maybeSingle();
 
-    if (!existingAssociation) return false;
+    if (error || !data) {
+      console.error("Error in getUserCommand:", error);
+      throw new Error("Command not found");
+    }
+
+    const row = data as unknown as {
+      commands: Record<string, unknown> | Record<string, unknown>[] | null;
+      profiles: Record<string, unknown> | Record<string, unknown>[] | null;
+      is_favorite: boolean;
+    };
+    const cmd = Array.isArray(row.commands) ? row.commands[0] : row.commands;
+    if (!cmd) throw new Error("Command not found");
+
+    const prof = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+    const cat = cmd.categories;
+    const categories =
+      cat == null
+        ? null
+        : Array.isArray(cat)
+          ? (cat[0] as { id: string; name: string }) ?? null
+          : (cat as { id: string; name: string });
+
+    return mapRowToGetCommand({
+      id: cmd.id as string,
+      description: cmd.description as string,
+      code: cmd.code as string,
+      is_private: cmd.is_private as boolean,
+      category_id: cmd.category_id as string,
+      doc_url: (cmd.doc_url as string | null) ?? null,
+      language: (cmd.language as string | null) ?? null,
+      created_at: cmd.created_at as string,
+      user_id: (cmd.user_id as string | null) ?? null,
+      categories,
+      profiles: prof
+        ? {
+            id: prof.id as string,
+            username: prof.username as string | null,
+            avatar_url: prof.avatar_url as string | null,
+          }
+        : null,
+      is_favorite: row.is_favorite,
+    });
+  }
+
+  /**
+   * Toggles the favorite flag for a user's command.
+   */
+  static async updateFavorite(
+    userId: string,
+    commandId: string
+  ): Promise<boolean> {
+    const exists = await this.checkUserAssociation(userId, commandId);
+    if (!exists) return false;
 
     const command = await this.getUserCommand(userId, commandId);
-
-    await db
-      .update(userCommands)
-      .set({
-        isFavorite: !command.isFavorite,
-      })
-      .where(
-        and(
-          eq(userCommands.userId, userId),
-          eq(userCommands.commandId, commandId)
-        )
-      );
+    await this.updateUserAssociation(
+      userId,
+      commandId,
+      !command.isFavorite
+    );
+    return true;
   }
 }
-
-// static async updateCommand(
-
-// 	id: string,
-// 	data: UpdateCommandDto
-// ): Promise<CommandResponseDto> {
-// 	try {
-// 		const [updatedCommand] = await db
-// 			.update(commands)
-// 			.set({
-// 				...data,
-// 				updatedAt: new Date().toISOString(),
-// 			})
-// 			.where(eq(commands.id, id))
-// 			.returning();
-
-// 		return this.getCommandById(updatedCommand.id);
-// 	} catch (error) {
-// 		console.error("Error in updateCommand:", error);
-// 		throw new Error("Failed to update command");
-// 	}
-// }
-
-// static async getCommandById(id: string): Promise<CommandResponseDto> {
-// 	try {
-// 		const command = await db
-// 			.select({
-// 				id: commands.id,
-// 				name: commands.name,
-// 				description: commands.description,
-// 				usage: commands.usage,
-// 				notes: commands.notes,
-// 				lastUsed: commands.lastUsed,
-// 				isPrivate: commands.isPrivate,
-// 				categoryId: commands.categoryId,
-// 				tags: commands.tags,
-// 				createdAt: commands.createdAt,
-// 				updatedAt: commands.updatedAt,
-// 				category: {
-// 					id: categories.id,
-// 					name: categories.name,
-// 				},
-// 			})
-// 			.from(commands)
-// 			.leftJoin(categories, eq(commands.categoryId, categories.id))
-// 			.where(eq(commands.id, id))
-// 			.limit(1);
-
-// 		if (!command || command.length === 0) {
-// 			throw new Error("Command not found");
-// 		}
-
-// 		return {
-// 			...command[0],
-// 			usage: command[0].usage || "",
-// 			notes: command[0].notes || "",
-// 			tags: command[0].tags || [],
-// 			isFavorite: false,
-// 		};
-// 	} catch (error) {
-// 		console.error("Error in getCommandById:", error);
-// 		throw new Error("Failed to fetch command");
-// 	}
-// }
-
-// static async deleteCommand(id: string): Promise<void> {
-// 	try {
-// 		await db.delete(commands).where(eq(commands.id, id));
-// 	} catch (error) {
-// 		console.error("Error in deleteCommand:", error);
-// 		throw new Error("Failed to delete command");
-// 	}
-// }
