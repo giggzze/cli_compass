@@ -107,6 +107,7 @@ export class ProcessService {
       processId: newProcess.id,
       stepExplanation: step.stepExplanation,
       code: step.code || null,
+      image: step.image || null,
       order: index,
     }));
 
@@ -160,6 +161,7 @@ export class ProcessService {
           processId: processId,
           stepExplanation: step.stepExplanation,
           code: step.code || null,
+          image: step.image || null,
           order: index,
         }))
       );

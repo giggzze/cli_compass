@@ -22,6 +22,8 @@ export class CommandService {
           code: commands.code,
           isPrivate: commands.isPrivate,
           categoryId: commands.categoryId,
+          docUrl: commands.docUrl,
+          language: commands.language,
           createdAt: commands.createdAt,
           category: categories,
           user: profiles,
@@ -54,6 +56,8 @@ export class CommandService {
           code: commands.code,
           isPrivate: commands.isPrivate,
           categoryId: commands.categoryId,
+          docUrl: commands.docUrl,
+          language: commands.language,
           isFavorite: userCommands.isFavorite,
           createdAt: commands.createdAt,
           category: {
@@ -198,6 +202,8 @@ export class CommandService {
           code: commands.code,
           isPrivate: commands.isPrivate,
           categoryId: commands.categoryId,
+          docUrl: commands.docUrl,
+          language: commands.language,
           createdAt: commands.createdAt,
           isFavorite: userCommands.isFavorite,
           category: {
