@@ -2,10 +2,11 @@
 
 import { IProcessStep } from "@/app/models/Process";
 import { useState } from "react";
-import { Code2, ClipboardCopy, CheckCheck, Pencil, Save, X, Trash2 } from "lucide-react";
+import { Code2, ClipboardCopy, CheckCheck, Pencil, Save, X, Trash2, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
+import Image from "next/image";
 
 interface BaseStepListProps {
   steps: IProcessStep[];
@@ -153,6 +154,49 @@ export function StepList({
                         className="font-mono min-h-[120px]"
                       />
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Image (Optional)
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              const base64String = reader.result as string;
+                              setEditingStep({
+                                ...editingStep!,
+                                image: base64String,
+                              });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="mb-2 text-sm"
+                      />
+                      {editingStep?.image && (
+                        <div className="relative mt-2">
+                          <Image
+                            src={editingStep.image}
+                            alt="Step image preview"
+                            width={200}
+                            height={150}
+                            className="rounded-md object-cover"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setEditingStep({ ...editingStep!, image: null })}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -174,6 +218,12 @@ export function StepList({
                         <Code2 className="h-3 w-3" />
                         {step.code ? "Code Included" : "No Code"}
                       </span>
+                      {step.image && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-600">
+                          <ImageIcon className="h-3 w-3" />
+                          Image
+                        </span>
+                      )}
                     </div>
                     {isEditable && (
                       <div className="flex items-center gap-2">
@@ -205,39 +255,57 @@ export function StepList({
                     )}
                   </div>
 
-                  <div className="space-y-3">
-                    <p className="text-gray-700 text-sm leading-relaxed">
-                      {step.stepExplanation}
-                    </p>
+                  <div
+                    className={cn(
+                      step.image && "flex flex-col sm:flex-row sm:items-start gap-4"
+                    )}
+                  >
+                    <div className={cn("min-w-0 space-y-3", step.image && "sm:flex-1")}>
+                      <p className="text-gray-700 text-sm leading-relaxed">
+                        {step.stepExplanation}
+                      </p>
 
-                    {step.code && (
-                      <div className="relative group">
-                        <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
-                          <code className="text-gray-100 text-sm font-mono whitespace-pre-wrap break-words">
-                            {step.code}
-                          </code>
-                        </pre>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyToClipboard(step.code!);
-                          }}
-                          className={cn(
-                            "absolute top-2 right-2 p-2 rounded-md transition-all duration-200",
-                            copiedCode === step.code
-                              ? "bg-green-500 text-white"
-                              : "bg-gray-800 text-gray-300 opacity-0 group-hover:opacity-100 hover:bg-gray-700"
-                          )}
-                        >
-                          {copiedCode === step.code ? (
-                            <CheckCheck className="h-4 w-4" />
-                          ) : (
-                            <ClipboardCopy className="h-4 w-4" />
-                          )}
-                          <span className="sr-only">
-                            {copiedCode === step.code ? "Copied!" : "Copy code"}
-                          </span>
-                        </button>
+                      {step.code && (
+                        <div className="relative group">
+                          <pre className="bg-gray-900 rounded-lg p-4 overflow-x-auto">
+                            <code className="text-gray-100 text-sm font-mono whitespace-pre-wrap break-words">
+                              {step.code}
+                            </code>
+                          </pre>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              copyToClipboard(step.code!);
+                            }}
+                            className={cn(
+                              "absolute top-2 right-2 p-2 rounded-md transition-all duration-200",
+                              copiedCode === step.code
+                                ? "bg-green-500 text-white"
+                                : "bg-gray-800 text-gray-300 opacity-0 group-hover:opacity-100 hover:bg-gray-700"
+                            )}
+                          >
+                            {copiedCode === step.code ? (
+                              <CheckCheck className="h-4 w-4" />
+                            ) : (
+                              <ClipboardCopy className="h-4 w-4" />
+                            )}
+                            <span className="sr-only">
+                              {copiedCode === step.code ? "Copied!" : "Copy code"}
+                            </span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {step.image && (
+                      <div className="relative rounded-lg overflow-hidden border border-gray-200 shrink-0 w-fit max-w-full sm:max-w-[min(24rem,100%)]">
+                        <Image
+                          src={step.image}
+                          alt={`Step ${step.order! + 1} image`}
+                          width={800}
+                          height={400}
+                          className="h-auto max-h-80 sm:max-h-96 w-auto max-w-[min(100%,24rem)] object-contain"
+                        />
                       </div>
                     )}
                   </div>

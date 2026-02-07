@@ -9,6 +9,7 @@ import {
   Split,
 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 import { StepList } from "./StepList";
 import { IProcessStep } from "@/app/models/Process";
 import { Button } from "../ui/button";
@@ -44,6 +45,8 @@ export function ProcessCard({
   onToggleExpand,
   onStepClick,
 }: ProcessCardProps) {
+  const { isSignedIn } = useAuth();
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-all">
       <div className="p-4">
@@ -75,12 +78,14 @@ export function ProcessCard({
 
           {/* Actions Section */}
           <div className="flex gap-2 shrink-0">
-            <Link href={`/private/process/edit/${id}`}>
-              <Button variant="outline" size="sm" className="h-8 px-2">
-                <Edit className="h-4 w-4" />
-                <span className="sr-only">Edit process</span>
-              </Button>
-            </Link>
+            {isSignedIn && (
+              <Link href={`/private/process/edit/${id}`}>
+                <Button variant="outline" size="sm" className="h-8 px-2">
+                  <Edit className="h-4 w-4" />
+                  <span className="sr-only">Edit process</span>
+                </Button>
+              </Link>
+            )}
             <Button
               variant="ghost"
               size="sm"

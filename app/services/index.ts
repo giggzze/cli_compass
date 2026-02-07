@@ -1,6 +1,9 @@
 export * from './commandService';
 export * from './categoryService';
 export * from './errorService';
-export * from './categoryService';
 export * from './userService';
-
+export * from './processService';
+export * from './tagService';
+export * from './collectionService';
+export * from './commandLinkService';
+export * from './usageService';
