@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { CommandService } from "@/app/services";
+import {Command, CommandInsert} from "@/types/STT";
 
 export async function GET() {
 	try {
@@ -32,7 +33,7 @@ export async function GET() {
 export async function POST(request: Request) {
 	try {
 		// Make sure the user is authenticated
-		const { userId } = await auth();
+		const { userId } = auth();
 		if (!userId) {
 			return NextResponse.json(
 				{ success: false, error: "Unauthorized" },
@@ -51,16 +52,16 @@ export async function POST(request: Request) {
 			);
 		}
 
+		const command : CommandInsert = {
+			code,
+			description,
+			is_private: isPrivate,
+			category_id: categoryId,
+			user_id: userId
+		}
+
 		// Create the command in the database
-		await CommandService.createCommand(
-			{
-				description,
-				categoryId,
-				code,
-				isPrivate,
-			},
-			userId
-		);
+		await CommandService.createCommand(command);
 
 		return NextResponse.json({
 			success: true,

@@ -6,15 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/export/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/export/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/import/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/import/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/Category.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/Command.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/Process.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/Profile.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/commands/user/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/commands/user/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/profile/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/profile/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/categoryService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/userService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/userService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/supabase/migrations/20260207120000_add_rls_policies.sql" beforeDir="false" afterPath="$PROJECT_DIR$/supabase/migrations/20260207120000_add_rls_policies.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,25 +33,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "18-add-images-to-processes",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.nodejs",
-    "ts.external.directory.path": "/Users/giggzze/Documents/GitHub/cli_compass/node_modules/typescript/lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;18-add-images-to-processes&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/GitHub/cli_compass&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;E:\\GitHub\\cli_compass\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -73,7 +74,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-WS-252.26830.93" />
+        <option value="bundled-js-predefined-d6986cc7102b-66ae2896e9e0-JavaScript-WS-261.20362.32" />
       </set>
     </attachedChunks>
   </component>
@@ -89,6 +90,10 @@
       <workItem from="1735399795385" duration="3102000" />
       <workItem from="1739629422010" duration="45000" />
       <workItem from="1770502591166" duration="1069000" />
+      <workItem from="1770504117154" duration="1258000" />
+      <workItem from="1770505458965" duration="48000" />
+      <workItem from="1770505517183" duration="2232000" />
+      <workItem from="1770547727498" duration="5015000" />
     </task>
     <servers />
   </component>

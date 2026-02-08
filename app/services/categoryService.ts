@@ -1,14 +1,16 @@
 import { db } from "@/db";
-import { categories } from "@/db/schema";
-import { eq } from "drizzle-orm";
 import { NotFoundError, ValidationError } from "./errorService";
-import {ICategory, ICategoryIdentifier} from "@/app/models";
+import {Category, CategoryInsert} from "@/types/STT";
+import {supabase} from "@/supabase";
 
 export class CategoryService {
-	static async getAllCategories(): Promise<ICategory[]> {
+	static async getAllCategories(): Promise<Category[]> {
 		try {
 			// retrieve and return all categories
-			return await db.select().from(categories);
+			const {data} = await supabase
+				.from("categories")
+				.select();
+			return data;
 		} catch (error) {
 			if (error instanceof NotFoundError) {
 				throw error;
@@ -18,28 +20,32 @@ export class CategoryService {
 		}
 	}
 
-	static async createCategory(newCategory: string): Promise<ICategory> {
+	static async createCategory(newCategory: string): Promise<Category> {
 		try {
 			// make sure name is not empty
 			if (!newCategory) throw new ValidationError("Category name is required");
 
 			// check if category already exists
-			const exists = await this.categoryExists({
-				name: newCategory,
-			});
-			if (exists.exists) {
-				return exists.category![0];
+			const exists = await this.categoryExists({name: newCategory} as CategoryInsert);
+
+			if (exists) {
+				const {data} = await supabase.from("categories").select().eq("name", newCategory).single();
+				return data as Category;
 			}
 
 			// create new category
-			const [createdCategory] = await db
-				.insert(categories)
-				.values({
-					name: newCategory.trim(),
-				})
-				.returning();
+			const {data , error }= await supabase 
+				.from("categories")
+				.insert({name: newCategory} as CategoryInsert)
+				.select()
+				.single();
 
-			return createdCategory
+			if (error) {
+				console.error("Error in createCategory:", error);
+				throw new ValidationError("Failed to create category");
+			}
+
+			return data as Category;
 		} catch (error) {
 			if (error instanceof ValidationError) {
 				throw error;
@@ -49,31 +55,24 @@ export class CategoryService {
 		}
 	}
 
-	static async categoryExists(identifier: ICategoryIdentifier) {
+	static async categoryExists(category: CategoryInsert) {
 		try {
 			// check what kind of identifier is provided
-			if (!identifier.id && !identifier.name) {
+			if (!category) {
 				throw new ValidationError(
 					"Either category ID or name is required"
 				);
 			}
 
 			// get all categories
-			const query = db.select().from(categories).limit(1);
+			const { data } = await supabase
+				.from("categories")
+				.select("id")
+				.eq("name", category.name)
+				.maybeSingle();
 
-			// check if category exists depending on identifier
-			if (identifier.id) {
-				query.where(eq(categories.id, identifier.id));
-			} else if (identifier.name) {
-				query.where(eq(categories.name, identifier.name));
-			}
+			return !!data
 
-			const category = await query;
-			if (category.length > 0)
-				return { exists: true, category: category };
-			return {
-				exists: false,
-			};
 		} catch (error) {
 			if (error instanceof ValidationError) {
 				throw error;

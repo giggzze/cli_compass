@@ -1,7 +1,5 @@
 import { supabase } from "@/supabase";
 import type {
-  GetCommand,
-  CreateCommandPayload,
   CommandInsert,
   UserCommandInsert,
 } from "@/types/STT";
@@ -136,21 +134,11 @@ export class CommandService {
   /**
    * Creates a new command and associates it with a user.
    */
-  static async createCommand(
-    data: CreateCommandPayload,
-    userId: string
-  ): Promise<boolean> {
-    const insert: CommandInsert = {
-      description: data.description,
-      code: data.code,
-      is_private: data.isPrivate,
-      category_id: data.categoryId,
-      user_id: userId,
-    };
+  static async createCommand(command: CommandInsert): Promise<boolean> {
 
     const { data: newCommand, error: cmdError } = await supabase
       .from("commands")
-      .insert(insert)
+      .insert(command)
       .select("id")
       .single();
 
@@ -160,7 +148,7 @@ export class CommandService {
     }
 
     const ucInsert: UserCommandInsert = {
-      user_id: userId,
+      user_id: command.user_id,
       command_id: newCommand.id,
       is_favorite: false,
     };
