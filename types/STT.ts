@@ -14,6 +14,8 @@ export type CommandUsage = Tables<"command_usage">;
 export type Collection = Tables<"collections">;
 export type Profile = Tables<"profiles">;
 
+export type GetCommand = Command & UserCommand
+
 // update types
 export type CategoryUpdate = TablesUpdate<"categories">;
 export type CommandUpdate = TablesUpdate<"commands">;

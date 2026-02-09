@@ -1,7 +1,8 @@
 import { supabase } from "@/supabase";
 import type {
-  CommandInsert,
-  UserCommandInsert,
+    Command,
+    CommandInsert, GetCommand,
+    UserCommandInsert,
 } from "@/types/STT";
 
 function mapRowToGetCommand(row: {
@@ -78,11 +79,11 @@ export class CommandService {
   /**
    * Retrieves a list of commands associated with a specific user.
    */
-  static async getUserCommands(userId: string): Promise<GetCommand[]> {
+  static async getUserCommands(userId: string): Promise<Command[]> {
     const { data, error } = await supabase
       .from("user_commands")
       .select(
-        "is_favorite, commands(id, description, code, is_private, category_id, doc_url, language, created_at, user_id, categories(id, name)), profiles(id, username, avatar_url)"
+        "*, commands(*), profiles(*)"
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
