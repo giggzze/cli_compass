@@ -6,16 +6,26 @@
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/categoryService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/collectionService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/collectionService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/commandLinkService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandLinkService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/processService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/processService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/tagService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/tagService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/usageService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/usageService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/types/STT.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/STT.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/categories/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/commands/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/processes/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/collections/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/command-links/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/export/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/import/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/usage/route.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/models/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/collectionService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/commandLinkService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/usageService.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/collections/AddToCollection.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/collections/CollectionCard.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/collections/CollectionManager.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/collections/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/dashboard/UsageStats.tsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +53,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "18-add-images-to-processes",
+    "git-widget-placeholder": "simple",
     "ignore.virus.scanning.warn.message": "true",
     "javascript.preferred.runtime.type.id": "node",
     "js.debugger.nextJs.config.created.client": "true",
@@ -103,7 +113,7 @@
       <workItem from="1770564351780" duration="464000" />
       <workItem from="1770564829203" duration="1211000" />
       <workItem from="1770566062790" duration="82000" />
-      <workItem from="1770670012543" duration="754000" />
+      <workItem from="1770670012543" duration="2780000" />
     </task>
     <servers />
   </component>
