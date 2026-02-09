@@ -1,84 +1,55 @@
-import { db } from "@/db";
-import { NotFoundError, ValidationError } from "./errorService";
-import {Category, CategoryInsert} from "@/types/STT";
-import {supabase} from "@/supabase";
+import { Category, CategoryInsert } from "@/types/STT";
+import { supabase } from "@/supabase";
 
 export class CategoryService {
-	static async getAllCategories(): Promise<Category[]> {
-		try {
-			// retrieve and return all categories
-			const {data} = await supabase
-				.from("categories")
-				.select();
-			return data;
-		} catch (error) {
-			if (error instanceof NotFoundError) {
-				throw error;
-			}
-			console.error("Error in getAllCategories:", error);
-			throw new ValidationError("Failed to fetch categories");
-		}
-	}
+  /**
+   *
+   * @returns return all the categories stored in the DB
+   */
+  static async getAllCategories(): Promise<Category[]> {
+    const { data, error } = await supabase.from("categories").select();
 
-	static async createCategory(newCategory: string): Promise<Category> {
-		try {
-			// make sure name is not empty
-			if (!newCategory) throw new ValidationError("Category name is required");
+    if (error) return [] as Category[];
 
-			// check if category already exists
-			const exists = await this.categoryExists({name: newCategory} as CategoryInsert);
+    return data;
+  }
 
-			if (exists) {
-				const {data} = await supabase.from("categories").select().eq("name", newCategory).single();
-				return data as Category;
-			}
+  /**
+   *
+   * @param newCategory Category that should be created
+   * @returns  The new Category after it has been stored in the DB
+   */
+  static async createCategory(newCategory: string): Promise<Category> {
+    // check if category already exists
+    const existingCategory = await this.categoryExists({
+      name: newCategory,
+    } as CategoryInsert);
 
-			// create new category
-			const {data , error }= await supabase 
-				.from("categories")
-				.insert({name: newCategory} as CategoryInsert)
-				.select()
-				.single();
+    if (existingCategory) {
+      return existingCategory;
+    }
 
-			if (error) {
-				console.error("Error in createCategory:", error);
-				throw new ValidationError("Failed to create category");
-			}
+    // create new category
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ name: newCategory } as CategoryInsert)
+      .select()
+      .single();
 
-			return data as Category;
-		} catch (error) {
-			if (error instanceof ValidationError) {
-				throw error;
-			}
-			console.error("Error in createCategory:", error);
-			throw new ValidationError("Failed to create category");
-		}
-	}
+    if (error) return {} as Category;
 
-	static async categoryExists(category: CategoryInsert) {
-		try {
-			// check what kind of identifier is provided
-			if (!category) {
-				throw new ValidationError(
-					"Either category ID or name is required"
-				);
-			}
+    return data as Category;
+  }
 
-			// get all categories
-			const { data } = await supabase
-				.from("categories")
-				.select("id")
-				.eq("name", category.name)
-				.maybeSingle();
+  static async categoryExists(category: CategoryInsert) {
+    const { data, error } = await supabase
+      .from("categories")
+      .select()
+      .eq("name", category.name)
+      .maybeSingle();
 
-			return !!data
+    if (error) return {} as Category;
 
-		} catch (error) {
-			if (error instanceof ValidationError) {
-				throw error;
-			}
-			console.error("Error in categoryExists:", error);
-			throw new ValidationError("Failed to check category existence");
-		}
-	}
+    return data;
+  }
 }

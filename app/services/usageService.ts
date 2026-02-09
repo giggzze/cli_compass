@@ -1,25 +1,5 @@
-import { db } from "@/db";
-import { commandUsage, commands, categories } from "@/db/schema";
-import { eq, and, desc, sql, count } from "drizzle-orm";
-
-export interface IUsageRecord {
-  id: string;
-  commandId: string;
-  userId: string;
-  action: string;
-  timestamp: string | null;
-}
-
-export interface ICommandUsageStats {
-  commandId: string;
-  description: string | null;
-  code: string | null;
-  categoryName: string | null;
-  copyCount: number;
-  viewCount: number;
-  totalCount: number;
-  lastUsed: string | null;
-}
+import { supabase } from "@/supabase";
+import type { ICommandUsageStats } from "@/types/STT";
 
 export class UsageService {
   /**
@@ -30,13 +10,13 @@ export class UsageService {
     commandId: string,
     action: "copy" | "view"
   ): Promise<void> {
-    try {
-      await db.insert(commandUsage).values({
-        userId,
-        commandId,
-        action,
-      });
-    } catch (error) {
+    const { error } = await supabase.from("command_usage").insert({
+      user_id: userId,
+      command_id: commandId,
+      action,
+    });
+
+    if (error) {
       console.error("Error tracking usage:", error);
       // Don't throw - tracking failures shouldn't break the app
     }
@@ -51,95 +31,154 @@ export class UsageService {
     totalCopies: number;
     totalViews: number;
   }> {
-    try {
-      // Get most used commands
-      const mostUsed = await db
-        .select({
-          commandId: commandUsage.commandId,
-          description: commands.description,
-          code: commands.code,
-          categoryName: categories.name,
-          totalCount: count(),
-        })
-        .from(commandUsage)
-        .innerJoin(commands, eq(commandUsage.commandId, commands.id))
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .where(eq(commandUsage.userId, userId))
-        .groupBy(
-          commandUsage.commandId,
-          commands.description,
-          commands.code,
-          categories.name
-        )
-        .orderBy(desc(count()))
-        .limit(10);
+    const { data: usageRows, error: usageError } = await supabase
+      .from("command_usage")
+      .select("command_id, action, timestamp")
+      .eq("user_id", userId)
+      .order("timestamp", { ascending: false })
+      .limit(2000);
 
-      // Get recently used commands
-      const recentlyUsed = await db
-        .select({
-          commandId: commandUsage.commandId,
-          description: commands.description,
-          code: commands.code,
-          categoryName: categories.name,
-          timestamp: commandUsage.timestamp,
-        })
-        .from(commandUsage)
-        .innerJoin(commands, eq(commandUsage.commandId, commands.id))
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .where(eq(commandUsage.userId, userId))
-        .orderBy(desc(commandUsage.timestamp))
-        .limit(10);
-
-      // Dedupe recently used
-      const seen = new Set<string>();
-      const uniqueRecent = recentlyUsed.filter((item) => {
-        if (seen.has(item.commandId)) return false;
-        seen.add(item.commandId);
-        return true;
-      });
-
-      // Get total counts
-      const totals = await db
-        .select({
-          action: commandUsage.action,
-          count: count(),
-        })
-        .from(commandUsage)
-        .where(eq(commandUsage.userId, userId))
-        .groupBy(commandUsage.action);
-
-      const totalCopies =
-        totals.find((t) => t.action === "copy")?.count || 0;
-      const totalViews = totals.find((t) => t.action === "view")?.count || 0;
-
-      return {
-        mostUsed: mostUsed.map((item) => ({
-          commandId: item.commandId,
-          description: item.description,
-          code: item.code,
-          categoryName: item.categoryName,
-          copyCount: 0, // Would need separate query
-          viewCount: 0,
-          totalCount: Number(item.totalCount),
-          lastUsed: null,
-        })),
-        recentlyUsed: uniqueRecent.map((item) => ({
-          commandId: item.commandId,
-          description: item.description,
-          code: item.code,
-          categoryName: item.categoryName,
-          copyCount: 0,
-          viewCount: 0,
-          totalCount: 0,
-          lastUsed: item.timestamp,
-        })),
-        totalCopies: Number(totalCopies),
-        totalViews: Number(totalViews),
-      };
-    } catch (error) {
-      console.error("Error getting user stats:", error);
+    if (usageError) {
+      console.error("Error getting user stats:", usageError);
       throw new Error("Failed to get usage statistics");
     }
+
+    const rows = usageRows ?? [];
+
+    const byCommand = new Map<
+      string,
+      { copy: number; view: number; lastUsed: string | null }
+    >();
+    let totalCopies = 0;
+    let totalViews = 0;
+
+    for (const r of rows) {
+      totalCopies += r.action === "copy" ? 1 : 0;
+      totalViews += r.action === "view" ? 1 : 0;
+      const cur = byCommand.get(r.command_id) ?? {
+        copy: 0,
+        view: 0,
+        lastUsed: null,
+      };
+      if (r.action === "copy") cur.copy += 1;
+      if (r.action === "view") cur.view += 1;
+      if (!cur.lastUsed || (r.timestamp && r.timestamp > cur.lastUsed)) {
+        cur.lastUsed = r.timestamp ?? null;
+      }
+      byCommand.set(r.command_id, cur);
+    }
+
+    const sortedByTotal = [...byCommand.entries()]
+      .map(([command_id, v]) => ({
+        command_id,
+        total_count: v.copy + v.view,
+        copy_count: v.copy,
+        view_count: v.view,
+        last_used: v.lastUsed,
+      }))
+      .sort((a, b) => b.total_count - a.total_count)
+      .slice(0, 10);
+
+    const recentEntries = [...byCommand.entries()]
+      .map(([command_id, v]) => ({ command_id, last_used: v.lastUsed }))
+      .filter((e) => e.last_used)
+      .sort(
+        (a, b) =>
+          (b.last_used ?? "").localeCompare(a.last_used ?? "")
+      )
+      .slice(0, 10);
+
+    const commandIds = [
+      ...new Set([
+        ...sortedByTotal.map((e) => e.command_id),
+        ...recentEntries.map((e) => e.command_id),
+      ]),
+    ].slice(0, 20);
+
+    if (commandIds.length === 0) {
+      return {
+        mostUsed: [],
+        recentlyUsed: [],
+        totalCopies,
+        totalViews,
+      };
+    }
+
+    const { data: commandRows, error: cmdError } = await supabase
+      .from("commands")
+      .select("id, description, code, category_id, categories(name)")
+      .in("id", commandIds);
+
+    if (cmdError) {
+      console.error("Error getting user stats (commands):", cmdError);
+      throw new Error("Failed to get usage statistics");
+    }
+
+    const commandMap = new Map<
+      string,
+      {
+        description: string | null;
+        code: string | null;
+        category_name: string | null;
+      }
+    >();
+    for (const c of commandRows ?? []) {
+      const cat = c.categories as { name: string } | null;
+      commandMap.set(c.id, {
+        description: c.description ?? null,
+        code: c.code ?? null,
+        category_name: cat?.name ?? null,
+      });
+    }
+
+    const toStats = (
+      command_id: string,
+      copy_count: number,
+      view_count: number,
+      total_count: number,
+      last_used: string | null
+    ): ICommandUsageStats => {
+      const info = commandMap.get(command_id);
+      return {
+        command_id,
+        description: info?.description ?? null,
+        code: info?.code ?? null,
+        category_name: info?.category_name ?? null,
+        copy_count,
+        view_count,
+        total_count,
+        last_used,
+      };
+    };
+
+    const mostUsed: ICommandUsageStats[] = sortedByTotal.map((e) => {
+      const info = byCommand.get(e.command_id)!;
+      return toStats(
+        e.command_id,
+        info.copy,
+        info.view,
+        e.total_count,
+        info.lastUsed
+      );
+    });
+
+    const recentlyUsed: ICommandUsageStats[] = recentEntries.map((e) => {
+      const info = byCommand.get(e.command_id)!;
+      return toStats(
+        e.command_id,
+        info.copy,
+        info.view,
+        info.copy + info.view,
+        info.lastUsed
+      );
+    });
+
+    return {
+      mostUsed,
+      recentlyUsed,
+      totalCopies,
+      totalViews,
+    };
   }
 
   /**
@@ -148,23 +187,25 @@ export class UsageService {
   static async getCommandStats(
     commandId: string
   ): Promise<{ copyCount: number; viewCount: number }> {
-    try {
-      const stats = await db
-        .select({
-          action: commandUsage.action,
-          count: count(),
-        })
-        .from(commandUsage)
-        .where(eq(commandUsage.commandId, commandId))
-        .groupBy(commandUsage.action);
+    const [
+      { count: copyCount },
+      { count: viewCount },
+    ] = await Promise.all([
+      supabase
+        .from("command_usage")
+        .select("*", { count: "exact", head: true })
+        .eq("command_id", commandId)
+        .eq("action", "copy"),
+      supabase
+        .from("command_usage")
+        .select("*", { count: "exact", head: true })
+        .eq("command_id", commandId)
+        .eq("action", "view"),
+    ]);
 
-      return {
-        copyCount: Number(stats.find((s) => s.action === "copy")?.count || 0),
-        viewCount: Number(stats.find((s) => s.action === "view")?.count || 0),
-      };
-    } catch (error) {
-      console.error("Error getting command stats:", error);
-      return { copyCount: 0, viewCount: 0 };
-    }
+    return {
+      copyCount: copyCount ?? 0,
+      viewCount: viewCount ?? 0,
+    };
   }
 }

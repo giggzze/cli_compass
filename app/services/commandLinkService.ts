@@ -1,79 +1,51 @@
-import { db } from "@/db";
-import { commandLinks, commands, categories, userCommands } from "@/db/schema";
-import { and, eq, or } from "drizzle-orm";
-
-export interface ICommandLink {
-  id: string;
-  commandId: string;
-  relatedCommandId: string;
-  relationshipType: string | null;
-}
-
-export interface ILinkedCommand {
-  id: string;
-  description: string | null;
-  code: string | null;
-  categoryId: string | null;
-  relationshipType: string | null;
-  category?: {
-    id: string;
-    name: string | null;
-  };
-}
+import { supabase } from "@/supabase";
+import type { CommandLink, ILinkedCommand } from "@/types/STT";
 
 export class CommandLinkService {
   /**
    * Get all related commands for a given command
    */
   static async getRelatedCommands(commandId: string): Promise<ILinkedCommand[]> {
-    try {
-      // Get commands where this command is the source
-      const linkedAsSource = await db
-        .select({
-          id: commands.id,
-          description: commands.description,
-          code: commands.code,
-          categoryId: commands.categoryId,
-          relationshipType: commandLinks.relationshipType,
-          category: {
-            id: categories.id,
-            name: categories.name,
-          },
-        })
-        .from(commandLinks)
-        .innerJoin(commands, eq(commandLinks.relatedCommandId, commands.id))
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .where(eq(commandLinks.commandId, commandId));
+    const [asSourceRes, asTargetRes] = await Promise.all([
+      supabase
+        .from("command_links")
+        .select(
+          "relationship_type, commands!command_links_related_command_id_fkey(id, description, code, category_id, categories(id, name))"
+        )
+        .eq("command_id", commandId),
+      supabase
+        .from("command_links")
+        .select(
+          "relationship_type, commands!command_links_command_id_fkey(id, description, code, category_id, categories(id, name))"
+        )
+        .eq("related_command_id", commandId),
+    ]);
 
-      // Get commands where this command is the target
-      const linkedAsTarget = await db
-        .select({
-          id: commands.id,
-          description: commands.description,
-          code: commands.code,
-          categoryId: commands.categoryId,
-          relationshipType: commandLinks.relationshipType,
-          category: {
-            id: categories.id,
-            name: categories.name,
-          },
-        })
-        .from(commandLinks)
-        .innerJoin(commands, eq(commandLinks.commandId, commands.id))
-        .leftJoin(categories, eq(commands.categoryId, categories.id))
-        .where(eq(commandLinks.relatedCommandId, commandId));
+    const fromSource = (asSourceRes.data ?? []).map((row: { relationship_type: string | null; commands: unknown }) => {
+      const cmd = row.commands as Record<string, unknown> | null;
+      if (!cmd) return null;
+      return {
+        ...cmd,
+        relationship_type: row.relationship_type,
+      };
+    }).filter(Boolean) as ILinkedCommand[];
 
-      // Combine and dedupe
-      const allLinked = [...linkedAsSource, ...linkedAsTarget];
-      const uniqueLinked = allLinked.filter(
-        (cmd, index, self) => index === self.findIndex((c) => c.id === cmd.id)
-      );
+    const fromTarget = (asTargetRes.data ?? []).map((row: { relationship_type: string | null; commands: unknown }) => {
+      const cmd = row.commands as Record<string, unknown> | null;
+      if (!cmd) return null;
+      return {
+        ...cmd,
+        relationship_type: row.relationship_type,
+      };
+    }).filter(Boolean) as ILinkedCommand[];
 
-      return uniqueLinked;
-    } catch (error) {
-      console.error("Error in getRelatedCommands:", error);
-      throw new Error("Failed to fetch related commands");
-    }
+    const allLinked = [...fromSource, ...fromTarget];
+    const seen = new Set<string>();
+    return allLinked.filter((c) => {
+      if (seen.has(c.id)) return false;
+      seen.add(c.id);
+      return true;
+    });
   }
 
   /**
@@ -83,27 +55,26 @@ export class CommandLinkService {
     commandId: string,
     relatedCommandId: string,
     relationshipType: string = "related"
-  ): Promise<ICommandLink> {
-    try {
-      // Don't allow linking a command to itself
-      if (commandId === relatedCommandId) {
-        throw new Error("Cannot link a command to itself");
-      }
+  ): Promise<CommandLink> {
+    if (commandId === relatedCommandId) {
+      throw new Error("Cannot link a command to itself");
+    }
 
-      const [newLink] = await db
-        .insert(commandLinks)
-        .values({
-          commandId,
-          relatedCommandId,
-          relationshipType,
-        })
-        .returning();
+    const { data, error } = await supabase
+      .from("command_links")
+      .insert({
+        command_id: commandId,
+        related_command_id: relatedCommandId,
+        relationship_type: relationshipType,
+      })
+      .select()
+      .single();
 
-      return newLink;
-    } catch (error) {
+    if (error) {
       console.error("Error in createLink:", error);
       throw new Error("Failed to create command link");
     }
+    return data as CommandLink;
   }
 
   /**
@@ -113,26 +84,27 @@ export class CommandLinkService {
     commandId: string,
     relatedCommandId: string
   ): Promise<boolean> {
-    try {
-      // Remove link in both directions
-      await db.delete(commandLinks).where(
-        or(
-          and(
-            eq(commandLinks.commandId, commandId),
-            eq(commandLinks.relatedCommandId, relatedCommandId)
-          ),
-          and(
-            eq(commandLinks.commandId, relatedCommandId),
-            eq(commandLinks.relatedCommandId, commandId)
-          )
-        )
-      );
+    const { error: e1 } = await supabase
+      .from("command_links")
+      .delete()
+      .eq("command_id", commandId)
+      .eq("related_command_id", relatedCommandId);
 
-      return true;
-    } catch (error) {
-      console.error("Error in removeLink:", error);
+    if (e1) {
+      console.error("Error in removeLink:", e1);
       throw new Error("Failed to remove command link");
     }
+
+    const { error: e2 } = await supabase
+      .from("command_links")
+      .delete()
+      .eq("command_id", relatedCommandId)
+      .eq("related_command_id", commandId);
+
+    if (e2) {
+      console.error("Error in removeLink (reverse):", e2);
+    }
+    return true;
   }
 
   /**
@@ -142,29 +114,25 @@ export class CommandLinkService {
     commandId: string,
     relatedCommandId: string
   ): Promise<boolean> {
-    try {
-      const result = await db
-        .select()
-        .from(commandLinks)
-        .where(
-          or(
-            and(
-              eq(commandLinks.commandId, commandId),
-              eq(commandLinks.relatedCommandId, relatedCommandId)
-            ),
-            and(
-              eq(commandLinks.commandId, relatedCommandId),
-              eq(commandLinks.relatedCommandId, commandId)
-            )
-          )
-        )
-        .limit(1);
+    const { data: d1 } = await supabase
+      .from("command_links")
+      .select("id")
+      .eq("command_id", commandId)
+      .eq("related_command_id", relatedCommandId)
+      .limit(1)
+      .maybeSingle();
 
-      return result.length > 0;
-    } catch (error) {
-      console.error("Error in areLinked:", error);
-      throw new Error("Failed to check command link");
-    }
+    if (d1) return true;
+
+    const { data: d2 } = await supabase
+      .from("command_links")
+      .select("id")
+      .eq("command_id", relatedCommandId)
+      .eq("related_command_id", commandId)
+      .limit(1)
+      .maybeSingle();
+
+    return !!d2;
   }
 
   /**
@@ -175,27 +143,24 @@ export class CommandLinkService {
     relatedCommandId: string,
     relationshipType: string
   ): Promise<boolean> {
-    try {
-      await db
-        .update(commandLinks)
-        .set({ relationshipType })
-        .where(
-          or(
-            and(
-              eq(commandLinks.commandId, commandId),
-              eq(commandLinks.relatedCommandId, relatedCommandId)
-            ),
-            and(
-              eq(commandLinks.commandId, relatedCommandId),
-              eq(commandLinks.relatedCommandId, commandId)
-            )
-          )
-        );
+    const { error: e1 } = await supabase
+      .from("command_links")
+      .update({ relationship_type: relationshipType })
+      .eq("command_id", commandId)
+      .eq("related_command_id", relatedCommandId);
 
-      return true;
-    } catch (error) {
-      console.error("Error in updateLinkType:", error);
+    if (!e1) return true;
+
+    const { error: e2 } = await supabase
+      .from("command_links")
+      .update({ relationship_type: relationshipType })
+      .eq("command_id", relatedCommandId)
+      .eq("related_command_id", commandId);
+
+    if (e2) {
+      console.error("Error in updateLinkType:", e2);
       throw new Error("Failed to update link type");
     }
+    return true;
   }
 }

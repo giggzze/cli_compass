@@ -14,8 +14,6 @@ export type CommandUsage = Tables<"command_usage">;
 export type Collection = Tables<"collections">;
 export type Profile = Tables<"profiles">;
 
-export type GetCommand = Command & UserCommand
-
 // update types
 export type CategoryUpdate = TablesUpdate<"categories">;
 export type CommandUpdate = TablesUpdate<"commands">;
@@ -45,3 +43,53 @@ export type CommandTagInsert = TablesInsert<"command_tags">;
 export type CommandUsageInsert = TablesInsert<"command_usage">;
 export type ProfileInsert = TablesInsert<"profiles">;
 export type CollectionInsert = TablesInsert<"collections">;
+
+export type UserCommandCombined = Command & UserCommand & Profile;
+export type UserCommandCombinedWithCategory = Command &
+  UserCommand &
+  Profile &
+  Category;
+export type PublicCommand = Command & Category;
+
+// Service-specific types
+export interface IProcessStep {
+  stepExplanation: string;
+  code?: string | null;
+  image?: string | null;
+  order?: number;
+}
+
+export type IGetProcessWithStep = Process & {
+  steps: ProcessStep[];
+  user?: Profile | null;
+};
+
+export type ILinkedCommand = Pick<
+  Command,
+  "id" | "description" | "code" | "category_id"
+> & {
+  relationship_type: string | null;
+  category?: Pick<Category, "id" | "name"> | null;
+  categories?: Pick<Category, "id" | "name"> | null;
+};
+
+export interface ICommandUsageStats {
+  command_id: string;
+  description: string | null;
+  code: string | null;
+  category_name: string | null;
+  copy_count: number;
+  view_count: number;
+  total_count: number;
+  last_used: string | null;
+}
+
+export type CollectionWithItems = Collection & {
+  commands: (Pick<Command, "id" | "description" | "code" | "is_private" | "category_id" | "created_at"> & {
+    order: number | null;
+    category?: Pick<Category, "id" | "name"> | null;
+  })[];
+  processes: (Pick<Process, "id" | "title" | "user_id" | "is_private" | "created_at"> & {
+    order: number | null;
+  })[];
+};
