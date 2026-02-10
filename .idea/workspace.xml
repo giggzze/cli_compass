@@ -6,26 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/categories/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/commands/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/processes/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/collections/[id]/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/collections/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/command-links/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/export/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/import/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/usage/route.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/collectionService.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/commandLinkService.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/usageService.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/collections/AddToCollection.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/collections/CollectionCard.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/collections/CollectionManager.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/collections/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/dashboard/UsageStats.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,30 +32,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "simple",
-    "ignore.virus.scanning.warn.message": "true",
-    "javascript.preferred.runtime.type.id": "node",
-    "js.debugger.nextJs.config.created.client": "true",
-    "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "E:/GitHub/cli_compass",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_interpreter_path": "node",
-    "nodejs_package_manager_path": "npm",
-    "npm.Next.js: server-side.executor": "Debug",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "E:\\GitHub\\cli_compass\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;simple&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
+    &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
+    &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/GitHub/cli_compass&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.Next.js: server-side.executor&quot;: &quot;Debug&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;E:\\GitHub\\cli_compass\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="npm.Next.js: server-side">
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
@@ -114,6 +99,8 @@
       <workItem from="1770564829203" duration="1211000" />
       <workItem from="1770566062790" duration="82000" />
       <workItem from="1770670012543" duration="2780000" />
+      <workItem from="1770672801515" duration="2544000" />
+      <workItem from="1770711759132" duration="6684000" />
     </task>
     <servers />
   </component>
@@ -125,18 +112,42 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>90</line>
+          <line>97</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>82</line>
+          <line>89</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>95</line>
+          <line>102</line>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
+          <line>153</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
+          <line>172</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
+          <line>22</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="16" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
+          <line>49</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

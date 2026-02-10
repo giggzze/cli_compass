@@ -8,6 +8,13 @@ import type {
   UserCommandInsert,
 } from "@/types/STT";
 
+/** Query keys for React Query; use from hooks/query and when invalidating. */
+export const commandQueryKeys = {
+  all: ["commands"] as const,
+  list: (endpoint: string) => ["commands", endpoint] as const,
+  userId: () => ["userId"] as const,
+};
+
 export class CommandService {
   /**
    * Retrieves a list of public commands from the database.
@@ -29,18 +36,18 @@ export class CommandService {
   /**
    * Retrieves a list of commands associated with a specific user.
    */
-  static async getUserCommands(userId: string): Promise<UserCommandCombined[]> {
+  static async getUserCommands(userId: string): Promise<UserCommandCombinedWithCategory[]> {
     const { data, error } = await supabase
       .from("user_commands")
-      .select("*, commands(*), profiles(*)")
+      .select("*, commands(*, categories(*)), profiles(*)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
     if (error) {
-      return [] as UserCommandCombined[];
+      return [] as UserCommandCombinedWithCategory[];
     }
 
-    return data as UserCommandCombined[];
+    return data as UserCommandCombinedWithCategory[];
   }
 
   /**
