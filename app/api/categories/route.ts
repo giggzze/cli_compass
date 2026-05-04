@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ICategory } from "@/app/models";
 import { CategoryService } from "@/app/services";
 import { ValidationError } from "@/app/services";
+import { CategoryInsert } from "@/types/STT";
 
 export async function GET() {
   try {
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     }
 
     // create a new category
-    const newCategory = await CategoryService.createCategory(name);
+    const newCategory = await CategoryService.createCategory(name as CategoryInsert);
 
     return NextResponse.json({
       success: true,
