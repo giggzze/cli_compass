@@ -5,12 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9830ab4d-5ef5-4273-9d08-188814d01a44" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.vscode/settings.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/workbox-5f3e40ee.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/yarn.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/categories/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/categories/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/commands/user/[id]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/commands/user/[id]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/commands/user/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/commands/user/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/private/command/add/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/private/command/add/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/categoryService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/categoryService.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/services/commandService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/commandService.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandsPageContent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/services/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/command/CategoryFilter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CategoryFilter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/command/CommandList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/command/CommandList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/hooks/query/useCommandsQuery.ts" beforeDir="false" afterPath="$PROJECT_DIR$/hooks/query/useCommandsQuery.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/services/commandService.test.ts" beforeDir="false" afterPath="$PROJECT_DIR$/tests/services/commandService.test.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/STT.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/STT.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/supabase.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/supabase.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,7 +33,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -34,11 +46,13 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Playwright.CommandService.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;simple&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;merge3&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;javascript.preferred.runtime.type.id&quot;: &quot;node&quot;,
     &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
@@ -57,6 +71,18 @@
   }
 }</component>
   <component name="RunManager" selected="npm.Next.js: server-side">
+    <configuration name="CommandService" type="JavaScriptTestRunnerPlaywright" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <playwright-package value="$PROJECT_DIR$/node_modules/@playwright/test" />
+      <working-dir value="$PROJECT_DIR$" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/tests/services/commandService.test.ts" />
+      <test-names>
+        <test-name value="CommandService" />
+      </test-names>
+      <method v="2" />
+    </configuration>
     <configuration name="Next.js: debug client-side" type="JavascriptDebugType" uri="http://localhost:3000/">
       <method v="2" />
     </configuration>
@@ -70,11 +96,16 @@
       <envs />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Playwright.CommandService" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-66ae2896e9e0-JavaScript-WS-261.20362.32" />
+        <option value="bundled-js-predefined-d6986cc7102b-3bd3a6803838-JavaScript-WS-261.22158.274" />
       </set>
     </attachedChunks>
   </component>
@@ -101,6 +132,13 @@
       <workItem from="1770670012543" duration="2780000" />
       <workItem from="1770672801515" duration="2544000" />
       <workItem from="1770711759132" duration="6684000" />
+      <workItem from="1777884982879" duration="2175000" />
+      <workItem from="1777965587529" duration="1174000" />
+      <workItem from="1778076059997" duration="3701000" />
+      <workItem from="1778313407037" duration="1163000" />
+      <workItem from="1778355717562" duration="293000" />
+      <workItem from="1778410026258" duration="188000" />
+      <workItem from="1779278265809" duration="595000" />
     </task>
     <servers />
   </component>
@@ -112,42 +150,38 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>97</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>89</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>102</line>
-          <option name="timeStamp" value="3" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>153</line>
-          <properties lambdaOrdinal="-1" />
+          <line>183</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>172</line>
-          <properties lambdaOrdinal="-1" />
+          <line>202</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>22</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="16" />
+          <url>file://$PROJECT_DIR$/tests/services/commandService.test.ts</url>
+          <line>16</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/app/services/commandService.ts</url>
-          <line>49</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="18" />
+          <url>file://$PROJECT_DIR$/app/private/command/add/page.tsx</url>
+          <line>29</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/private/command/add/page.tsx</url>
+          <line>18</line>
+          <option name="timeStamp" value="22" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/private/command/add/page.tsx</url>
+          <line>56</line>
+          <option name="timeStamp" value="23" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/app/private/command/add/page.tsx</url>
+          <line>130</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

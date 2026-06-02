@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
-import { ICategory } from "@/app/models";
-import { CategoryService } from "@/app/services";
-import { ValidationError } from "@/app/services";
-import { CategoryInsert } from "@/types/STT";
+import { CategoryService, ValidationError } from "@/app/services";
+import { Category } from "@/types/STT";
 
 export async function GET() {
   try {
     // retrieve all categories from the database
-    const allCategories: ICategory[] = await CategoryService.getAllCategories();
+    const allCategories: Category[] = await CategoryService.getAllCategories();
 
     return NextResponse.json({ success: true, data: allCategories });
   } catch (error) {
@@ -34,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     // create a new category
-    const newCategory = await CategoryService.createCategory(name as CategoryInsert);
+    const newCategory = await CategoryService.createCategory(name);
 
     return NextResponse.json({
       success: true,

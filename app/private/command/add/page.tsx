@@ -93,6 +93,10 @@ export default function AddCommandPage() {
         throw new Error("Please enter a category name");
       }
 
+      if (!categoryId) {
+        throw new Error("Failed to resolve a category — please try again");
+      }
+
       const response = await fetch("/api/commands/user", {
         method: "POST",
         headers: {
@@ -129,7 +133,7 @@ export default function AddCommandPage() {
     setIsCustomCategory(isCustom);
     setFormData((prev) => ({
       ...prev,
-      category_id: isCustom ? "" : value,
+      categoryId: isCustom ? "" : value,
       customCategory: isCustom ? prev.customCategory : "",
     }));
   };
@@ -204,7 +208,7 @@ export default function AddCommandPage() {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} onClick={handleSubmit}>
             {isSubmitting ? "Adding..." : "Add Command"}
           </Button>
         </div>

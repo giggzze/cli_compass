@@ -278,7 +278,6 @@ export type Database = {
           is_private: boolean
           language: string | null
           updated_at: string
-          user_id: string | null
         }
         Insert: {
           category_id: string
@@ -290,7 +289,6 @@ export type Database = {
           is_private?: boolean
           language?: string | null
           updated_at?: string
-          user_id?: string | null
         }
         Update: {
           category_id?: string
@@ -302,7 +300,6 @@ export type Database = {
           is_private?: boolean
           language?: string | null
           updated_at?: string
-          user_id?: string | null
         }
         Relationships: [
           {
@@ -310,13 +307,6 @@ export type Database = {
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "commands_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

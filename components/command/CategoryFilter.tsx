@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { Category } from "@/lib/db.types";
+import { Category } from "@/types/STT";
 
 interface CategoryFilterProps {
   categories: Category[];

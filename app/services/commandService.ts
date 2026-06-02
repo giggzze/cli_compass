@@ -1,12 +1,24 @@
 import { supabase } from "@/supabase";
 import type {
+  Category,
   Command,
   CommandInsert,
+  CommandListItem,
+  Profile,
   PublicCommand,
-  UserCommandCombined,
   UserCommandCombinedWithCategory,
   UserCommandInsert,
 } from "@/types/STT";
+
+type UserCommandRow = {
+  id: string;
+  user_id: string;
+  command_id: string;
+  is_favorite: boolean | null;
+  created_at: string;
+  commands: (Command & { categories?: Category | null }) | null;
+  profiles: Profile | null;
+};
 
 /** Query keys for React Query; use from hooks/query and when invalidating. */
 export const commandQueryKeys = {
@@ -30,24 +42,42 @@ export class CommandService {
       return [] as PublicCommand[];
     }
 
+
+    console.log(data)
     return data;
   }
 
   /**
    * Retrieves a list of commands associated with a specific user.
    */
-  static async getUserCommands(userId: string): Promise<UserCommandCombinedWithCategory[]> {
+  static async getUserCommands(userId: string): Promise<CommandListItem[]> {
     const { data, error } = await supabase
       .from("user_commands")
       .select("*, commands(*, categories(*)), profiles(*)")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      return [] as UserCommandCombinedWithCategory[];
-    }
+    if (error || !data) return [];
 
-    return data as UserCommandCombinedWithCategory[];
+    return (data as UserCommandRow[])
+      .map((item) => {
+        const cmd = item.commands;
+        if (!cmd) return null;
+        const { categories, ...commandFields } = cmd;
+        return {
+          ...commandFields,
+          isFavorite: item.is_favorite ?? false,
+          category: categories ?? null,
+          user: item.profiles
+            ? {
+                id: item.profiles.id,
+                avatarUrl: item.profiles.avatar_url,
+                username: item.profiles.username,
+              }
+            : null,
+        } as CommandListItem;
+      })
+      .filter((item): item is CommandListItem => item !== null);
   }
 
   /**
@@ -75,7 +105,7 @@ export class CommandService {
   /**
    * Creates a new command and associates it with a user.
    */
-  static async createCommand(command: CommandInsert): Promise<boolean> {
+  static async createCommand(command: CommandInsert, userId: string): Promise<boolean> {
     const { data: newCommand, error: cmdError } = await supabase
       .from("commands")
       .insert(command)
@@ -87,7 +117,7 @@ export class CommandService {
     }
 
     const ucInsert: UserCommandInsert = {
-      user_id: command.user_id,
+      user_id: userId,
       command_id: newCommand.id,
       is_favorite: false,
     };

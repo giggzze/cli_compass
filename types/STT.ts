@@ -84,6 +84,12 @@ export interface ICommandUsageStats {
   last_used: string | null;
 }
 
+export type CommandListItem = Command & {
+  category?: Pick<Category, "id" | "name"> | null;
+  user?: { id: string; avatarUrl?: string | null; username?: string | null } | null;
+  isFavorite?: boolean;
+};
+
 export type CollectionWithItems = Collection & {
   commands: (Pick<Command, "id" | "description" | "code" | "is_private" | "category_id" | "created_at"> & {
     order: number | null;

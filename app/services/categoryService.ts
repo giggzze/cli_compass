@@ -20,36 +20,31 @@ export class CategoryService {
    * @returns  The new Category after it has been stored in the DB
    */
   static async createCategory(newCategory: string): Promise<Category> {
-    // check if category already exists
-    const existingCategory = await this.categoryExists({
-      name: newCategory,
-    } as CategoryInsert);
+    const existingCategory = await this.categoryExists(newCategory);
+    if (existingCategory) return existingCategory;
 
-    if (existingCategory) {
-      return existingCategory;
-    }
-
-    // create new category
     const { data, error } = await supabase
       .from("categories")
       .insert({ name: newCategory } as CategoryInsert)
       .select()
       .single();
 
-    if (error) return {} as Category;
+    if (error) {
+      console.error("categoryService.createCategory error:", error);
+      throw new Error(error.message);
+    }
 
     return data as Category;
   }
 
-  static async categoryExists(category: CategoryInsert) {
+  static async categoryExists(name: string): Promise<Category | null> {
     const { data, error } = await supabase
       .from("categories")
       .select()
-      .eq("name", category.name)
+      .eq("name", name)
       .maybeSingle();
 
-    if (error) return {} as Category;
-
+    if (error) return null;
     return data;
   }
 }

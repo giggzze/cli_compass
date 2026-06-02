@@ -2,14 +2,9 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { commandQueryKeys } from "@/app/services/commandService";
-import type { Category, Command } from "@/types/STT";
+import type { CommandListItem } from "@/types/STT";
 
-/** API response shape for command list (with optional category, user, isFavorite) */
-export type CommandListItem = Command & {
-  category?: Category | null;
-  user?: { id: string } | null;
-  isFavorite?: boolean;
-};
+export type { CommandListItem };
 
 async function fetchCommands(endpoint: string): Promise<CommandListItem[]> {
   const res = await fetch(endpoint);
