@@ -1,5 +1,5 @@
 import { CommandService } from "@/app/services";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { userId } =  auth();
+    const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json(

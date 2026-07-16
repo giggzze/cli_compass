@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { CommandService } from "@/app/services";
+import { CommandInsert } from "@/types/STT";
 
 export async function GET() {
 	try {
@@ -16,6 +17,8 @@ export async function GET() {
 		// Fetch all commands with their categories and user-specific data
 		const allCommands = await CommandService.getUserCommands(userId);
 
+		console.log(33)
+		console.log(allCommands);
 		return NextResponse.json({
 			success: true,
 			data: allCommands,
@@ -45,22 +48,25 @@ export async function POST(request: Request) {
 			await request.json();
 
 		if (!code || !description || !categoryId) {
+			const missing = [!code && "code", !description && "description", !categoryId && "categoryId"]
+				.filter(Boolean)
+				.join(", ");
+			console.error("POST /api/commands/user — missing fields:", missing);
 			return NextResponse.json(
-				{ success: false, error: "Missing required fields" },
+				{ success: false, error: `Missing required fields: ${missing}` },
 				{ status: 400 }
 			);
 		}
 
+		const command: CommandInsert = {
+			code,
+			description,
+			is_private: isPrivate,
+			category_id: categoryId,
+		}
+
 		// Create the command in the database
-		await CommandService.createCommand(
-			{
-				description,
-				categoryId,
-				code,
-				isPrivate,
-			},
-			userId
-		);
+		await CommandService.createCommand(command, userId);
 
 		return NextResponse.json({
 			success: true,

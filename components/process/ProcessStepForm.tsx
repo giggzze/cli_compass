@@ -1,16 +1,21 @@
-"use client";
 
 import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
-import { IProcessStepFormProps } from "@/app/models/Process";
 import { useState } from "react";
 import Image from "next/image";
+import {ProcessStep} from "@/types/STT";
 
+
+interface IProcessStepFormProps {
+  step: ProcessStep,
+  onChange: (step: ProcessStep) => void;
+  onAdd?: () => void;
+}
 export function ProcessStepForm({
   step,
   onChange,
   onAdd,
-}: IProcessStepFormProps) {
+}: IProcessStepFormProps ) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

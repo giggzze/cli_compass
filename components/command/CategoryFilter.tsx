@@ -1,10 +1,9 @@
-// @ts-nocheck
-import { Category } from "@/lib/db.types";
+import { Category } from "@/types/STT";
 
 interface CategoryFilterProps {
-  categories: Category[];
-  selectedCategory: Category;
-  onCategoryChange: (category: Category) => void;
+  categories: Pick<Category, "id" | "name">[];
+  selectedCategory: Pick<Category, "id" | "name">;
+  onCategoryChange: (category: Pick<Category, "id" | "name">) => void;
 }
 
 export default function CategoryFilter({

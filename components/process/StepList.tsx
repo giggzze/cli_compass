@@ -1,20 +1,19 @@
-"use client";
 
-import { IProcessStep } from "@/app/models/Process";
 import { useState } from "react";
 import { Code2, ClipboardCopy, CheckCheck, Pencil, Save, X, Trash2, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
+import {ProcessStep} from "@/types/STT";
 
 interface BaseStepListProps {
-  steps: IProcessStep[];
+  steps: ProcessStep[];
   isEditable?: boolean;
   currentStep?: number;
   processId?: string;
   onStepClick?: (processId: string, stepOrder: number) => void;
-  onUpdate?: (index: number, updatedStep: IProcessStep) => void;
+  onUpdate?: (index: number, updatedStep: ProcessStep) => void;
   onRemove?: (index: number) => void;
 }
 
@@ -29,7 +28,7 @@ export function StepList({
 }: BaseStepListProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [editingStep, setEditingStep] = useState<IProcessStep | null>(null);
+  const [editingStep, setEditingStep] = useState<ProcessStep | null>(null);
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -41,7 +40,7 @@ export function StepList({
     }
   };
 
-  const handleEdit = (index: number, step: IProcessStep) => {
+  const handleEdit = (index: number, step: ProcessStep) => {
     setEditingIndex(index);
     setEditingStep({ ...step });
   };
@@ -59,7 +58,7 @@ export function StepList({
     setEditingStep(null);
   };
 
-  const handleStepClick = (step: IProcessStep) => {
+  const handleStepClick = (step: ProcessStep) => {
     if (!isEditable && onStepClick && processId) {
       onStepClick(processId, step.order!);
     }

@@ -1,14 +1,5 @@
-import { db } from "@/db";
-import { tags, commandTags } from "@/db/schema";
-import { and, eq, inArray } from "drizzle-orm";
-
-export interface ITag {
-  id: string;
-  name: string;
-  color: string | null;
-  userId: string;
-  createdAt: string | null;
-}
+import { supabase } from "@/supabase";
+import type { Tag, TagInsert, TagUpdate } from "@/types/STT";
 
 export interface ICreateTag {
   name: string;
@@ -19,37 +10,38 @@ export class TagService {
   /**
    * Get all tags for a user
    */
-  static async getUserTags(userId: string): Promise<ITag[]> {
-    try {
-      return await db
-        .select()
-        .from(tags)
-        .where(eq(tags.userId, userId));
-    } catch (error) {
+  static async getUserTags(userId: string): Promise<Tag[]> {
+    const { data, error } = await supabase
+      .from("tags")
+      .select()
+      .eq("user_id", userId);
+
+    if (error) {
       console.error("Error in getUserTags:", error);
       throw new Error("Failed to fetch user tags");
     }
+    return data ?? [];
   }
 
   /**
    * Create a new tag for a user
    */
-  static async createTag(userId: string, data: ICreateTag): Promise<ITag> {
-    try {
-      const [newTag] = await db
-        .insert(tags)
-        .values({
-          name: data.name,
-          color: data.color || "#6366f1",
-          userId,
-        })
-        .returning();
+  static async createTag(userId: string, data: ICreateTag): Promise<Tag> {
+    const { data: newTag, error } = await supabase
+      .from("tags")
+      .insert({
+        name: data.name,
+        color: data.color ?? "#6366f1",
+        user_id: userId,
+      } as TagInsert)
+      .select()
+      .single();
 
-      return newTag;
-    } catch (error) {
+    if (error) {
       console.error("Error in createTag:", error);
       throw new Error("Failed to create tag");
     }
+    return newTag as Tag;
   }
 
   /**
@@ -59,62 +51,75 @@ export class TagService {
     userId: string,
     tagId: string,
     data: Partial<ICreateTag>
-  ): Promise<ITag | null> {
-    try {
-      const [updatedTag] = await db
-        .update(tags)
-        .set({
-          ...(data.name && { name: data.name }),
-          ...(data.color && { color: data.color }),
-        })
-        .where(and(eq(tags.id, tagId), eq(tags.userId, userId)))
-        .returning();
+  ): Promise<Tag | null> {
+    const updatePayload: TagUpdate = {};
+    if (data.name !== undefined) updatePayload.name = data.name;
+    if (data.color !== undefined) updatePayload.color = data.color;
 
-      return updatedTag || null;
-    } catch (error) {
+    if (Object.keys(updatePayload).length === 0) {
+      const { data: existing } = await supabase
+        .from("tags")
+        .select()
+        .eq("id", tagId)
+        .eq("user_id", userId)
+        .maybeSingle();
+      return existing as Tag | null;
+    }
+
+    const { data: updated, error } = await supabase
+      .from("tags")
+      .update(updatePayload)
+      .eq("id", tagId)
+      .eq("user_id", userId)
+      .select()
+      .maybeSingle();
+
+    if (error) {
       console.error("Error in updateTag:", error);
       throw new Error("Failed to update tag");
     }
+    return updated as Tag | null;
   }
 
   /**
    * Delete a tag
    */
   static async deleteTag(userId: string, tagId: string): Promise<boolean> {
-    try {
-      const result = await db
-        .delete(tags)
-        .where(and(eq(tags.id, tagId), eq(tags.userId, userId)));
+    const { error } = await supabase
+      .from("tags")
+      .delete()
+      .eq("id", tagId)
+      .eq("user_id", userId);
 
-      return true;
-    } catch (error) {
+    if (error) {
       console.error("Error in deleteTag:", error);
       throw new Error("Failed to delete tag");
     }
+    return true;
   }
 
   /**
    * Get tags for a specific command
    */
-  static async getCommandTags(commandId: string): Promise<ITag[]> {
-    try {
-      const result = await db
-        .select({
-          id: tags.id,
-          name: tags.name,
-          color: tags.color,
-          userId: tags.userId,
-          createdAt: tags.createdAt,
-        })
-        .from(commandTags)
-        .innerJoin(tags, eq(commandTags.tagId, tags.id))
-        .where(eq(commandTags.commandId, commandId));
+  static async getCommandTags(commandId: string): Promise<Tag[]> {
+    const { data: links, error: linksError } = await supabase
+      .from("command_tags")
+      .select("tag_id")
+      .eq("command_id", commandId);
 
-      return result;
-    } catch (error) {
+    if (linksError || !links?.length) return [];
+
+    const tagIds = links.map((l) => l.tag_id);
+    const { data: tags, error } = await supabase
+      .from("tags")
+      .select()
+      .in("id", tagIds);
+
+    if (error) {
       console.error("Error in getCommandTags:", error);
       throw new Error("Failed to fetch command tags");
     }
+    return (tags ?? []) as Tag[];
   }
 
   /**
@@ -124,16 +129,13 @@ export class TagService {
     commandId: string,
     tagIds: string[]
   ): Promise<void> {
-    try {
-      if (tagIds.length === 0) return;
+    if (tagIds.length === 0) return;
 
-      const values = tagIds.map((tagId) => ({
-        commandId,
-        tagId,
-      }));
+    const rows = tagIds.map((tag_id) => ({ command_id: commandId, tag_id }));
 
-      await db.insert(commandTags).values(values).onConflictDoNothing();
-    } catch (error) {
+    const { error } = await supabase.from("command_tags").insert(rows);
+
+    if (error && error.code !== "23505") {
       console.error("Error in addTagsToCommand:", error);
       throw new Error("Failed to add tags to command");
     }
@@ -146,16 +148,13 @@ export class TagService {
     commandId: string,
     tagId: string
   ): Promise<void> {
-    try {
-      await db
-        .delete(commandTags)
-        .where(
-          and(
-            eq(commandTags.commandId, commandId),
-            eq(commandTags.tagId, tagId)
-          )
-        );
-    } catch (error) {
+    const { error } = await supabase
+      .from("command_tags")
+      .delete()
+      .eq("command_id", commandId)
+      .eq("tag_id", tagId);
+
+    if (error) {
       console.error("Error in removeTagFromCommand:", error);
       throw new Error("Failed to remove tag from command");
     }
@@ -168,19 +167,18 @@ export class TagService {
     commandId: string,
     tagIds: string[]
   ): Promise<void> {
-    try {
-      // Delete existing tags
-      await db
-        .delete(commandTags)
-        .where(eq(commandTags.commandId, commandId));
+    const { error: deleteError } = await supabase
+      .from("command_tags")
+      .delete()
+      .eq("command_id", commandId);
 
-      // Add new tags
-      if (tagIds.length > 0) {
-        await this.addTagsToCommand(commandId, tagIds);
-      }
-    } catch (error) {
-      console.error("Error in setCommandTags:", error);
+    if (deleteError) {
+      console.error("Error in setCommandTags (delete):", deleteError);
       throw new Error("Failed to set command tags");
+    }
+
+    if (tagIds.length > 0) {
+      await this.addTagsToCommand(commandId, tagIds);
     }
   }
 
@@ -188,16 +186,15 @@ export class TagService {
    * Get commands by tag
    */
   static async getCommandIdsByTag(tagId: string): Promise<string[]> {
-    try {
-      const result = await db
-        .select({ commandId: commandTags.commandId })
-        .from(commandTags)
-        .where(eq(commandTags.tagId, tagId));
+    const { data, error } = await supabase
+      .from("command_tags")
+      .select("command_id")
+      .eq("tag_id", tagId);
 
-      return result.map((r) => r.commandId);
-    } catch (error) {
+    if (error) {
       console.error("Error in getCommandIdsByTag:", error);
       throw new Error("Failed to fetch commands by tag");
     }
+    return (data ?? []).map((r) => r.command_id);
   }
 }

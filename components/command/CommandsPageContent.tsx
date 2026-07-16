@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import CommandSearch from "./CommandSearch";
 import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";
 import CommandList from "./CommandList";
-import { ICategory } from "@/app/models/Category";
-import { IGetCommand } from "@/app/models/Command";
+import { Category } from "@/types/STT";
+import { useCommandsQuery, useUserIdQuery } from "@/hooks/query";
+import { commandQueryKeys } from "@/app/services/commandService";
 
 interface CommandsPageContentProps {
   commandsEndpoint: string;
@@ -17,67 +19,25 @@ export default function CommandsPageContent({
   commandsEndpoint,
   shouldFetchUserId = false,
 }: CommandsPageContentProps) {
-  const [selectedCategory, setSelectedCategory] = useState<ICategory>({
+  const queryClient = useQueryClient();
+  const [selectedCategory, setSelectedCategory] = useState<Pick<Category, "id" | "name">>({
     id: "all",
     name: "all",
   });
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showUserCommandsOnly, setShowUserCommandsOnly] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [categories, setCategories] = useState<ICategory[]>([
-    { id: "all", name: "all" },
-  ]);
-  const [commands, setCommands] = useState<IGetCommand[]>([]);
-  const [userId, setUserId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        // Fetch user ID if needed
-        if (shouldFetchUserId) {
-          const userIdResponse = await fetch("/api/user-id");
-          const userIdData = await userIdResponse.json();
-          if (userIdData.success) {
-            setUserId(userIdData.data);
-          }
-        }
+  const { data: userId = null } = useUserIdQuery(shouldFetchUserId);
+  const { data: commands = [], isLoading } = useCommandsQuery(commandsEndpoint);
 
-        // Fetch commands
-        const commandsResponse = await fetch(commandsEndpoint);
-        const commandsData = await commandsResponse.json();
-
-        if (commandsData.success) {
-          setCommands(commandsData.data);
-        }
-
-        // ensure we only have unique categories
-        const usedCategoryIds: ICategory[] = Array.from(
-          new Set(
-            commandsData.data
-              .filter((cmd: IGetCommand) => cmd.category !== null)
-              .map((cmd: IGetCommand) => cmd.category!.id)
-          )
-        )
-          .map(
-            (categoryId) =>
-              commandsData.data.find(
-                (cmd: IGetCommand) => cmd.category?.id === categoryId
-              )?.category!
-          )
-          .filter((category): category is ICategory => category !== undefined);
-
-        setCategories([{ id: "all", name: "all" }, ...usedCategoryIds]);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [commandsEndpoint, shouldFetchUserId, userId]);
+  const categories = useMemo(() => {
+    const byId = new Map<string, Pick<Category, "id" | "name">>();
+    for (const cmd of commands) {
+      if (cmd.category?.id) byId.set(cmd.category.id, cmd.category);
+    }
+    return [{ id: "all", name: "all" }, ...Array.from(byId.values())];
+  }, [commands]);
 
   useEffect(() => {
     const favorites = commands
@@ -86,7 +46,9 @@ export default function CommandsPageContent({
     localStorage.setItem("favoriteCommands", JSON.stringify(favorites));
   }, [commands]);
 
-  const handleCategoryChange = (category: ICategory) => {
+
+
+  const handleCategoryChange = (category: Pick<Category, "id" | "name">) => {
     setSelectedCategory(category);
   };
 
@@ -107,11 +69,7 @@ export default function CommandsPageContent({
       });
 
       if (response.ok) {
-        setCommands(
-          commands.map((cmd) =>
-            cmd.id === commandId ? { ...cmd, isFavorite: !cmd.isFavorite } : cmd
-          )
-        );
+        await queryClient.invalidateQueries({ queryKey: commandQueryKeys.list(commandsEndpoint) });
       }
     } catch (error) {
       console.error("Error toggling favorite:", error);

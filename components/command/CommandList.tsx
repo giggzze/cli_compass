@@ -2,10 +2,10 @@ import { useState } from "react";
 import Loading from "@/components/shared/Loading";
 import { UserBadge } from "@/components/shared/UserBadge";
 import { PrivacyBadge } from "@/components/shared/PrivacyBadge";
-import { IGetCommand } from "@/app/models";
+import { CommandListItem } from "@/types/STT";
 
 interface CommandListProps {
-  commands: IGetCommand[];
+  commands: CommandListItem[];
   isLoading: boolean;
   showFavoritesToggle: boolean;
   showFavoritesOnly: boolean;
@@ -61,7 +61,7 @@ export default function CommandList({
                           username={command.user?.username}
                         />
                       )}
-                      <PrivacyBadge isPrivate={command.isPrivate} />
+                      <PrivacyBadge isPrivate={command.is_private} />
                     </div>
                     <h3 className="font-medium text-gray-900">
                       {command.description}

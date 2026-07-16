@@ -1,85 +1,50 @@
-import { db } from "@/db";
-import { categories } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { NotFoundError, ValidationError } from "./errorService";
-import {ICategory, ICategoryIdentifier} from "@/app/models";
+import { Category, CategoryInsert } from "@/types/STT";
+import { supabase } from "@/supabase";
 
 export class CategoryService {
-	static async getAllCategories(): Promise<ICategory[]> {
-		try {
-			// retrieve and return all categories
-			return await db.select().from(categories);
-		} catch (error) {
-			if (error instanceof NotFoundError) {
-				throw error;
-			}
-			console.error("Error in getAllCategories:", error);
-			throw new ValidationError("Failed to fetch categories");
-		}
-	}
+  /**
+   *
+   * @returns return all the categories stored in the DB
+   */
+  static async getAllCategories(): Promise<Category[]> {
+    const { data, error } = await supabase.from("categories").select();
 
-	static async createCategory(newCategory: string): Promise<ICategory> {
-		try {
-			// make sure name is not empty
-			if (!newCategory) throw new ValidationError("Category name is required");
+    if (error) return [] as Category[];
 
-			// check if category already exists
-			const exists = await this.categoryExists({
-				name: newCategory,
-			});
-			if (exists.exists) {
-				return exists.category![0];
-			}
+    return data;
+  }
 
-			// create new category
-			const [createdCategory] = await db
-				.insert(categories)
-				.values({
-					name: newCategory.trim(),
-				})
-				.returning();
+  /**
+   *
+   * @param newCategory Category that should be created
+   * @returns  The new Category after it has been stored in the DB
+   */
+  static async createCategory(newCategory: string): Promise<Category> {
+    const existingCategory = await this.categoryExists(newCategory);
+    if (existingCategory) return existingCategory;
 
-			return createdCategory
-		} catch (error) {
-			if (error instanceof ValidationError) {
-				throw error;
-			}
-			console.error("Error in createCategory:", error);
-			throw new ValidationError("Failed to create category");
-		}
-	}
+    const { data, error } = await supabase
+      .from("categories")
+      .insert({ name: newCategory } as CategoryInsert)
+      .select()
+      .single();
 
-	static async categoryExists(identifier: ICategoryIdentifier) {
-		try {
-			// check what kind of identifier is provided
-			if (!identifier.id && !identifier.name) {
-				throw new ValidationError(
-					"Either category ID or name is required"
-				);
-			}
+    if (error) {
+      console.error("categoryService.createCategory error:", error);
+      throw new Error(error.message);
+    }
 
-			// get all categories
-			const query = db.select().from(categories).limit(1);
+    return data as Category;
+  }
 
-			// check if category exists depending on identifier
-			if (identifier.id) {
-				query.where(eq(categories.id, identifier.id));
-			} else if (identifier.name) {
-				query.where(eq(categories.name, identifier.name));
-			}
+  static async categoryExists(name: string): Promise<Category | null> {
+    const { data, error } = await supabase
+      .from("categories")
+      .select()
+      .eq("name", name)
+      .maybeSingle();
 
-			const category = await query;
-			if (category.length > 0)
-				return { exists: true, category: category };
-			return {
-				exists: false,
-			};
-		} catch (error) {
-			if (error instanceof ValidationError) {
-				throw error;
-			}
-			console.error("Error in categoryExists:", error);
-			throw new ValidationError("Failed to check category existence");
-		}
-	}
+    if (error) return null;
+    return data;
+  }
 }

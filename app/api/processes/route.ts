@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { ProcessService } from "@/app/services/processService";
-import { IProcess } from "@/app/models/Process";
+import {Process} from "@/types/STT";
 
 export async function GET() {
   try {
     // Fetch all processes with their steps
-    const processes: IProcess[] = await ProcessService.getPublicProcesses();
+    const processes: Process[] = await ProcessService.getPublicProcesses();
 
     return NextResponse.json({
       success: true,

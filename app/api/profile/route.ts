@@ -1,5 +1,6 @@
 import { NextResponse, NextRequest } from "next/server";
 import { UserService } from "@/app/services/userService";
+import {ProfileInsert} from "@/types/STT";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +12,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Create new profile
-    if (await UserService.createProfile(userId, username, userImageUrl)) {
+    const profile : ProfileInsert = {
+      id: userId,
+      username,
+      avatar_url: userImageUrl,
+    }
+    if (await UserService.createProfile(profile)) {
       return NextResponse.json({ success: true });
     }
 
