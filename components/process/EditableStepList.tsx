@@ -1,12 +1,10 @@
-"use client";
-
-import { IProcessStep } from "@/app/models/Process";
 import { StepList } from "./StepList";
+import {ProcessStep} from "@/types/STT";
 
 interface EditableStepListProps {
-  steps: IProcessStep[];
+  steps: ProcessStep[];
   onRemove: (index: number) => void;
-  onUpdate: (index: number, updatedStep: IProcessStep) => void;
+  onUpdate: (index: number, updatedStep: ProcessStep) => void;
 }
 
 export function EditableStepList({

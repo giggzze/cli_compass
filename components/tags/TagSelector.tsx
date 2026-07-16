@@ -1,7 +1,6 @@
-"use client";
 
-import { useState, useEffect } from "react";
-import { Plus, Check, X } from "lucide-react";
+import { useState} from "react";
+import { Plus, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { TagBadge } from "./TagBadge";

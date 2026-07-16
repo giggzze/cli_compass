@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ProcessForm } from "@/components/process/ProcessForm";
-import { IProcessStep } from "@/app/models/Process";
 import Loading from "@/components/shared/Loading";
+import {ProcessStep} from "@/types/STT";
 
 export default function EditProcessPage({
 	params,
@@ -15,7 +15,7 @@ export default function EditProcessPage({
 	const [isLoading, setIsLoading] = useState(true);
 	const [initialData, setInitialData] = useState<{
 		title: string;
-		steps: IProcessStep[];
+		steps: ProcessStep[];
 	} | null>(null);
 
 	useEffect(() => {

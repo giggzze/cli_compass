@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
 import { ProcessService } from "@/app/services/processService";
-import { IProcess } from "@/app/models/Process";
+import {Process} from "@/types/STT";
 
 export async function GET() {
   return withAuth(async (userId) => {
     try {
       // Fetch all processes with their steps
-      const processes: IProcess[] = await ProcessService.getPrivateProcesses(
+      const processes: Process[] = await ProcessService.getPrivateProcesses(
         userId
       );
 

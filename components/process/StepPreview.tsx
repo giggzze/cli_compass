@@ -1,10 +1,10 @@
 "use client";
 
-import { IProcessStep } from "@/app/models/Process";
 import { StepList } from "./StepList";
+import {ProcessStep} from "@/types/STT";
 
 interface StepPreviewProps {
-  steps: IProcessStep[];
+  steps: ProcessStep[];
 }
 
 export function StepPreview({ steps }: StepPreviewProps) {

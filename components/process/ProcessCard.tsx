@@ -1,4 +1,3 @@
-"use client";
 
 import {
   Edit,
@@ -11,15 +10,15 @@ import {
 import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { StepList } from "./StepList";
-import { IProcessStep } from "@/app/models/Process";
 import { Button } from "../ui/button";
 import { UserBadge } from "../shared/UserBadge";
 import { PrivacyBadge } from "../shared/PrivacyBadge";
+import {ProcessStep} from "@/types/STT";
 
 interface ProcessCardProps {
   id: string;
   title: string;
-  steps: IProcessStep[];
+  steps: ProcessStep[];
   isExpanded: boolean;
   currentStep: number | undefined;
   createdAt: string;

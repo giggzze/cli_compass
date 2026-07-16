@@ -6,8 +6,8 @@ import CommandSearch from "./CommandSearch";
 import CommandFilters from "./CommandFilters";
 import CategoryFilter from "./CategoryFilter";
 import CommandList from "./CommandList";
-import { Category, CategoryInsert } from "@/types/STT";
-import { useCommandsQuery, useUserIdQuery, type CommandListItem } from "@/hooks/query";
+import { Category } from "@/types/STT";
+import { useCommandsQuery, useUserIdQuery } from "@/hooks/query";
 import { commandQueryKeys } from "@/app/services/commandService";
 
 interface CommandsPageContentProps {
@@ -20,7 +20,7 @@ export default function CommandsPageContent({
   shouldFetchUserId = false,
 }: CommandsPageContentProps) {
   const queryClient = useQueryClient();
-  const [selectedCategory, setSelectedCategory] = useState<CategoryInsert>({
+  const [selectedCategory, setSelectedCategory] = useState<Pick<Category, "id" | "name">>({
     id: "all",
     name: "all",
   });
@@ -31,21 +31,12 @@ export default function CommandsPageContent({
   const { data: userId = null } = useUserIdQuery(shouldFetchUserId);
   const { data: commands = [], isLoading } = useCommandsQuery(commandsEndpoint);
 
-  const categories = useMemo((): CategoryInsert[] => {
-    const withCategory = commands as CommandListItem[];
-    const usedCategoryIds: Category[] = Array.from(
-      new Set(
-        withCategory
-          .filter((cmd) => cmd.category_id != null)
-          .map((cmd) => cmd.category_id)
-      )
-    )
-      .map(
-        (categoryId) =>
-          withCategory.find((cmd) => cmd.category?.id === categoryId)?.category
-      )
-      .filter((c): c is Category => c != null);
-    return [{ id: "all", name: "all" }, ...usedCategoryIds];
+  const categories = useMemo(() => {
+    const byId = new Map<string, Pick<Category, "id" | "name">>();
+    for (const cmd of commands) {
+      if (cmd.category?.id) byId.set(cmd.category.id, cmd.category);
+    }
+    return [{ id: "all", name: "all" }, ...Array.from(byId.values())];
   }, [commands]);
 
   useEffect(() => {
@@ -57,7 +48,7 @@ export default function CommandsPageContent({
 
 
 
-  const handleCategoryChange = (category: Category | CategoryInsert) => {
+  const handleCategoryChange = (category: Pick<Category, "id" | "name">) => {
     setSelectedCategory(category);
   };
 

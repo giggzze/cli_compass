@@ -1,4 +1,3 @@
-"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import Fuse, { IFuseOptions } from "fuse.js";
