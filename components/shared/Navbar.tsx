@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton, SignInButton, useAuth } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -18,11 +18,7 @@ const Logo = () => (
 
 const PublicNavigation = ({ pathname }: { pathname: string }) => {
   if (pathname === "/") {
-    return (
-      <SignInButton mode="modal" afterSignInUrl="/private/command">
-        <Button>Sign In</Button>
-      </SignInButton>
-    );
+    return null;
   }
 
   return (
@@ -123,13 +119,15 @@ function Navbar() {
         <div className="flex justify-between items-center">
           <Logo />
           
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="sm:hidden p-2 rounded-md hover:bg-gray-100"
-          >
-            <Menu className="h-6 w-6" />
-          </button>
+          {/* Mobile menu button — hidden on landing for guests (no nav items) */}
+          {(isSignedIn || pathname !== "/") && (
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="sm:hidden p-2 rounded-md hover:bg-gray-100"
+            >
+              <Menu className="h-6 w-6" />
+            </button>
+          )}
 
           {/* Desktop navigation */}
           <div className="hidden sm:flex items-center gap-4">
